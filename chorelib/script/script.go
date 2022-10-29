@@ -9,7 +9,6 @@ import (
 
 	"github.com/9seconds/chore/chorelib"
 	"github.com/9seconds/chore/chorelib/config"
-	"golang.org/x/sys/unix"
 )
 
 type Script struct {
@@ -54,7 +53,7 @@ func (s Script) IsValid() error {
 		return fmt.Errorf("cannot stat script %s: %w", s.Path(), err)
 	case stat.IsDir():
 		return fmt.Errorf("script %s is a directory", s.Path())
-	case unix.Access(s.Path(), unix.X_OK) != nil:
+	case isExecutable(s.Path()) != nil:
 		return fmt.Errorf("script %s is not executable: %v", s.Path(), stat.Mode())
 	}
 
