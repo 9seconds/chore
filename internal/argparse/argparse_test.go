@@ -110,8 +110,8 @@ func (suite *ParseTestSuite) TestChecksum() {
 	suite.NoError(err)
 
 	suite.Equal(
-		"8358d19726018bff4a4e0cacd0608f5b4190c6b2d413ab182bc536e660f14b7d",
-		hex.EncodeToString(args.Checksum([]byte{1, 2, 3})))
+		"1616b0d3a9dd205c42698c5bd8c6f56c155eea50fa1a7698c8094dc98b833fb6",
+		hex.EncodeToString(args.Checksum()))
 }
 
 func TestSuite(t *testing.T) {

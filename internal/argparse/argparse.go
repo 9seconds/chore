@@ -21,7 +21,7 @@ type ParsedArgs struct {
 	Positional []string
 }
 
-func (p ParsedArgs) Checksum(seed []byte) []byte {
+func (p ParsedArgs) Checksum() []byte {
 	argNames := make([]string, 0, len(p.Keywords))
 
 	for k := range p.Keywords {
@@ -31,9 +31,6 @@ func (p ParsedArgs) Checksum(seed []byte) []byte {
 	sort.Strings(argNames)
 
 	mixer := sha256.New()
-	binary.Write(mixer, binary.LittleEndian, uint64(len(seed)))
-	mixer.Write(seed)
-
 	binary.Write(mixer, binary.LittleEndian, uint64(len(argNames)))
 
 	for _, v := range argNames {

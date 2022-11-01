@@ -1,10 +1,13 @@
 package script
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
+	"sync"
 
+	"github.com/9seconds/chore/internal/argparse"
 	"github.com/9seconds/chore/internal/config"
 	"github.com/9seconds/chore/internal/env"
 	"github.com/adrg/xdg"
@@ -52,6 +55,40 @@ func (s Script) RuntimePath() string {
 
 func (s Script) TempPath() string {
 	return s.tmpDir
+}
+
+func (s Script) Environ(ctx context.Context, args argparse.ParsedArgs) []string {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	environ := []string{
+		env.MakeValue(env.EnvNamespace, s.Namespace),
+		env.MakeValue(env.EnvCaller, s.Executable),
+		env.MakeValue(env.EnvPathCaller, s.Path()),
+		env.MakeValue(env.EnvPathData, s.DataPath()),
+		env.MakeValue(env.EnvPathCache, s.CachePath()),
+		env.MakeValue(env.EnvPathState, s.StatePath()),
+		env.MakeValue(env.EnvPathRuntime, s.RuntimePath()),
+		env.MakeValue(env.EnvPathTemp, s.TempPath()),
+	}
+
+	wg := &sync.WaitGroup{}
+	values := make(chan string, 1)
+
+	env.GenerateTime(ctx, values, wg)
+	env.GenerateMachineId(ctx, values, wg)
+	env.GenerateIds(ctx, values, wg, s.Path(), args)
+
+	go func() {
+		wg.Wait()
+		close(values)
+	}()
+
+	for value := range values {
+		environ = append(environ, value)
+	}
+
+	return environ
 }
 
 func New(namespace, executable string) (Script, error) {
