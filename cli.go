@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/9seconds/chore/chorelib/env"
+	"github.com/9seconds/chore/internal/env"
 	"github.com/alecthomas/kong"
 )
 
@@ -22,13 +22,15 @@ type CliNamespace struct {
 func (c *CliNamespace) UnmarshalText(b []byte) error {
 	text := string(b)
 
-	if text == "." {
-		value, ok := os.LookupEnv(env.EnvNamespace)
-		if !ok {
-			return fmt.Errorf("Namespace is dotted but no value for %s is provided", env.EnvNamespace)
-		}
+	if text != "." {
+		c.Value = text
 
-		text = value
+		return nil
+	}
+
+	text, ok := os.LookupEnv(env.EnvNamespace)
+	if !ok {
+		return fmt.Errorf("Namespace is dotted but no value for %s is provided", env.EnvNamespace)
 	}
 
 	c.Value = text

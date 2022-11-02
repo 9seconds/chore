@@ -6,8 +6,9 @@ import (
 	"path/filepath"
 	"sort"
 
-	"github.com/9seconds/chore/chorelib/env"
-	"github.com/9seconds/chore/chorelib/script"
+	"github.com/9seconds/chore/internal/env"
+	"github.com/9seconds/chore/internal/script"
+	"github.com/adrg/xdg"
 )
 
 type CliCmdList struct {
@@ -23,9 +24,10 @@ func (c *CliCmdList) Run(ctx Context) error {
 }
 
 func (c *CliCmdList) listNamespaces() error {
-	entries, err := os.ReadDir(env.Home)
+	choreDir := filepath.Join(xdg.ConfigHome, env.ChoreDir)
+	entries, err := os.ReadDir(choreDir)
 	if err != nil {
-		return fmt.Errorf("cannot read home %s: %w", env.Home, err)
+		return fmt.Errorf("cannot read chore dir %s: %w", choreDir, err)
 	}
 
 	names := make([]string, 0, len(entries))
@@ -46,7 +48,7 @@ func (c *CliCmdList) listNamespaces() error {
 }
 
 func (c *CliCmdList) listScripts() error {
-	path := filepath.Join(env.Home, c.Namespace.Value)
+	path := filepath.Join(xdg.ConfigHome, env.ChoreDir, c.Namespace.Value)
 
 	entries, err := os.ReadDir(path)
 	if err != nil {
@@ -56,13 +58,8 @@ func (c *CliCmdList) listScripts() error {
 	names := make([]string, 0, len(entries))
 
 	for _, v := range entries {
-		vv := script.Script{
-			Namespace:  c.Namespace.Value,
-			Executable: v.Name(),
-		}
-
-		if vv.IsValid() != nil {
-			names = append(names, vv.String())
+		if _, err := script.New(c.Namespace.Value, v.Name()); err != nil {
+			names = append(names, v.Name())
 		}
 	}
 
