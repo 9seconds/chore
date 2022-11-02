@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 
 	"github.com/9seconds/chore/internal/argparse"
@@ -72,12 +73,23 @@ func (s Script) Environ(ctx context.Context, args argparse.ParsedArgs) []string 
 		env.MakeValue(env.EnvPathTemp, s.TempPath()),
 	}
 
+	for k, v := range args.Keywords {
+		environ = append(
+			environ,
+			env.MakeValue(env.EnvArgPrefix+strings.ToUpper(k), v))
+	}
+
 	wg := &sync.WaitGroup{}
 	values := make(chan string, 1)
 
 	env.GenerateTime(ctx, values, wg)
 	env.GenerateMachineId(ctx, values, wg)
 	env.GenerateIds(ctx, values, wg, s.Path(), args)
+
+	if s.Config.Network {
+		env.GenerateNetwork(ctx, values, wg)
+		env.GenerateNetworkIPv6(ctx, values, wg)
+	}
 
 	go func() {
 		wg.Wait()

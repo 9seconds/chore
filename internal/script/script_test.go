@@ -1,14 +1,20 @@
 package script_test
 
 import (
+	"context"
 	"encoding/json"
+	"net/http"
 	"os"
 	"path/filepath"
+	"regexp"
+	"strings"
 	"testing"
 
+	"github.com/9seconds/chore/internal/argparse"
 	"github.com/9seconds/chore/internal/env"
 	"github.com/9seconds/chore/internal/script"
 	"github.com/adrg/xdg"
+	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -137,6 +143,74 @@ func (suite *ScriptTestSuite) TestString() {
 	})
 
 	suite.NotEmpty(s.String())
+}
+
+func (suite *ScriptTestSuite) TestEnviron() {
+	httpmock.ActivateNonDefault(env.HTTPClientV4)
+	httpmock.ActivateNonDefault(env.HTTPClientV6)
+	httpmock.RegisterRegexpResponder(
+		http.MethodGet,
+		regexp.MustCompile(".*?"),
+		httpmock.NewBytesResponder(http.StatusInternalServerError, nil))
+	suite.T().Cleanup(httpmock.DeactivateAndReset)
+
+	suite.createScript("xx", "1", "echo 1")
+
+	s, err := script.New("xx", "1")
+	suite.NoError(err)
+
+	suite.T().Cleanup(func() {
+		suite.NoError(os.RemoveAll(s.TempPath()))
+	})
+
+	s.Config.Network = true
+	environ := s.Environ(context.Background(), argparse.ParsedArgs{
+		Keywords: map[string]string{
+			"k":  "v",
+			"XX": "y",
+		},
+		Positional: []string{"a", "b", "c"},
+	})
+
+	data := map[string]string{}
+
+	for _, v := range environ {
+		name, value, found := strings.Cut(v, "=")
+		require.True(suite.T(), found)
+		data[name] = value
+	}
+
+	suite.Len(data, 30)
+	suite.Equal(s.Namespace, data[env.EnvNamespace])
+	suite.Equal(s.Executable, data[env.EnvCaller])
+	suite.Equal(s.Path(), data[env.EnvPathCaller])
+	suite.Equal(s.DataPath(), data[env.EnvPathData])
+	suite.Equal(s.CachePath(), data[env.EnvPathCache])
+	suite.Equal(s.StatePath(), data[env.EnvPathState])
+	suite.Equal(s.RuntimePath(), data[env.EnvPathRuntime])
+	suite.Equal(s.TempPath(), data[env.EnvPathTemp])
+	suite.Equal("v", data[env.EnvArgPrefix+"K"])
+	suite.Equal("y", data[env.EnvArgPrefix+"XX"])
+	suite.Contains(data, env.EnvIdUnique)
+	suite.Contains(data, env.EnvIdChainUnique)
+	suite.Contains(data, env.EnvIdIsolated)
+	suite.Contains(data, env.EnvIdChainIsolated)
+	suite.Contains(data, env.EnvMachineId)
+	suite.Contains(data, env.EnvStartedAtRFC3339)
+	suite.Contains(data, env.EnvStartedAtUnix)
+	suite.Contains(data, env.EnvStartedAtYear)
+	suite.Contains(data, env.EnvStartedAtYearDay)
+	suite.Contains(data, env.EnvStartedAtDay)
+	suite.Contains(data, env.EnvStartedAtMonth)
+	suite.Contains(data, env.EnvStartedAtMonthStr)
+	suite.Contains(data, env.EnvStartedAtHour)
+	suite.Contains(data, env.EnvStartedAtMinute)
+	suite.Contains(data, env.EnvStartedAtSecond)
+	suite.Contains(data, env.EnvStartedAtNanosecond)
+	suite.Contains(data, env.EnvStartedAtTimezone)
+	suite.Contains(data, env.EnvStartedAtOffset)
+	suite.Contains(data, env.EnvStartedAtWeekday)
+	suite.Contains(data, env.EnvStartedAtWeekdayStr)
 }
 
 func TestScript(t *testing.T) {
