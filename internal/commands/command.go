@@ -28,3 +28,7 @@ func (e ExitError) Error() string {
 		e.Result.ExitCode,
 		e.Result.ElapsedTime)
 }
+
+func (e ExitError) Code() int {
+	return e.Result.ExitCode
+}

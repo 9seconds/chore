@@ -23,7 +23,8 @@ type OSTestSuite struct {
 	ctx       context.Context
 	ctxCancel context.CancelFunc
 	s         script.Script
-	args      argparse.ParsedArgs
+	args      []string
+	environ   []string
 
 	stdout bytes.Buffer
 	stderr bytes.Buffer
@@ -100,13 +101,16 @@ func (suite *OSTestSuite) SetupTest() {
 	s, err = script.New("x", "y")
 	require.NoError(t, err)
 
-	suite.s = s
-	suite.args = argparse.ParsedArgs{
+	parsedArgs := argparse.ParsedArgs{
 		Keywords: map[string]string{
 			"k": "v",
 		},
 		Positional: []string{"a", "b"},
 	}
+
+	suite.s = s
+	suite.environ = s.Environ(ctx, parsedArgs)
+	suite.args = parsedArgs.Positional
 }
 
 func (suite *OSTestSuite) WriteScriptContent(content string) {
@@ -119,7 +123,7 @@ func (suite *OSTestSuite) WriteScriptContent(content string) {
 }
 
 func (suite *OSTestSuite) TestExecuteCommand() {
-	cmd := commands.NewOS(suite.ctx, suite.s, suite.args)
+	cmd := commands.NewOS(suite.ctx, suite.s, suite.environ, suite.args)
 
 	suite.Equal(0, cmd.Pid())
 
@@ -137,7 +141,7 @@ func (suite *OSTestSuite) TestExecuteCommand() {
 }
 
 func (suite *OSTestSuite) TestExitCode() {
-	cmd := commands.NewOS(suite.ctx, suite.s, suite.args)
+	cmd := commands.NewOS(suite.ctx, suite.s, suite.environ, suite.args)
 	suite.WriteScriptContent("exit 3")
 
 	suite.NoError(cmd.Start())

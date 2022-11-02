@@ -5,12 +5,15 @@ import (
 	"os"
 	"text/template"
 
-	"github.com/9seconds/chore/chorelib/script"
+	"github.com/9seconds/chore/internal/script"
 )
 
 const (
 	cliCmdShowText = `Path:           {{ .Path }}
-Persistent dir: {{ .PersistentDir  }}
+Data path:      {{ .DataPath  }}
+Cache path:     {{ .CachePath  }}
+State path:     {{ .StatePath  }}
+Runtime path:   {{ .RuntimePath  }}
 Network:        {{ print .Config.Network }}
 {{ if .Config.Description }}
 {{ .Config.Description }}
@@ -33,20 +36,12 @@ type CliCmdShow struct {
 }
 
 func (c *CliCmdShow) Run(ctx Context) error {
-	executable := script.Script{
-		Namespace:  c.Namespace.Value,
-		Executable: c.Script,
-	}
-
-	if err := executable.IsValid(); err != nil {
-		return fmt.Errorf("script is invalid: %w", err)
-	}
-
-	if err := executable.Init(); err != nil {
+	executable, err := script.New(c.Namespace.Value, c.Script)
+	if err != nil {
 		return fmt.Errorf("cannot initialize script: %w", err)
 	}
 
-	defer executable.Cleanup()
+	defer os.RemoveAll(executable.TempPath())
 
 	cliCmdShotTemplate.Execute(os.Stdout, executable)
 

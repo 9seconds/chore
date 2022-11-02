@@ -1,12 +1,14 @@
 package main
 
 import (
-	"errors"
+	"context"
 	"io"
 	"log"
 	"os"
+	"os/signal"
+	"syscall"
 
-	"github.com/9seconds/chore/chorelib"
+	"github.com/9seconds/chore/internal/commands"
 	"github.com/alecthomas/kong"
 )
 
@@ -32,7 +34,11 @@ func main() {
 		log.SetOutput(io.Discard)
 	}
 
-	appCtx, cancel := makeMainContext()
+	appCtx, cancel := signal.NotifyContext(
+		context.Background(),
+		syscall.SIGINT,
+		syscall.SIGTERM,
+		syscall.SIGQUIT)
 	defer cancel()
 
 	go func() {
@@ -40,14 +46,10 @@ func main() {
 		log.Println("application context is closed")
 	}()
 
-	if err := os.MkdirAll(chorelib.Home, 0750); err != nil {
-		log.Fatalf("cannot create home directory %s: %s", chorelib.Home, err.Error())
-	}
-
 	err := cliCtx.Run(Context{appCtx})
 
-	if errors.Is(err, scriptExitError{}) {
-		os.Exit(err.(scriptExitError).code)
+	if val, ok := err.(commands.ExitError); ok {
+		os.Exit(val.Code())
 	}
 
 	cliCtx.FatalIfErrorf(err)

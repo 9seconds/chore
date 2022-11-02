@@ -10,7 +10,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/9seconds/chore/internal/argparse"
 	"github.com/9seconds/chore/internal/script"
 )
 
@@ -109,11 +108,11 @@ func (o *osCommand) Wait() (ExecutionResult, error) {
 	return result, o.finishErr
 }
 
-func NewOS(ctx context.Context, script script.Script, args argparse.ParsedArgs) Command {
+func NewOS(ctx context.Context, script script.Script, environ, args []string) Command {
 	ctx, cancel := context.WithCancel(ctx)
 
-	cmd := exec.CommandContext(ctx, script.Path(), args.Positional...)
-	cmd.Env = append(os.Environ(), script.Environ(ctx, args)...)
+	cmd := exec.CommandContext(ctx, script.Path(), args...)
+	cmd.Env = append(os.Environ(), environ...)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr

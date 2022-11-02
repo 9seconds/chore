@@ -4,20 +4,11 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"os/exec"
-	"time"
 
-	"github.com/9seconds/chore/chorelib/env"
-	"github.com/9seconds/chore/chorelib/script"
+	"github.com/9seconds/chore/internal/argparse"
+	"github.com/9seconds/chore/internal/commands"
+	"github.com/9seconds/chore/internal/script"
 )
-
-type scriptExitError struct {
-	code int
-}
-
-func (s scriptExitError) Error() string {
-	return fmt.Sprintf("exit with code %d", s.code)
-}
 
 type CliCmdRun struct {
 	Namespace CliNamespace `arg:"" help:"Script namespace."`
@@ -26,72 +17,46 @@ type CliCmdRun struct {
 }
 
 func (c *CliCmdRun) Run(ctx Context) error {
-	executable := script.Script{
-		Namespace:  c.Namespace.Value,
-		Executable: c.Script,
-	}
-
-	if err := executable.IsValid(); err != nil {
-		return fmt.Errorf("script is invalid: %w", err)
-	}
-
-	if err := executable.Init(); err != nil {
+	executable, err := script.New(c.Namespace.Value, c.Script)
+	if err != nil {
 		return fmt.Errorf("cannot initialize script: %w", err)
 	}
 
-	defer executable.Cleanup()
+	defer os.RemoveAll(executable.TempPath())
 
-	if err := os.MkdirAll(executable.PersistentDir(), 0750); err != nil {
-		return fmt.Errorf(
-			"cannot ensure persistent dir %s: %w",
-			executable.PersistentDir(),
-			err)
-	}
-
-	environ, err := env.MakeEnviron(ctx, executable, c.Args)
+	args, err := argparse.Parse(executable.Config.Parameters, c.Args)
 	if err != nil {
-		return fmt.Errorf("cannot generate environment variables: %w", err)
+		return fmt.Errorf("cannot parse arguments: %w", err)
 	}
 
-	log.Printf(
-		"run: namespace=%s, executable=%s, args=%v",
-		executable.Namespace,
-		executable.Executable,
-		c.Args)
+	environ := executable.Environ(ctx, args)
+
 	for _, v := range environ {
 		log.Printf("env: %s", v)
 	}
 
-	cmd := exec.CommandContext(ctx, executable.Path())
-	cmd.Env = append(os.Environ(), environ...)
-	cmd.Stdin = os.Stdin
-	cmd.Stderr = os.Stderr
-	cmd.Stdout = os.Stdout
-	timeStart := time.Now()
+	cmd := commands.NewOS(ctx, executable, environ, args.Positional)
 
 	if err := cmd.Start(); err != nil {
-		return fmt.Errorf("command cannot start: %w", err)
+		return fmt.Errorf("cannot start command: %w", err)
 	}
 
-	log.Printf("process %d has started", cmd.Process.Pid)
+	log.Printf("command %s has started as %d", executable, cmd.Pid())
 
-	relaySignals(ctx, cmd)
-
-	err = cmd.Wait()
-	timeStop := time.Now()
-
-	exitCode := 0
-
+	result, err := cmd.Wait()
 	if err != nil {
-		exitCode = cmd.ProcessState.ExitCode()
+		return fmt.Errorf("cannot correctly finish command: %w", err)
 	}
 
-	log.Printf("sys time %v", cmd.ProcessState.SystemTime())
-	log.Printf("user time %v", cmd.ProcessState.UserTime())
-	log.Printf("elapsed time %v", timeStop.Sub(timeStart))
-	log.Printf("process exited with %d", exitCode)
+	log.Printf("command %d exit with exit code %d", cmd.Pid(), result.ExitCode)
+	log.Printf(
+		"command %d times: user=%v, sys=%v, real=%v",
+		cmd.Pid(),
+		result.UserTime,
+		result.SystemTime,
+		result.ElapsedTime)
 
-	return scriptExitError{
-		code: exitCode,
+	return commands.ExitError{
+		Result: result,
 	}
 }
