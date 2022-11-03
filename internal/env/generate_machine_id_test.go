@@ -12,7 +12,7 @@ type GenerateMachineIdTestSuite struct {
 }
 
 func (suite *GenerateMachineIdTestSuite) TestNoEnv() {
-	env.GenerateMachineId(suite.ctx, suite.values, suite.wg)
+	env.GenerateMachineId(suite.Context(), suite.values, suite.wg)
 	data := suite.Collect()
 
 	suite.Len(data, 1)
@@ -21,7 +21,7 @@ func (suite *GenerateMachineIdTestSuite) TestNoEnv() {
 
 func (suite *GenerateMachineIdTestSuite) TestWithEnv() {
 	suite.Setenv(env.EnvMachineId, "xxx")
-	env.GenerateMachineId(suite.ctx, suite.values, suite.wg)
+	env.GenerateMachineId(suite.Context(), suite.values, suite.wg)
 	data := suite.Collect()
 
 	suite.Empty(data)

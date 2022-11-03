@@ -1,10 +1,10 @@
 package env_test
 
 import (
-	"context"
 	"strings"
 	"sync"
 
+	"github.com/9seconds/chore/internal/testlib"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )
@@ -12,23 +12,20 @@ import (
 type EnvBaseTestSuite struct {
 	suite.Suite
 
-	wg        *sync.WaitGroup
-	ctx       context.Context
-	ctxCancel context.CancelFunc
-	values    chan string
+	testlib.CtxTestSuite
+
+	wg     *sync.WaitGroup
+	values chan string
 }
 
 func (suite *EnvBaseTestSuite) SetupTest() {
-	ctx, cancel := context.WithCancel(context.Background())
+	suite.CtxTestSuite.Setup(suite.T())
 
-	suite.ctx = ctx
-	suite.ctxCancel = cancel
 	suite.values = make(chan string, 1)
 	suite.wg = &sync.WaitGroup{}
 }
 
 func (suite *EnvBaseTestSuite) TearDownTest() {
-	suite.ctxCancel()
 	suite.wg.Wait()
 }
 

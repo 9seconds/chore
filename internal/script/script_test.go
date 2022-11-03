@@ -2,10 +2,8 @@ package script_test
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 	"os"
-	"path/filepath"
 	"regexp"
 	"strings"
 	"testing"
@@ -13,6 +11,7 @@ import (
 	"github.com/9seconds/chore/internal/argparse"
 	"github.com/9seconds/chore/internal/env"
 	"github.com/9seconds/chore/internal/script"
+	"github.com/9seconds/chore/internal/testlib"
 	"github.com/adrg/xdg"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
@@ -23,63 +22,16 @@ import (
 type ScriptTestSuite struct {
 	suite.Suite
 
-	fsRoot string
+	testlib.CustomRootTestSuite
+	testlib.ScriptTestSuite
+	testlib.NetworkTestSuite
 }
 
 func (suite *ScriptTestSuite) SetupTest() {
 	t := suite.T()
-
-	suite.fsRoot = t.TempDir()
-	t.Setenv("TMPDIR", suite.fsRoot)
-
-	oldConfigHome := xdg.ConfigHome
-	oldDataHome := xdg.DataHome
-	oldCacheHome := xdg.CacheHome
-	oldStateHome := xdg.StateHome
-	oldRuntimeDir := xdg.RuntimeDir
-
-	t.Cleanup(func() {
-		xdg.ConfigHome = oldConfigHome
-		xdg.DataHome = oldDataHome
-		xdg.CacheHome = oldCacheHome
-		xdg.StateHome = oldStateHome
-		xdg.RuntimeDir = oldRuntimeDir
-	})
-
-	xdg.ConfigHome = filepath.Join(suite.fsRoot, "config_home")
-	xdg.DataHome = filepath.Join(suite.fsRoot, "data_home")
-	xdg.CacheHome = filepath.Join(suite.fsRoot, "cache_home")
-	xdg.StateHome = filepath.Join(suite.fsRoot, "state_home")
-	xdg.RuntimeDir = filepath.Join(suite.fsRoot, "runtime_dir")
-}
-
-func (suite *ScriptTestSuite) buildPath(root, namespace string) string {
-	return filepath.Join(root, env.ChoreDir, namespace)
-}
-
-func (suite *ScriptTestSuite) ensureNamespace(namespace string) string {
-	base := suite.buildPath(xdg.ConfigHome, namespace)
-	require.NoError(suite.T(), os.MkdirAll(base, 0700))
-
-	return base
-}
-
-func (suite *ScriptTestSuite) createScript(namespace, executable, content string) {
-	base := suite.ensureNamespace(namespace)
-	err := os.WriteFile(
-		filepath.Join(base, executable),
-		[]byte("#!/usr/bin/env sh\n"+content),
-		0700)
-	require.NoError(suite.T(), err)
-}
-
-func (suite *ScriptTestSuite) createConfig(namespace, executable string, content interface{}) {
-	base := suite.ensureNamespace(namespace)
-	data, err := json.Marshal(content)
-	suite.NoError(err)
-
-	err = os.WriteFile(filepath.Join(base, executable+".json"), data, 0600)
-	require.NoError(suite.T(), err)
+	suite.CustomRootTestSuite.Setup(t)
+	suite.ScriptTestSuite.Setup(t)
+	suite.NetworkTestSuite.Setup(t)
 }
 
 func (suite *ScriptTestSuite) TestAbsentScript() {
@@ -95,7 +47,7 @@ func (suite *ScriptTestSuite) TestCannotCreatePath() {
 		xdg.RuntimeDir: "runtime",
 	}
 
-	suite.createScript("xx", "1", "echo 1")
+	suite.EnsureScript("xx", "1", "echo 1")
 
 	for testValue, testName := range testTable {
 		suite.NoError(os.MkdirAll(testValue, 0500))
@@ -108,15 +60,15 @@ func (suite *ScriptTestSuite) TestCannotCreatePath() {
 }
 
 func (suite *ScriptTestSuite) TestCannotReadConfig() {
-	suite.createScript("xx", "1", "echo 1")
-	suite.createConfig("xx", "1", "x")
+	suite.EnsureScript("xx", "1", "echo 1")
+	suite.EnsureScriptConfig("xx", "1", "x")
 
 	_, err := script.New("xx", "1")
 	suite.ErrorContains(err, "cannot parse config file")
 }
 
 func (suite *ScriptTestSuite) TestDirsAreAvailable() {
-	suite.createScript("xx", "1", "echo 1")
+	suite.EnsureScript("xx", "1", "echo 1")
 
 	s, err := script.New("xx", "1")
 	suite.NoError(err)
@@ -133,7 +85,7 @@ func (suite *ScriptTestSuite) TestDirsAreAvailable() {
 }
 
 func (suite *ScriptTestSuite) TestString() {
-	suite.createScript("xx", "1", "echo 1")
+	suite.EnsureScript("xx", "1", "echo 1")
 
 	s, err := script.New("xx", "1")
 	suite.NoError(err)
@@ -146,15 +98,12 @@ func (suite *ScriptTestSuite) TestString() {
 }
 
 func (suite *ScriptTestSuite) TestEnviron() {
-	httpmock.ActivateNonDefault(env.HTTPClientV4)
-	httpmock.ActivateNonDefault(env.HTTPClientV6)
 	httpmock.RegisterRegexpResponder(
 		http.MethodGet,
 		regexp.MustCompile(".*?"),
 		httpmock.NewBytesResponder(http.StatusInternalServerError, nil))
-	suite.T().Cleanup(httpmock.DeactivateAndReset)
 
-	suite.createScript("xx", "1", "echo 1")
+	suite.EnsureScript("xx", "1", "echo 1")
 
 	s, err := script.New("xx", "1")
 	suite.NoError(err)

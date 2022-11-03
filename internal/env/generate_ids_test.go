@@ -26,7 +26,7 @@ func (suite *GenerateIdsTestSuite) SetupTest() {
 }
 
 func (suite *GenerateIdsTestSuite) TestNoEnvs() {
-	env.GenerateIds(suite.ctx, suite.values, suite.wg, "xx", suite.args)
+	env.GenerateIds(suite.Context(), suite.values, suite.wg, "xx", suite.args)
 
 	data := suite.Collect()
 
@@ -42,13 +42,13 @@ func (suite *GenerateIdsTestSuite) TestNoEnvs() {
 }
 
 func (suite *GenerateIdsTestSuite) TestUniquesAreDifferent() {
-	env.GenerateIds(suite.ctx, suite.values, suite.wg, "xx", suite.args)
+	env.GenerateIds(suite.Context(), suite.values, suite.wg, "xx", suite.args)
 
 	data := suite.Collect()
 	unique := data[env.EnvIdUnique]
 	suite.values = make(chan string, 1)
 
-	env.GenerateIds(suite.ctx, suite.values, suite.wg, "xx", suite.args)
+	env.GenerateIds(suite.Context(), suite.values, suite.wg, "xx", suite.args)
 
 	data = suite.Collect()
 
@@ -57,7 +57,7 @@ func (suite *GenerateIdsTestSuite) TestUniquesAreDifferent() {
 
 func (suite *GenerateIdsTestSuite) TestChainUnique() {
 	suite.Setenv(env.EnvIdChainUnique, "xx2")
-	env.GenerateIds(suite.ctx, suite.values, suite.wg, "xx", suite.args)
+	env.GenerateIds(suite.Context(), suite.values, suite.wg, "xx", suite.args)
 
 	data := suite.Collect()
 

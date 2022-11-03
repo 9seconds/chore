@@ -6,24 +6,20 @@ import (
 	"testing"
 
 	"github.com/9seconds/chore/internal/env"
+	"github.com/9seconds/chore/internal/testlib"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/suite"
 )
 
 type GenerateNetworkBaseTestSuite struct {
 	EnvBaseTestSuite
+
+	testlib.NetworkTestSuite
 }
 
 func (suite *GenerateNetworkBaseTestSuite) SetupTest() {
 	suite.EnvBaseTestSuite.SetupTest()
-
-	httpmock.ActivateNonDefault(env.HTTPClientV4)
-	httpmock.ActivateNonDefault(env.HTTPClientV6)
-}
-
-func (suite *GenerateNetworkBaseTestSuite) TearDownTest() {
-	httpmock.DeactivateAndReset()
-	suite.EnvBaseTestSuite.TearDownTest()
+	suite.NetworkTestSuite.Setup(suite.T())
 }
 
 type GenerateNetworkTestSuite struct {
@@ -36,25 +32,25 @@ func (suite *GenerateNetworkTestSuite) SetupResponder(r httpmock.Responder) {
 
 func (suite *GenerateNetworkTestSuite) TestEnvSet() {
 	suite.Setenv(env.EnvNetworkIPv4, "xx")
-	env.GenerateNetwork(suite.ctx, suite.values, suite.wg)
+	env.GenerateNetwork(suite.Context(), suite.values, suite.wg)
 	suite.Empty(suite.Collect())
 }
 
 func (suite *GenerateNetworkTestSuite) TestCannotAccess() {
 	suite.SetupResponder(httpmock.NewErrorResponder(io.ErrUnexpectedEOF))
-	env.GenerateNetwork(suite.ctx, suite.values, suite.wg)
+	env.GenerateNetwork(suite.Context(), suite.values, suite.wg)
 	suite.Empty(suite.Collect())
 }
 
 func (suite *GenerateNetworkTestSuite) TestBadHTTPStatusCode() {
 	suite.SetupResponder(httpmock.NewBytesResponder(http.StatusBadGateway, nil))
-	env.GenerateNetwork(suite.ctx, suite.values, suite.wg)
+	env.GenerateNetwork(suite.Context(), suite.values, suite.wg)
 	suite.Empty(suite.Collect())
 }
 
 func (suite *GenerateNetworkTestSuite) TestBrokenJSON() {
 	suite.SetupResponder(httpmock.NewBytesResponder(http.StatusOK, nil))
-	env.GenerateNetwork(suite.ctx, suite.values, suite.wg)
+	env.GenerateNetwork(suite.Context(), suite.values, suite.wg)
 	suite.Empty(suite.Collect())
 }
 
@@ -73,7 +69,7 @@ func (suite *GenerateNetworkTestSuite) TestCorrectResponse() {
 			"timezone": "Europe/Berlin",
 			"readme":   "https://ipinfo.io/missingauth",
 		}))
-	env.GenerateNetwork(suite.ctx, suite.values, suite.wg)
+	env.GenerateNetwork(suite.Context(), suite.values, suite.wg)
 	data := suite.Collect()
 
 	suite.Len(data, 11)
@@ -100,25 +96,25 @@ func (suite *GenerateNetworkIPv6TestSuite) SetupResponder(r httpmock.Responder) 
 
 func (suite *GenerateNetworkIPv6TestSuite) TestEnvSet() {
 	suite.Setenv(env.EnvNetworkIPv6, "xx")
-	env.GenerateNetworkIPv6(suite.ctx, suite.values, suite.wg)
+	env.GenerateNetworkIPv6(suite.Context(), suite.values, suite.wg)
 	suite.Empty(suite.Collect())
 }
 
 func (suite *GenerateNetworkIPv6TestSuite) TestCannotAccess() {
 	suite.SetupResponder(httpmock.NewErrorResponder(io.ErrUnexpectedEOF))
-	env.GenerateNetworkIPv6(suite.ctx, suite.values, suite.wg)
+	env.GenerateNetworkIPv6(suite.Context(), suite.values, suite.wg)
 	suite.Empty(suite.Collect())
 }
 
 func (suite *GenerateNetworkIPv6TestSuite) TestBadHTTPStatusCode() {
 	suite.SetupResponder(httpmock.NewBytesResponder(http.StatusBadGateway, nil))
-	env.GenerateNetworkIPv6(suite.ctx, suite.values, suite.wg)
+	env.GenerateNetworkIPv6(suite.Context(), suite.values, suite.wg)
 	suite.Empty(suite.Collect())
 }
 
 func (suite *GenerateNetworkIPv6TestSuite) TestBrokenJSON() {
 	suite.SetupResponder(httpmock.NewBytesResponder(http.StatusOK, nil))
-	env.GenerateNetworkIPv6(suite.ctx, suite.values, suite.wg)
+	env.GenerateNetworkIPv6(suite.Context(), suite.values, suite.wg)
 	suite.Empty(suite.Collect())
 }
 
@@ -126,7 +122,7 @@ func (suite *GenerateNetworkIPv6TestSuite) TestCorrectResponse() {
 	suite.SetupResponder(httpmock.NewJsonResponderOrPanic(
 		http.StatusOK,
 		map[string]string{"ip": "cafe::1"}))
-	env.GenerateNetworkIPv6(suite.ctx, suite.values, suite.wg)
+	env.GenerateNetworkIPv6(suite.Context(), suite.values, suite.wg)
 	data := suite.Collect()
 
 	suite.Len(data, 1)

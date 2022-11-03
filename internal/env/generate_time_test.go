@@ -14,7 +14,7 @@ type GenerateTimeTestSuite struct {
 }
 
 func (suite *GenerateTimeTestSuite) TestOk() {
-	env.GenerateTime(suite.ctx, suite.values, suite.wg)
+	env.GenerateTime(suite.Context(), suite.values, suite.wg)
 	data := suite.Collect()
 	suite.Len(data, 15)
 
