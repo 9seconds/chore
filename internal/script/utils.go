@@ -11,7 +11,7 @@ import (
 func ensureTempDir(script *Script) error {
 	dir, err := os.MkdirTemp(
 		"",
-		fmt.Sprintf("%script-%script-%script", env.ChoreDir, script.Namespace, script.Executable))
+		fmt.Sprintf("%s-%s-%s--", env.ChoreDir, script.Namespace, script.Executable))
 	if err != nil {
 		return err
 	}

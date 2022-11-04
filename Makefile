@@ -1,5 +1,4 @@
 APP_NAME := chore
-ROOT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 GOBIN    := .bin
 
 GOLANGCI_LINT_VERSION := v1.50.1
@@ -7,8 +6,7 @@ GOFUMPT_VERSION       := v0.4.0
 
 VERSION      := $(shell git describe --exact-match HEAD 2>/dev/null || git describe --tags --always)
 STATIC_FLAGS := -trimpath -mod=readonly -ldflags="-extldflags '-static' -s -w -X 'main.version=$(VERSION)'"
-
-GOTOOL := env "GOBIN=$(realpath $(GOBIN))" "PATH=$(realpath $(GOBIN)):$(PATH)"
+GOTOOL       := env "GOBIN=$(abspath $(GOBIN))" "PATH=$(abspath $(GOBIN)):$(PATH)"
 
 # -----------------------------------------------------------------------------
 
