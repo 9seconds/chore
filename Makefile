@@ -41,6 +41,14 @@ static:
 		-a \
 		-o "$(APP_NAME)"
 
+.PHONY: test
+test:
+	@go test -v -parallel 4 ./...
+
+.PHONY: full-test
+full-test:
+	@go test -v -parallel 4 -race -cover -coverprofile coverage.out ./...
+
 .PHONY: lint
 lint: $(GOBIN)/golangci-lint
 	@$(GOTOOL) golangci-lint run ./...
