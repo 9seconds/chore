@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"net"
 	"net/http"
 	"os"
 	"regexp"
@@ -15,7 +14,7 @@ import (
 	"sync"
 	"time"
 
-	"golang.org/x/net/proxy"
+	"github.com/9seconds/chore/internal/network"
 )
 
 const (
@@ -40,31 +39,7 @@ type ifConfigResponse struct {
 }
 
 var (
-	netDialer = proxy.FromEnvironmentUsing(&net.Dialer{
-		Timeout:       connectTimeout,
-		FallbackDelay: -1,
-		KeepAlive:     -1,
-	}).(proxy.ContextDialer)
 	ipInfoOrgFormat = regexp.MustCompile(`^AS(\d+)\s+(.*?)$`)
-
-	HTTPClientV4 = &http.Client{
-		Transport: &http.Transport{
-			DisableKeepAlives: true,
-			DialContext: func(ctx context.Context, network, address string) (net.Conn, error) {
-				return netDialer.DialContext(ctx, "tcp4", address)
-			},
-		},
-		Timeout: httpTimeout,
-	}
-	HTTPClientV6 = &http.Client{
-		Transport: &http.Transport{
-			DisableKeepAlives: true,
-			DialContext: func(ctx context.Context, network, address string) (net.Conn, error) {
-				return netDialer.DialContext(ctx, "tcp6", address)
-			},
-		},
-		Timeout: httpTimeout,
-	}
 )
 
 func doRequest(ctx context.Context, client *http.Client, url string, target interface{}) error {
@@ -110,7 +85,7 @@ func GenerateNetwork(ctx context.Context, results chan<- string, waiters *sync.W
 		}
 
 		resp := ipInfoResponse{}
-		if err := doRequest(ctx, HTTPClientV4, "https://ipinfo.io/json", &resp); err != nil {
+		if err := doRequest(ctx, network.HTTPClientV4, "https://ipinfo.io/json", &resp); err != nil {
 			log.Printf("cannot request network data: %v", err)
 
 			return
@@ -152,7 +127,7 @@ func GenerateNetworkIPv6(ctx context.Context, results chan<- string, waiters *sy
 		}
 
 		resp := ifConfigResponse{}
-		if err := doRequest(ctx, HTTPClientV6, "https://ifconfig.co", &resp); err != nil {
+		if err := doRequest(ctx, network.HTTPClientV6, "https://ifconfig.co", &resp); err != nil {
 			log.Printf("cannot get IPv6 address: %v", err)
 
 			return
