@@ -1,7 +1,6 @@
 package argparse_test
 
 import (
-	"encoding/hex"
 	"testing"
 
 	"github.com/9seconds/chore/internal/argparse"
@@ -115,18 +114,6 @@ func (suite *ParseTestSuite) TestMergeArguments() {
 	suite.NoError(err)
 	suite.Len(args.Keywords, 1)
 	suite.Equal("1 'xx yy' ''\"'\"'xx' 3", args.Keywords["req"])
-}
-
-func (suite *ParseTestSuite) TestChecksum() {
-	args, err := argparse.Parse(
-		suite.Context(),
-		suite.params,
-		[]string{"req=1", "req=xx yy", "req='xx", "req=3", "--", "1", "2 3"})
-	suite.NoError(err)
-
-	suite.Equal(
-		"1616b0d3a9dd205c42698c5bd8c6f56c155eea50fa1a7698c8094dc98b833fb6",
-		hex.EncodeToString(args.Checksum()))
 }
 
 func TestSuite(t *testing.T) {
