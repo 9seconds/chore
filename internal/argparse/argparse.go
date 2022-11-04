@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"sync"
 
 	"github.com/9seconds/chore/internal/config"
 	"github.com/alessio/shellescape"
@@ -14,13 +15,23 @@ const (
 	SeparatorPositional = "--"
 )
 
+type validatedValue struct {
+	name  string
+	value string
 }
 
 func Parse(ctx context.Context, parameters map[string]config.Parameter, args []string) (ParsedArgs, error) {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	keywords := make(map[string][]string)
 	rValue := ParsedArgs{
 		Keywords: make(map[string]string),
 	}
+
+	waiters := &sync.WaitGroup{}
+	errChan := make(chan error)
+	resChan := make(chan validatedValue)
 
 	for idx, arg := range args {
 		if arg == SeparatorPositional {
@@ -42,11 +53,24 @@ func Parse(ctx context.Context, parameters map[string]config.Parameter, args []s
 			return rValue, fmt.Errorf("unknown parameter %s", name)
 		}
 
-		if err := spec.Validate(ctx, value); err != nil {
-			return rValue, fmt.Errorf("incorrect value %s for parameter %s: %w", name, value, err)
-		}
+		validateValue(ctx, waiters, spec, name, value, resChan, errChan)
+	}
 
-		keywords[name] = append(keywords[name], value)
+	go func() {
+		waiters.Wait()
+		cancel()
+	}()
+
+parametersLoop:
+	for {
+		select {
+		case <-ctx.Done():
+			break parametersLoop
+		case val := <-resChan:
+			keywords[val.name] = append(keywords[val.name], val.value)
+		case err := <-errChan:
+			return rValue, err
+		}
 	}
 
 	for name, param := range parameters {
@@ -60,4 +84,31 @@ func Parse(ctx context.Context, parameters map[string]config.Parameter, args []s
 	}
 
 	return rValue, nil
+}
+
+func validateValue(ctx context.Context,
+	waiters *sync.WaitGroup,
+	spec config.Parameter,
+	name, value string,
+	resChan chan<- validatedValue, errChan chan<- error) {
+	waiters.Add(1)
+
+	go func() {
+		defer waiters.Done()
+
+		err := spec.Validate(ctx, value)
+
+		if err != nil {
+			resChan = nil
+			err = fmt.Errorf("incorrect value %s for parameter %s: %w", name, value, err)
+		} else {
+			errChan = nil
+		}
+
+		select {
+		case <-ctx.Done():
+		case resChan <- validatedValue{name: name, value: value}:
+		case errChan <- err:
+		}
+	}()
 }
