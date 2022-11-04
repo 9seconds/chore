@@ -24,7 +24,7 @@ func (c *CliCmdRun) Run(ctx Context) error {
 
 	defer os.RemoveAll(executable.TempPath())
 
-	args, err := argparse.Parse(executable.Config.Parameters, c.Args)
+	args, err := argparse.Parse(ctx, executable.Config.Parameters, c.Args)
 	if err != nil {
 		return fmt.Errorf("cannot parse arguments: %w", err)
 	}

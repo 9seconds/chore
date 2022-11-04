@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"fmt"
 	"math"
 	"strconv"
@@ -46,7 +47,7 @@ func (p paramFloat) String() string {
 	return fmt.Sprintf("required=%t, min=%v, max=%v", p.required, p.min, p.max)
 }
 
-func (p paramFloat) Validate(value string) error {
+func (p paramFloat) Validate(_ context.Context, value string) error {
 	parsed, err := strconv.ParseFloat(value, 64)
 
 	switch {

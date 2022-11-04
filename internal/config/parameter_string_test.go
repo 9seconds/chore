@@ -5,12 +5,19 @@ import (
 	"testing"
 
 	"github.com/9seconds/chore/internal/config"
+	"github.com/9seconds/chore/internal/testlib"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
 
 type ParameterStringTestSuite struct {
 	suite.Suite
+
+	testlib.CtxTestSuite
+}
+
+func (suite *ParameterStringTestSuite) SetupTest() {
+	suite.CtxTestSuite.Setup(suite.T())
 }
 
 func (suite *ParameterStringTestSuite) TestRequired() {
@@ -66,7 +73,7 @@ func (suite *ParameterStringTestSuite) TestInvalidValues() {
 		testValue := testValue
 
 		suite.T().Run(testValue, func(t *testing.T) {
-			assert.Error(t, param.Validate(testValue))
+			assert.Error(t, param.Validate(suite.Context(), testValue))
 		})
 	}
 }
@@ -86,7 +93,7 @@ func (suite *ParameterStringTestSuite) TestValidValues() {
 		testValue := testValue
 
 		suite.T().Run(testValue, func(t *testing.T) {
-			assert.NoError(t, param.Validate(testValue))
+			assert.NoError(t, param.Validate(suite.Context(), testValue))
 		})
 	}
 }

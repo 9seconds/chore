@@ -1,11 +1,14 @@
 package config
 
-import "fmt"
+import (
+	"context"
+	"fmt"
+)
 
 type Parameter interface {
 	fmt.Stringer
 
 	Type() string
 	Required() bool
-	Validate(string) error
+	Validate(context.Context, string) error
 }

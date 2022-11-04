@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"fmt"
 	"regexp"
 	"strings"
@@ -25,7 +26,7 @@ func (p paramString) String() string {
 	return fmt.Sprintf("required=%t, re=%v", p.required, p.re)
 }
 
-func (p paramString) Validate(value string) error {
+func (p paramString) Validate(_ context.Context, value string) error {
 	if p.re != nil && !p.re.MatchString(value) {
 		return fmt.Errorf("value %s does not match %s", value, p.re.String())
 	}

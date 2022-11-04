@@ -1,6 +1,7 @@
 package argparse
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/binary"
 	"fmt"
@@ -50,7 +51,7 @@ func (p ParsedArgs) Checksum() []byte {
 	return mixer.Sum(nil)
 }
 
-func Parse(parameters map[string]config.Parameter, args []string) (ParsedArgs, error) {
+func Parse(ctx context.Context, parameters map[string]config.Parameter, args []string) (ParsedArgs, error) {
 	keywords := make(map[string][]string)
 	rValue := ParsedArgs{
 		Keywords: make(map[string]string),
@@ -76,7 +77,7 @@ func Parse(parameters map[string]config.Parameter, args []string) (ParsedArgs, e
 			return rValue, fmt.Errorf("unknown parameter %s", name)
 		}
 
-		if err := spec.Validate(value); err != nil {
+		if err := spec.Validate(ctx, value); err != nil {
 			return rValue, fmt.Errorf("incorrect value %s for parameter %s: %w", name, value, err)
 		}
 

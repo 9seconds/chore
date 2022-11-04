@@ -5,12 +5,19 @@ import (
 	"testing"
 
 	"github.com/9seconds/chore/internal/config"
+	"github.com/9seconds/chore/internal/testlib"
 	"github.com/alecthomas/assert/v2"
 	"github.com/stretchr/testify/suite"
 )
 
 type ParameterFloatTestSuite struct {
 	suite.Suite
+
+	testlib.CtxTestSuite
+}
+
+func (suite *ParameterFloatTestSuite) SetupTest() {
+	suite.CtxTestSuite.Setup(suite.T())
 }
 
 func (suite *ParameterFloatTestSuite) TestRequired() {
@@ -63,7 +70,7 @@ func (suite *ParameterFloatTestSuite) TestIncorrectValues() {
 		testValue := testValue
 
 		suite.T().Run(testValue, func(t *testing.T) {
-			assert.Error(t, param.Validate(testValue))
+			assert.Error(t, param.Validate(suite.Context(), testValue))
 		})
 	}
 }
@@ -88,7 +95,7 @@ func (suite *ParameterFloatTestSuite) TestCorrectValues() {
 		testValue := testValue
 
 		suite.T().Run(testValue, func(t *testing.T) {
-			assert.NoError(t, param.Validate(testValue))
+			assert.NoError(t, param.Validate(suite.Context(), testValue))
 		})
 	}
 }
