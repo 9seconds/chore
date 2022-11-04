@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"io"
 	"log"
 	"os"
@@ -39,7 +40,6 @@ func main() {
 		syscall.SIGINT,
 		syscall.SIGTERM,
 		syscall.SIGQUIT)
-	defer cancel()
 
 	go func() {
 		<-appCtx.Done()
@@ -48,9 +48,12 @@ func main() {
 
 	err := cliCtx.Run(Context{appCtx})
 
-	if val, ok := err.(commands.ExitError); ok {
-		os.Exit(val.Code())
+	var exitErr commands.ExitError
+
+	if errors.As(err, &exitErr) {
+		os.Exit(exitErr.Code())
 	}
 
+	cancel()
 	cliCtx.FatalIfErrorf(err)
 }

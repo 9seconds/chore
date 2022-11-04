@@ -11,12 +11,19 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+const (
+	defaultDirPermission    = 0o700
+	defaultScriptPermission = 0o700
+)
+
 type CustomRootTestSuite struct {
 	fsRoot string
 	t      *testing.T
 }
 
 func (suite *CustomRootTestSuite) Setup(t *testing.T) {
+	t.Helper()
+
 	suite.t = t
 	suite.fsRoot = t.TempDir()
 	t.Setenv("TMPDIR", suite.fsRoot)
@@ -43,12 +50,14 @@ func (suite *CustomRootTestSuite) Setup(t *testing.T) {
 }
 
 func (suite *CustomRootTestSuite) EnsureDir(path string) string {
-	require.NoError(suite.t, os.MkdirAll(path, 0700))
+	require.NoError(suite.t, os.MkdirAll(path, defaultDirPermission))
+
 	return path
 }
 
 func (suite *CustomRootTestSuite) EnsureFile(
-	path string, content string, mode os.FileMode) string {
+	path, content string, mode os.FileMode,
+) string {
 	suite.EnsureDir(filepath.Dir(path))
 	require.NoError(suite.t, os.WriteFile(path, []byte(content), mode))
 
@@ -104,7 +113,7 @@ func (suite *CustomRootTestSuite) EnsureScript(namespace, executable, content st
 	suite.EnsureFile(
 		suite.ConfigScriptPath(namespace, executable),
 		content,
-		0700)
+		defaultScriptPermission)
 }
 
 func (suite *CustomRootTestSuite) EnsureScriptConfig(namespace, executable string, content interface{}) {
@@ -117,12 +126,13 @@ func (suite *CustomRootTestSuite) EnsureScriptConfig(namespace, executable strin
 		strContent = string(val)
 	default:
 		data, err := json.Marshal(content)
-		require.NoError(suite.t, err)
 		strContent = string(data)
+
+		require.NoError(suite.t, err)
 	}
 
 	suite.EnsureFile(
 		suite.ConfigScriptConfigPath(namespace, executable),
 		strContent,
-		0700)
+		defaultScriptPermission)
 }

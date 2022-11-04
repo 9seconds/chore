@@ -7,10 +7,11 @@ import (
 	"github.com/jarcoal/httpmock"
 )
 
-type NetworkTestSuite struct {
-}
+type NetworkTestSuite struct{}
 
 func (suite *NetworkTestSuite) Setup(t *testing.T) {
+	t.Helper()
+
 	httpmock.Activate()
 	httpmock.ActivateNonDefault(env.HTTPClientV4)
 	httpmock.ActivateNonDefault(env.HTTPClientV6)

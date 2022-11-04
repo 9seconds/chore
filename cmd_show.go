@@ -35,7 +35,7 @@ type CliCmdShow struct {
 	Script    string       `arg:"" help:"Script name."`
 }
 
-func (c *CliCmdShow) Run(ctx Context) error {
+func (c *CliCmdShow) Run(_ Context) error {
 	executable, err := script.New(c.Namespace.Value, c.Script)
 	if err != nil {
 		return fmt.Errorf("cannot initialize script: %w", err)
@@ -43,7 +43,5 @@ func (c *CliCmdShow) Run(ctx Context) error {
 
 	defer os.RemoveAll(executable.TempPath())
 
-	cliCmdShotTemplate.Execute(os.Stdout, executable)
-
-	return nil
+	return cliCmdShotTemplate.Execute(os.Stdout, executable)
 }

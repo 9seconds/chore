@@ -21,8 +21,6 @@ import (
 const (
 	connectTimeout = 2 * time.Second
 	httpTimeout    = 10 * time.Second
-
-	userAgent = "chore"
 )
 
 type ipInfoResponse struct {
@@ -83,11 +81,11 @@ func doRequest(ctx context.Context, client *http.Client, url string, target inte
 	}
 
 	defer func() {
-		io.Copy(io.Discard, resp.Body)
+		io.Copy(io.Discard, resp.Body) //nolint: errcheck
 		resp.Body.Close()
 	}()
 
-	if resp.StatusCode >= 400 {
+	if resp.StatusCode >= http.StatusBadRequest {
 		return fmt.Errorf("unexpected response status code %d", resp.StatusCode)
 	}
 
@@ -101,11 +99,11 @@ func doRequest(ctx context.Context, client *http.Client, url string, target inte
 	return nil
 }
 
-func GenerateNetwork(ctx context.Context, results chan<- string, wg *sync.WaitGroup) {
-	wg.Add(1)
+func GenerateNetwork(ctx context.Context, results chan<- string, waiters *sync.WaitGroup) { //nolint: cyclop
+	waiters.Add(1)
 
 	go func() {
-		defer wg.Done()
+		defer waiters.Done()
 
 		if _, ok := os.LookupEnv(EnvNetworkIPv4); ok {
 			return
@@ -139,6 +137,7 @@ func GenerateNetwork(ctx context.Context, results chan<- string, wg *sync.WaitGr
 		}
 
 		asnChunks := ipInfoOrgFormat.FindStringSubmatch(resp.Org)
+
 		switch {
 		case asnChunks == nil && resp.Org != "":
 			sendValue(ctx, results, EnvNetworkOrganization, resp.Org)
@@ -162,11 +161,11 @@ func GenerateNetwork(ctx context.Context, results chan<- string, wg *sync.WaitGr
 	}()
 }
 
-func GenerateNetworkIPv6(ctx context.Context, results chan<- string, wg *sync.WaitGroup) {
-	wg.Add(1)
+func GenerateNetworkIPv6(ctx context.Context, results chan<- string, waiters *sync.WaitGroup) {
+	waiters.Add(1)
 
 	go func() {
-		defer wg.Done()
+		defer waiters.Done()
 
 		if _, ok := os.LookupEnv(EnvNetworkIPv6); ok {
 			return

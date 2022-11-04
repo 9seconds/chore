@@ -14,6 +14,8 @@ import (
 	"github.com/adrg/xdg"
 )
 
+const defaultDirPermission = 0o700
+
 type Script struct {
 	Namespace  string
 	Executable string
@@ -79,20 +81,20 @@ func (s Script) Environ(ctx context.Context, args argparse.ParsedArgs) []string 
 			env.MakeValue(env.EnvArgPrefix+strings.ToUpper(k), v))
 	}
 
-	wg := &sync.WaitGroup{}
+	waiterGroup := &sync.WaitGroup{}
 	values := make(chan string, 1)
 
-	env.GenerateTime(ctx, values, wg)
-	env.GenerateMachineId(ctx, values, wg)
-	env.GenerateIds(ctx, values, wg, s.Path(), args)
+	env.GenerateTime(ctx, values, waiterGroup)
+	env.GenerateMachineID(ctx, values, waiterGroup)
+	env.GenerateIds(ctx, values, waiterGroup, s.Path(), args)
 
 	if s.Config.Network {
-		env.GenerateNetwork(ctx, values, wg)
-		env.GenerateNetworkIPv6(ctx, values, wg)
+		env.GenerateNetwork(ctx, values, waiterGroup)
+		env.GenerateNetworkIPv6(ctx, values, waiterGroup)
 	}
 
 	go func() {
-		wg.Wait()
+		waiterGroup.Wait()
 		close(values)
 	}()
 
@@ -104,38 +106,38 @@ func (s Script) Environ(ctx context.Context, args argparse.ParsedArgs) []string 
 }
 
 func New(namespace, executable string) (Script, error) {
-	rv := Script{
+	rValue := Script{
 		Namespace:  namespace,
 		Executable: executable,
 	}
 
-	if err := isExecutable(rv.Path()); err != nil {
-		return rv, fmt.Errorf("cannot find out executable %s: %w", rv.Path(), err)
+	if err := isExecutable(rValue.Path()); err != nil {
+		return rValue, fmt.Errorf("cannot find out executable %s: %w", rValue.Path(), err)
 	}
 
-	if err := os.MkdirAll(rv.DataPath(), 0700); err != nil {
-		return rv, fmt.Errorf("cannot create data path %s: %w", rv.DataPath(), err)
+	if err := os.MkdirAll(rValue.DataPath(), defaultDirPermission); err != nil {
+		return rValue, fmt.Errorf("cannot create data path %s: %w", rValue.DataPath(), err)
 	}
 
-	if err := os.MkdirAll(rv.CachePath(), 0700); err != nil {
-		return rv, fmt.Errorf("cannot create cache path %s: %w", rv.CachePath(), err)
+	if err := os.MkdirAll(rValue.CachePath(), defaultDirPermission); err != nil {
+		return rValue, fmt.Errorf("cannot create cache path %s: %w", rValue.CachePath(), err)
 	}
 
-	if err := os.MkdirAll(rv.StatePath(), 0700); err != nil {
-		return rv, fmt.Errorf("cannot create state path %s: %w", rv.StatePath(), err)
+	if err := os.MkdirAll(rValue.StatePath(), defaultDirPermission); err != nil {
+		return rValue, fmt.Errorf("cannot create state path %s: %w", rValue.StatePath(), err)
 	}
 
-	if err := os.MkdirAll(rv.RuntimePath(), 0700); err != nil {
-		return rv, fmt.Errorf("cannot create runtime path %s: %w", rv.RuntimePath(), err)
+	if err := os.MkdirAll(rValue.RuntimePath(), defaultDirPermission); err != nil {
+		return rValue, fmt.Errorf("cannot create runtime path %s: %w", rValue.RuntimePath(), err)
 	}
 
-	if err := readConfig(&rv); err != nil {
-		return rv, err
+	if err := readConfig(&rValue); err != nil {
+		return rValue, err
 	}
 
-	if err := ensureTempDir(&rv); err != nil {
-		return rv, fmt.Errorf("cannot create temporary dir: %w", err)
+	if err := ensureTempDir(&rValue); err != nil {
+		return rValue, fmt.Errorf("cannot create temporary dir: %w", err)
 	}
 
-	return rv, nil
+	return rValue, nil
 }

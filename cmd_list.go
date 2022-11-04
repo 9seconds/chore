@@ -15,7 +15,7 @@ type CliCmdList struct {
 	Namespace CliNamespace `arg:"" optional:"" help:"Namespace to list."`
 }
 
-func (c *CliCmdList) Run(ctx Context) error {
+func (c *CliCmdList) Run(_ Context) error {
 	if c.Namespace.Value == "" {
 		return c.listNamespaces()
 	}
@@ -25,6 +25,7 @@ func (c *CliCmdList) Run(ctx Context) error {
 
 func (c *CliCmdList) listNamespaces() error {
 	choreDir := filepath.Join(xdg.ConfigHome, env.ChoreDir)
+
 	entries, err := os.ReadDir(choreDir)
 	if err != nil {
 		return fmt.Errorf("cannot read chore dir %s: %w", choreDir, err)
@@ -60,6 +61,7 @@ func (c *CliCmdList) listScripts() error {
 	for _, v := range entries {
 		if vv, err := script.New(c.Namespace.Value, v.Name()); err == nil {
 			os.RemoveAll(vv.TempPath())
+
 			names = append(names, v.Name())
 		}
 	}

@@ -43,7 +43,7 @@ func (p paramInteger) Validate(value string) error {
 }
 
 func NewInteger(required bool, spec map[string]string) (Parameter, error) {
-	rv := paramInteger{
+	rValue := paramInteger{
 		required: required,
 		min:      math.MinInt64,
 		max:      math.MaxInt64,
@@ -55,7 +55,7 @@ func NewInteger(required bool, spec map[string]string) (Parameter, error) {
 			return nil, fmt.Errorf("cannot parse 'min' %s as integer: %w", strValue, err)
 		}
 
-		rv.min = value
+		rValue.min = value
 	}
 
 	if strValue, ok := spec["max"]; ok {
@@ -64,12 +64,12 @@ func NewInteger(required bool, spec map[string]string) (Parameter, error) {
 			return nil, fmt.Errorf("cannot parse 'max' %s as integer: %w", strValue, err)
 		}
 
-		rv.max = value
+		rValue.max = value
 	}
 
-	if rv.min > rv.max {
+	if rValue.min > rValue.max {
 		return nil, fmt.Errorf("'max' %s value should be bigger than 'min' %s", spec["max"], spec["min"])
 	}
 
-	return rv, nil
+	return rValue, nil
 }

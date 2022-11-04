@@ -7,27 +7,27 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type GenerateMachineIdTestSuite struct {
+type GenerateMachineIDTestSuite struct {
 	EnvBaseTestSuite
 }
 
-func (suite *GenerateMachineIdTestSuite) TestNoEnv() {
-	env.GenerateMachineId(suite.Context(), suite.values, suite.wg)
+func (suite *GenerateMachineIDTestSuite) TestNoEnv() {
+	env.GenerateMachineID(suite.Context(), suite.values, suite.wg)
 	data := suite.Collect()
 
 	suite.Len(data, 1)
-	suite.NotEmpty(data[env.EnvMachineId])
+	suite.NotEmpty(data[env.EnvMachineID])
 }
 
-func (suite *GenerateMachineIdTestSuite) TestWithEnv() {
-	suite.Setenv(env.EnvMachineId, "xxx")
-	env.GenerateMachineId(suite.Context(), suite.values, suite.wg)
+func (suite *GenerateMachineIDTestSuite) TestWithEnv() {
+	suite.Setenv(env.EnvMachineID, "xxx")
+	env.GenerateMachineID(suite.Context(), suite.values, suite.wg)
 	data := suite.Collect()
 
 	suite.Empty(data)
 }
 
-func TestGenerateMachineId(t *testing.T) {
+func TestGenerateMachineID(t *testing.T) {
 	t.Parallel()
-	suite.Run(t, &GenerateMachineIdTestSuite{})
+	suite.Run(t, &GenerateMachineIDTestSuite{})
 }

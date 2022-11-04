@@ -20,23 +20,23 @@ func (suite *ParameterStringTestSuite) TestRequired() {
 		testValue := testValue
 
 		suite.T().Run(strconv.FormatBool(testValue), func(t *testing.T) {
-			p, err := config.NewString(testValue, nil)
+			param, err := config.NewString(testValue, nil)
 			assert.NoError(t, err)
-			assert.Equal(t, testValue, p.Required())
+			assert.Equal(t, testValue, param.Required())
 		})
 	}
 }
 
 func (suite *ParameterStringTestSuite) TestType() {
-	p, err := config.NewString(false, nil)
+	param, err := config.NewString(false, nil)
 	suite.NoError(err)
-	suite.Equal(config.ParameterString, p.Type())
+	suite.Equal(config.ParameterString, param.Type())
 }
 
 func (suite *ParameterStringTestSuite) TestString() {
-	p, err := config.NewString(false, nil)
+	param, err := config.NewString(false, nil)
 	suite.NoError(err)
-	suite.NotEmpty(p.String())
+	suite.NotEmpty(param.String())
 }
 
 func (suite *ParameterStringTestSuite) TestIncorrectRegexp() {
@@ -47,7 +47,7 @@ func (suite *ParameterStringTestSuite) TestIncorrectRegexp() {
 }
 
 func (suite *ParameterStringTestSuite) TestInvalidValues() {
-	p, err := config.NewString(false, map[string]string{
+	param, err := config.NewString(false, map[string]string{
 		"regexp": `xx\w{2}\d`,
 	})
 	suite.NoError(err)
@@ -66,13 +66,13 @@ func (suite *ParameterStringTestSuite) TestInvalidValues() {
 		testValue := testValue
 
 		suite.T().Run(testValue, func(t *testing.T) {
-			assert.Error(t, p.Validate(testValue))
+			assert.Error(t, param.Validate(testValue))
 		})
 	}
 }
 
 func (suite *ParameterStringTestSuite) TestValidValues() {
-	p, err := config.NewString(false, map[string]string{
+	param, err := config.NewString(false, map[string]string{
 		"regexp": `xx\w{2}\d`,
 	})
 	suite.NoError(err)
@@ -86,7 +86,7 @@ func (suite *ParameterStringTestSuite) TestValidValues() {
 		testValue := testValue
 
 		suite.T().Run(testValue, func(t *testing.T) {
-			assert.NoError(t, p.Validate(testValue))
+			assert.NoError(t, param.Validate(testValue))
 		})
 	}
 }

@@ -17,8 +17,10 @@ type RedirectStreamsTestSuite struct {
 }
 
 func (suite *RedirectStreamsTestSuite) Setup(t *testing.T) {
-	wg := &sync.WaitGroup{}
-	wg.Add(2)
+	t.Helper()
+
+	waiterGroup := &sync.WaitGroup{}
+	waiterGroup.Add(1 + 1)
 
 	outR, outW, err := os.Pipe()
 	if err != nil {
@@ -31,13 +33,13 @@ func (suite *RedirectStreamsTestSuite) Setup(t *testing.T) {
 	}
 
 	go func() {
-		defer wg.Done()
-		io.Copy(&suite.stdout, outR)
+		defer waiterGroup.Done()
+		io.Copy(&suite.stdout, outR) //nolint: errcheck
 	}()
 
 	go func() {
-		defer wg.Done()
-		io.Copy(&suite.stderr, errR)
+		defer waiterGroup.Done()
+		io.Copy(&suite.stderr, errR) //nolint: errcheck
 	}()
 
 	oldStdout := os.Stdout
@@ -51,7 +53,7 @@ func (suite *RedirectStreamsTestSuite) Setup(t *testing.T) {
 		os.Stdout = oldStdout
 		os.Stderr = oldStderr
 
-		wg.Wait()
+		waiterGroup.Wait()
 	})
 
 	os.Stdout = outW

@@ -13,24 +13,25 @@ const idLength = 32
 func GenerateIds(
 	ctx context.Context,
 	results chan<- string,
-	wg *sync.WaitGroup,
-	scriptId string,
-	args argparse.ParsedArgs) {
-	wg.Add(1)
+	waiters *sync.WaitGroup,
+	scriptID string,
+	args argparse.ParsedArgs,
+) {
+	waiters.Add(1)
 
 	go func() {
-		defer wg.Done()
+		defer waiters.Done()
 
 		checksum := EncodeBytes(args.Checksum())
-		isolatedId := chainValues(checksum, scriptId)
-		chainedIsolatedId := chainValues(isolatedId, os.Getenv(EnvIdChainIsolated))
+		isolatedID := chainValues(checksum, scriptID)
+		chainedIsolatedID := chainValues(isolatedID, os.Getenv(EnvIDChainIsolated))
 
-		sendValue(ctx, results, EnvIdUnique, generateRandomString(idLength))
-		sendValue(ctx, results, EnvIdIsolated, isolatedId)
-		sendValue(ctx, results, EnvIdChainIsolated, chainedIsolatedId)
+		sendValue(ctx, results, EnvIDUnique, generateRandomString(idLength))
+		sendValue(ctx, results, EnvIDIsolated, isolatedID)
+		sendValue(ctx, results, EnvIDChainIsolated, chainedIsolatedID)
 
-		if _, ok := os.LookupEnv(EnvIdChainUnique); !ok {
-			sendValue(ctx, results, EnvIdChainUnique, generateRandomString(idLength))
+		if _, ok := os.LookupEnv(EnvIDChainUnique); !ok {
+			sendValue(ctx, results, EnvIDChainUnique, generateRandomString(idLength))
 		}
 	}()
 }

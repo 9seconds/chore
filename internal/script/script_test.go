@@ -50,7 +50,7 @@ func (suite *ScriptTestSuite) TestCannotCreatePath() {
 	suite.EnsureScript("xx", "1", "echo 1")
 
 	for testValue, testName := range testTable {
-		suite.NoError(os.MkdirAll(testValue, 0500))
+		suite.NoError(os.MkdirAll(testValue, 0o500))
 
 		suite.T().Run(testName, func(t *testing.T) {
 			_, err := script.New("xx", "1")
@@ -70,31 +70,31 @@ func (suite *ScriptTestSuite) TestCannotReadConfig() {
 func (suite *ScriptTestSuite) TestDirsAreAvailable() {
 	suite.EnsureScript("xx", "1", "echo 1")
 
-	s, err := script.New("xx", "1")
+	scr, err := script.New("xx", "1")
 	suite.NoError(err)
 
 	suite.T().Cleanup(func() {
-		suite.NoError(os.RemoveAll(s.TempPath()))
+		suite.NoError(os.RemoveAll(scr.TempPath()))
 	})
 
-	suite.DirExists(s.DataPath())
-	suite.DirExists(s.CachePath())
-	suite.DirExists(s.StatePath())
-	suite.DirExists(s.RuntimePath())
-	suite.DirExists(s.TempPath())
+	suite.DirExists(scr.DataPath())
+	suite.DirExists(scr.CachePath())
+	suite.DirExists(scr.StatePath())
+	suite.DirExists(scr.RuntimePath())
+	suite.DirExists(scr.TempPath())
 }
 
 func (suite *ScriptTestSuite) TestString() {
 	suite.EnsureScript("xx", "1", "echo 1")
 
-	s, err := script.New("xx", "1")
+	scr, err := script.New("xx", "1")
 	suite.NoError(err)
 
 	suite.T().Cleanup(func() {
-		suite.NoError(os.RemoveAll(s.TempPath()))
+		suite.NoError(os.RemoveAll(scr.TempPath()))
 	})
 
-	suite.NotEmpty(s.String())
+	suite.NotEmpty(scr.String())
 }
 
 func (suite *ScriptTestSuite) TestEnviron() {
@@ -105,15 +105,15 @@ func (suite *ScriptTestSuite) TestEnviron() {
 
 	suite.EnsureScript("xx", "1", "echo 1")
 
-	s, err := script.New("xx", "1")
+	scr, err := script.New("xx", "1")
 	suite.NoError(err)
 
 	suite.T().Cleanup(func() {
-		suite.NoError(os.RemoveAll(s.TempPath()))
+		suite.NoError(os.RemoveAll(scr.TempPath()))
 	})
 
-	s.Config.Network = true
-	environ := s.Environ(context.Background(), argparse.ParsedArgs{
+	scr.Config.Network = true
+	environ := scr.Environ(context.Background(), argparse.ParsedArgs{
 		Keywords: map[string]string{
 			"k":  "v",
 			"XX": "y",
@@ -125,26 +125,27 @@ func (suite *ScriptTestSuite) TestEnviron() {
 
 	for _, v := range environ {
 		name, value, found := strings.Cut(v, "=")
-		require.True(suite.T(), found)
 		data[name] = value
+
+		require.True(suite.T(), found)
 	}
 
 	suite.Len(data, 30)
-	suite.Equal(s.Namespace, data[env.EnvNamespace])
-	suite.Equal(s.Executable, data[env.EnvCaller])
-	suite.Equal(s.Path(), data[env.EnvPathCaller])
-	suite.Equal(s.DataPath(), data[env.EnvPathData])
-	suite.Equal(s.CachePath(), data[env.EnvPathCache])
-	suite.Equal(s.StatePath(), data[env.EnvPathState])
-	suite.Equal(s.RuntimePath(), data[env.EnvPathRuntime])
-	suite.Equal(s.TempPath(), data[env.EnvPathTemp])
+	suite.Equal(scr.Namespace, data[env.EnvNamespace])
+	suite.Equal(scr.Executable, data[env.EnvCaller])
+	suite.Equal(scr.Path(), data[env.EnvPathCaller])
+	suite.Equal(scr.DataPath(), data[env.EnvPathData])
+	suite.Equal(scr.CachePath(), data[env.EnvPathCache])
+	suite.Equal(scr.StatePath(), data[env.EnvPathState])
+	suite.Equal(scr.RuntimePath(), data[env.EnvPathRuntime])
+	suite.Equal(scr.TempPath(), data[env.EnvPathTemp])
 	suite.Equal("v", data[env.EnvArgPrefix+"K"])
 	suite.Equal("y", data[env.EnvArgPrefix+"XX"])
-	suite.Contains(data, env.EnvIdUnique)
-	suite.Contains(data, env.EnvIdChainUnique)
-	suite.Contains(data, env.EnvIdIsolated)
-	suite.Contains(data, env.EnvIdChainIsolated)
-	suite.Contains(data, env.EnvMachineId)
+	suite.Contains(data, env.EnvIDUnique)
+	suite.Contains(data, env.EnvIDChainUnique)
+	suite.Contains(data, env.EnvIDIsolated)
+	suite.Contains(data, env.EnvIDChainIsolated)
+	suite.Contains(data, env.EnvMachineID)
 	suite.Contains(data, env.EnvStartedAtRFC3339)
 	suite.Contains(data, env.EnvStartedAtUnix)
 	suite.Contains(data, env.EnvStartedAtYear)

@@ -10,8 +10,8 @@ const (
 	EnvPathPrefix      = Prefix + "PATH_"
 	EnvNetworkPrefix   = Prefix + "NETWORK_"
 	EnvStartedAtPrefix = Prefix + "STARTED_AT_"
-	EnvIdPrefix        = Prefix + "ID_"
-	EnvIdChainPrefix   = Prefix + "CHAIN_ID_"
+	EnvIDPrefix        = Prefix + "ID_"
+	EnvIDChainPrefix   = Prefix + "CHAIN_ID_"
 
 	EnvNamespace = Prefix + "NAMESPACE"
 	EnvCaller    = Prefix + "CALLER"
@@ -23,12 +23,12 @@ const (
 	EnvPathRuntime = EnvPathPrefix + "RUNTIME"
 	EnvPathTemp    = EnvPathPrefix + "TEMP"
 
-	EnvIdUnique        = EnvIdPrefix + "UNIQUE"
-	EnvIdChainUnique   = EnvIdChainPrefix + "UNIQUE"
-	EnvIdIsolated      = EnvIdPrefix + "ISOLATED"
-	EnvIdChainIsolated = EnvIdChainPrefix + "ISOLATED"
+	EnvIDUnique        = EnvIDPrefix + "UNIQUE"
+	EnvIDChainUnique   = EnvIDChainPrefix + "UNIQUE"
+	EnvIDIsolated      = EnvIDPrefix + "ISOLATED"
+	EnvIDChainIsolated = EnvIDChainPrefix + "ISOLATED"
 
-	EnvMachineId = Prefix + "MACHINE_ID"
+	EnvMachineID = Prefix + "MACHINE_ID"
 
 	EnvStartedAtRFC3339    = EnvStartedAtPrefix + "RFC3339"
 	EnvStartedAtUnix       = EnvStartedAtPrefix + "UNIX"

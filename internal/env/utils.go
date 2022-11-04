@@ -24,13 +24,13 @@ func chainValues(value, upstream string) string {
 }
 
 func generateRandomString(length int) string {
-	id := make([]byte, length)
+	randomID := make([]byte, length)
 
-	if _, err := rand.Read(id); err != nil {
+	if _, err := rand.Read(randomID); err != nil {
 		panic(err)
 	}
 
-	return EncodeBytes(id)
+	return EncodeBytes(randomID)
 }
 
 func sendValue(ctx context.Context, results chan<- string, name, value string) {

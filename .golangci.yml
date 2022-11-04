@@ -1,0 +1,37 @@
+output:
+  format: "tab"
+  sort-results: true
+  uniq-by-line: true
+
+run:
+  go: "1.19"
+  tests: true
+  timeout: "90s"
+  allow-parallel-runners: false
+  allow-serial-runners: false
+  concurrency: 4
+
+linters:
+  enable:
+    - "revive"
+    - "wsl"
+    - "gofumpt"
+    - "unused"
+    - "gomnd"
+    - "cyclop"
+    - "varnamelen"
+    - "thelper"
+    - "nlreturn"
+    - "gocritic"
+    - "errorlint"
+    - "errchkjson"
+    - "unparam"
+    - "nolintlint"
+
+issues:
+  exclude-rules:
+    - path: '(.+)_test\.go'
+      # typecheck for some reason cannot understand "mixins". If code compiles
+      # and runs, this is enough
+      text: 'suite.(.*?) undefined \(type *(.*?)TestSuite has no field or method (.*?)\)'
+

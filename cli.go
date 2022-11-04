@@ -38,14 +38,6 @@ func (c *CliNamespace) UnmarshalText(b []byte) error {
 	return nil
 }
 
-func (c CliNamespace) String() string {
-	return c.Value
-}
-
-func (c CliNamespace) MarshalText() ([]byte, error) {
-	return []byte(c.String()), nil
-}
-
 var CLI struct {
 	Debug   bool             `short:"d" env:"CHORE_DEBUG" help:"Run in debug mode."`
 	Version kong.VersionFlag `short:"V" help:"Show version."`

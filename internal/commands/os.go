@@ -13,9 +13,7 @@ import (
 	"github.com/9seconds/chore/internal/script"
 )
 
-var (
-	ErrNotStarted = errors.New("process not started")
-)
+var ErrNotStarted = errors.New("process not started")
 
 type osCommand struct {
 	cmd       *exec.Cmd
@@ -99,8 +97,10 @@ func (o *osCommand) Wait() (ExecutionResult, error) {
 		result.ElapsedTime = o.finishTime.Sub(o.startTime)
 	}
 
-	if val, ok := o.finishErr.(*exec.ExitError); ok {
-		result.ExitCode = val.ExitCode()
+	var exitErr *exec.ExitError
+
+	if errors.As(o.finishErr, &exitErr) {
+		result.ExitCode = exitErr.ExitCode()
 
 		return result, nil
 	}
@@ -112,6 +112,7 @@ func NewOS(ctx context.Context, script script.Script, environ, args []string) Co
 	ctx, cancel := context.WithCancel(ctx)
 
 	cmd := exec.CommandContext(ctx, script.Path(), args...)
+
 	cmd.Env = append(os.Environ(), environ...)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout

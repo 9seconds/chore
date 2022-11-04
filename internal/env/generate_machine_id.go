@@ -9,15 +9,15 @@ import (
 	"github.com/denisbrodbeck/machineid"
 )
 
-func GenerateMachineId(ctx context.Context, results chan<- string, wg *sync.WaitGroup) {
-	if _, ok := os.LookupEnv(EnvMachineId); ok {
+func GenerateMachineID(ctx context.Context, results chan<- string, waiters *sync.WaitGroup) {
+	if _, ok := os.LookupEnv(EnvMachineID); ok {
 		return
 	}
 
-	wg.Add(1)
+	waiters.Add(1)
 
 	go func() {
-		defer wg.Done()
+		defer waiters.Done()
 
 		value, err := machineid.ProtectedID("chore")
 		if err != nil {
@@ -26,6 +26,6 @@ func GenerateMachineId(ctx context.Context, results chan<- string, wg *sync.Wait
 			return
 		}
 
-		sendValue(ctx, results, EnvMachineId, value)
+		sendValue(ctx, results, EnvMachineID, value)
 	}()
 }

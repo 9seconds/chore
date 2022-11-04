@@ -35,7 +35,7 @@ func (suite *OSTestSuite) SetupTest() {
 
 	suite.EnsureScript("x", "y", "echo $CHORE_CALLER $1")
 
-	s, err := suite.NewScript("x", "y")
+	scr, err := suite.NewScript("x", "y")
 	require.NoError(t, err)
 
 	parsedArgs := argparse.ParsedArgs{
@@ -45,8 +45,8 @@ func (suite *OSTestSuite) SetupTest() {
 		Positional: []string{"a", "b"},
 	}
 
-	suite.s = s
-	suite.environ = s.Environ(suite.Context(), parsedArgs)
+	suite.s = scr
+	suite.environ = scr.Environ(suite.Context(), parsedArgs)
 	suite.args = parsedArgs.Positional
 }
 

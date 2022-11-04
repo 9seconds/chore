@@ -20,27 +20,27 @@ func (suite *ParameterIntegerTestSuite) TestRequired() {
 		testValue := testValue
 
 		suite.T().Run(strconv.FormatBool(testValue), func(t *testing.T) {
-			p, err := config.NewInteger(testValue, nil)
+			param, err := config.NewInteger(testValue, nil)
 			assert.NoError(t, err)
-			assert.Equal(t, testValue, p.Required())
+			assert.Equal(t, testValue, param.Required())
 		})
 	}
 }
 
 func (suite *ParameterIntegerTestSuite) TestType() {
-	p, err := config.NewInteger(false, nil)
+	param, err := config.NewInteger(false, nil)
 	suite.NoError(err)
-	suite.Equal(config.ParameterInteger, p.Type())
+	suite.Equal(config.ParameterInteger, param.Type())
 }
 
 func (suite *ParameterIntegerTestSuite) TestString() {
-	p, err := config.NewInteger(false, nil)
+	param, err := config.NewInteger(false, nil)
 	suite.NoError(err)
-	suite.NotEmpty(p.String())
+	suite.NotEmpty(param.String())
 }
 
 func (suite *ParameterIntegerTestSuite) TestIncorrectValues() {
-	p, err := config.NewInteger(false, map[string]string{
+	param, err := config.NewInteger(false, map[string]string{
 		"min": "10",
 		"max": "20",
 	})
@@ -60,13 +60,13 @@ func (suite *ParameterIntegerTestSuite) TestIncorrectValues() {
 		testValue := testValue
 
 		suite.T().Run(testValue, func(t *testing.T) {
-			assert.Error(t, p.Validate(testValue))
+			assert.Error(t, param.Validate(testValue))
 		})
 	}
 }
 
 func (suite *ParameterIntegerTestSuite) TestCorrectValues() {
-	p, err := config.NewInteger(false, map[string]string{
+	param, err := config.NewInteger(false, map[string]string{
 		"min": "10",
 		"max": "20",
 	})
@@ -83,7 +83,7 @@ func (suite *ParameterIntegerTestSuite) TestCorrectValues() {
 		testValue := testValue
 
 		suite.T().Run(testValue, func(t *testing.T) {
-			assert.NoError(t, p.Validate(testValue))
+			assert.NoError(t, param.Validate(testValue))
 		})
 	}
 }

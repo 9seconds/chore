@@ -13,17 +13,19 @@ type ScriptTestSuite struct {
 }
 
 func (suite *ScriptTestSuite) Setup(t *testing.T) {
+	t.Helper()
+
 	suite.t = t
 }
 
 func (suite *ScriptTestSuite) NewScript(namespace, executable string) (script.Script, error) {
-	s, err := script.New(namespace, executable)
+	script, err := script.New(namespace, executable)
 
 	if err == nil {
 		suite.t.Cleanup(func() {
-			require.NoError(suite.t, os.RemoveAll(s.TempPath()))
+			require.NoError(suite.t, os.RemoveAll(script.TempPath()))
 		})
 	}
 
-	return s, err
+	return script, err
 }

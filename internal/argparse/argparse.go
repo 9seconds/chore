@@ -31,7 +31,7 @@ func (p ParsedArgs) Checksum() []byte {
 	sort.Strings(argNames)
 
 	mixer := sha256.New()
-	binary.Write(mixer, binary.LittleEndian, uint64(len(argNames)))
+	binary.Write(mixer, binary.LittleEndian, uint64(len(argNames))) //nolint: errcheck
 
 	for _, v := range argNames {
 		mixer.Write([]byte(v))
@@ -40,7 +40,7 @@ func (p ParsedArgs) Checksum() []byte {
 		mixer.Write([]byte{0x00})
 	}
 
-	binary.Write(mixer, binary.LittleEndian, uint64(len(p.Positional)))
+	binary.Write(mixer, binary.LittleEndian, uint64(len(p.Positional))) //nolint: errcheck
 
 	for _, v := range p.Positional {
 		mixer.Write([]byte(v))
@@ -52,32 +52,32 @@ func (p ParsedArgs) Checksum() []byte {
 
 func Parse(parameters map[string]config.Parameter, args []string) (ParsedArgs, error) {
 	keywords := make(map[string][]string)
-	rv := ParsedArgs{
+	rValue := ParsedArgs{
 		Keywords: make(map[string]string),
 	}
 
 	for idx, arg := range args {
 		if arg == SeparatorPositional {
-			rv.Positional = make([]string, len(args)-idx-1)
-			copy(rv.Positional, args[idx+1:])
+			rValue.Positional = make([]string, len(args)-idx-1)
+			copy(rValue.Positional, args[idx+1:])
 
 			break
 		}
 
 		name, value, found := strings.Cut(arg, SeparatorKeyword)
 		if !found {
-			return rv, fmt.Errorf("cannot find %s separator in argument %s", SeparatorKeyword, arg)
+			return rValue, fmt.Errorf("cannot find %s separator in argument %s", SeparatorKeyword, arg)
 		}
 
 		name = strings.ToLower(name)
 
 		spec, ok := parameters[name]
 		if !ok {
-			return rv, fmt.Errorf("unknown parameter %s", name)
+			return rValue, fmt.Errorf("unknown parameter %s", name)
 		}
 
 		if err := spec.Validate(value); err != nil {
-			return rv, fmt.Errorf("incorrect value %s for parameter %s: %w", name, value, err)
+			return rValue, fmt.Errorf("incorrect value %s for parameter %s: %w", name, value, err)
 		}
 
 		keywords[name] = append(keywords[name], value)
@@ -85,13 +85,13 @@ func Parse(parameters map[string]config.Parameter, args []string) (ParsedArgs, e
 
 	for name, param := range parameters {
 		if _, ok := keywords[name]; !ok && param.Required() {
-			return rv, fmt.Errorf("absent value for parameter %s", name)
+			return rValue, fmt.Errorf("absent value for parameter %s", name)
 		}
 	}
 
 	for k, v := range keywords {
-		rv.Keywords[k] = shellescape.QuoteCommand(v)
+		rValue.Keywords[k] = shellescape.QuoteCommand(v)
 	}
 
-	return rv, nil
+	return rValue, nil
 }

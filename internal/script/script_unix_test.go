@@ -12,7 +12,7 @@ func (suite *ScriptTestSuite) TestScriptNoExecutableBit() {
 	suite.EnsureScript("xx", "1", "echo 1")
 
 	path := suite.ConfigScriptPath("xx", "1")
-	suite.NoError(os.Chmod(path, 0600))
+	suite.NoError(os.Chmod(path, 0o600))
 
 	_, err := script.New("xx", "1")
 	suite.ErrorContains(err, "permission denied")

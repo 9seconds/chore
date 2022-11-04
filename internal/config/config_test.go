@@ -41,7 +41,7 @@ func (suite *ConfigTestSuite) TestParseDescription() {
 	configRaw := map[string]string{
 		"description": "xxy",
 	}
-	data, _ := json.Marshal(configRaw)
+	data, _ := json.Marshal(configRaw) //nolint: errchkjson
 	buf := bytes.NewBuffer(data)
 
 	conf, err := config.Parse(buf)
@@ -90,7 +90,7 @@ func (suite *ConfigTestSuite) TestUnknownParameterType() {
 			},
 		},
 	}
-	data, _ := json.Marshal(configRaw)
+	data, _ := json.Marshal(configRaw) //nolint: errchkjson
 	buf := bytes.NewBuffer(data)
 
 	_, err := config.Parse(buf)
@@ -109,7 +109,7 @@ func (suite *ConfigTestSuite) TestCannotInitializeParameter() {
 			},
 		},
 	}
-	data, _ := json.Marshal(configRaw)
+	data, _ := json.Marshal(configRaw) //nolint: errchkjson
 	buf := bytes.NewBuffer(data)
 
 	_, err := config.Parse(buf)
@@ -126,7 +126,7 @@ func (suite *ConfigTestSuite) TestIncorrectParameterName() {
 			},
 		},
 	}
-	data, _ := json.Marshal(configRaw)
+	data, _ := json.Marshal(configRaw) //nolint: errchkjson
 	buf := bytes.NewBuffer(data)
 
 	_, err := config.Parse(buf)

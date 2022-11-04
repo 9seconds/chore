@@ -31,8 +31,10 @@ func Parse(reader io.Reader) (Config, error) {
 			}
 		}
 
-		var value Parameter
-		var err error
+		var (
+			value Parameter
+			err   error
+		)
 
 		switch param.Type {
 		case ParameterInteger:

@@ -11,6 +11,8 @@ type CtxTestSuite struct {
 }
 
 func (suite *CtxTestSuite) Setup(t *testing.T) {
+	t.Helper()
+
 	ctx, cancel := context.WithCancel(context.Background())
 
 	suite.ctx = ctx
