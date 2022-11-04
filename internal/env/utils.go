@@ -34,8 +34,10 @@ func generateRandomString(length int) string {
 }
 
 func sendValue(ctx context.Context, results chan<- string, name, value string) {
-	select {
-	case <-ctx.Done():
-	case results <- MakeValue(name, value):
+	if value != "" {
+		select {
+		case <-ctx.Done():
+		case results <- MakeValue(name, value):
+		}
 	}
 }

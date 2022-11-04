@@ -99,7 +99,7 @@ func doRequest(ctx context.Context, client *http.Client, url string, target inte
 	return nil
 }
 
-func GenerateNetwork(ctx context.Context, results chan<- string, waiters *sync.WaitGroup) { //nolint: cyclop
+func GenerateNetwork(ctx context.Context, results chan<- string, waiters *sync.WaitGroup) {
 	waiters.Add(1)
 
 	go func() {
@@ -116,25 +116,13 @@ func GenerateNetwork(ctx context.Context, results chan<- string, waiters *sync.W
 			return
 		}
 
-		if resp.IP != "" {
-			sendValue(ctx, results, EnvNetworkIPv4, resp.IP)
-		}
-
-		if resp.Hostname != "" {
-			sendValue(ctx, results, EnvNetworkHostname, resp.Hostname)
-		}
-
-		if resp.City != "" {
-			sendValue(ctx, results, EnvNetworkCity, resp.City)
-		}
-
-		if resp.Region != "" {
-			sendValue(ctx, results, EnvNetworkRegion, resp.Region)
-		}
-
-		if resp.Country != "" {
-			sendValue(ctx, results, EnvNetworkCountry, resp.Country)
-		}
+		sendValue(ctx, results, EnvNetworkIPv4, resp.IP)
+		sendValue(ctx, results, EnvNetworkHostname, resp.Hostname)
+		sendValue(ctx, results, EnvNetworkCity, resp.City)
+		sendValue(ctx, results, EnvNetworkRegion, resp.Region)
+		sendValue(ctx, results, EnvNetworkCountry, resp.Country)
+		sendValue(ctx, results, EnvNetworkPostal, resp.Postal)
+		sendValue(ctx, results, EnvNetworkTimezone, resp.Timezone)
 
 		asnChunks := ipInfoOrgFormat.FindStringSubmatch(resp.Org)
 
@@ -144,14 +132,6 @@ func GenerateNetwork(ctx context.Context, results chan<- string, waiters *sync.W
 		case asnChunks != nil:
 			sendValue(ctx, results, EnvNetworkASN, asnChunks[1])
 			sendValue(ctx, results, EnvNetworkOrganization, asnChunks[2])
-		}
-
-		if resp.Postal != "" {
-			sendValue(ctx, results, EnvNetworkPostal, resp.Postal)
-		}
-
-		if resp.Timezone != "" {
-			sendValue(ctx, results, EnvNetworkTimezone, resp.Timezone)
 		}
 
 		if lat, lon, ok := strings.Cut(resp.Loc, ","); ok {

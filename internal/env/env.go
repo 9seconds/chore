@@ -12,6 +12,8 @@ const (
 	EnvStartedAtPrefix = Prefix + "STARTED_AT_"
 	EnvIDPrefix        = Prefix + "ID_"
 	EnvIDChainPrefix   = Prefix + "CHAIN_ID_"
+	EnvOSPrefix        = Prefix + "OS_"
+	EnvOSVersionPrefix = EnvOSPrefix + "VERSION_"
 
 	EnvNamespace = Prefix + "NAMESPACE"
 	EnvCaller    = Prefix + "CALLER"
@@ -29,6 +31,14 @@ const (
 	EnvIDChainIsolated = EnvIDChainPrefix + "ISOLATED"
 
 	EnvMachineID = Prefix + "MACHINE_ID"
+
+	EnvOSType         = EnvOSPrefix + "TYPE"
+	EnvOSArch         = EnvOSPrefix + "ARCH"
+	EnvOSID           = EnvOSPrefix + "ID"
+	EnvOSCodename     = EnvOSPrefix + "CODENAME"
+	EnvOSVersion      = EnvOSPrefix + "VERSION"
+	EnvOSVersionMajor = EnvOSVersionPrefix + "MAJOR"
+	EnvOSVersionMinor = EnvOSVersionPrefix + "MINOR"
 
 	EnvStartedAtRFC3339    = EnvStartedAtPrefix + "RFC3339"
 	EnvStartedAtUnix       = EnvStartedAtPrefix + "UNIX"
