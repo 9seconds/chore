@@ -117,6 +117,5 @@ func (suite *ParseTestSuite) TestMergeArguments() {
 }
 
 func TestSuite(t *testing.T) {
-	t.Parallel()
 	suite.Run(t, &ParseTestSuite{})
 }

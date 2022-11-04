@@ -21,6 +21,5 @@ func (suite *GenerateOSTestSuite) TestNoEnv() {
 }
 
 func TestGenerateOS(t *testing.T) {
-	t.Parallel()
 	suite.Run(t, &GenerateOSTestSuite{})
 }

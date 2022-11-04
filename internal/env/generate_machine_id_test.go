@@ -28,6 +28,5 @@ func (suite *GenerateMachineIDTestSuite) TestWithEnv() {
 }
 
 func TestGenerateMachineID(t *testing.T) {
-	t.Parallel()
 	suite.Run(t, &GenerateMachineIDTestSuite{})
 }

@@ -72,6 +72,5 @@ func (suite *MacOSPlistTestSuite) TestUnknownVersion() {
 }
 
 func TestMacOSPlist(t *testing.T) {
-	t.Parallel()
 	suite.Run(t, &MacOSPlistTestSuite{})
 }

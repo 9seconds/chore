@@ -61,6 +61,5 @@ func (suite *GenerateTimeTestSuite) TestOk() {
 }
 
 func TestGenerateTime(t *testing.T) {
-	t.Parallel()
 	suite.Run(t, &GenerateTimeTestSuite{})
 }

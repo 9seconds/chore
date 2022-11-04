@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"regexp"
-	"strings"
 )
 
 const ParameterString = "string"
@@ -35,23 +34,18 @@ func (p paramString) Validate(_ context.Context, value string) error {
 }
 
 func NewString(required bool, spec map[string]string) (Parameter, error) {
-	var parsedRe *regexp.Regexp
+	param := paramString{
+		required: required,
+	}
 
 	if value, ok := spec["regexp"]; ok {
-		if !strings.HasPrefix(value, "^") && !strings.HasSuffix(value, "$") {
-			value = "^" + value + "$"
-		}
-
 		re, err := regexp.Compile(value)
 		if err != nil {
 			return nil, fmt.Errorf("cannot compile regexp: %w", err)
 		}
 
-		parsedRe = re
+		param.re = re
 	}
 
-	return paramString{
-		required: required,
-		re:       parsedRe,
-	}, nil
+	return param, nil
 }

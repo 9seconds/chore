@@ -55,7 +55,7 @@ func (suite *ParameterStringTestSuite) TestIncorrectRegexp() {
 
 func (suite *ParameterStringTestSuite) TestInvalidValues() {
 	param, err := config.NewString(false, map[string]string{
-		"regexp": `xx\w{2}\d`,
+		"regexp": `^xx\w{2}\d`,
 	})
 	suite.NoError(err)
 
@@ -99,6 +99,5 @@ func (suite *ParameterStringTestSuite) TestValidValues() {
 }
 
 func TestParameterString(t *testing.T) {
-	t.Parallel()
 	suite.Run(t, &ParameterStringTestSuite{})
 }

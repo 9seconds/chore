@@ -42,11 +42,9 @@ func (suite *EncodeBytesTestSuite) TestValue() {
 }
 
 func TestMakeValue(t *testing.T) {
-	t.Parallel()
 	suite.Run(t, &MakeValueTestSuite{})
 }
 
 func TestEncodeBytes(t *testing.T) {
-	t.Parallel()
 	suite.Run(t, &EncodeBytesTestSuite{})
 }

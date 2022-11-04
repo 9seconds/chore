@@ -147,6 +147,5 @@ func (suite *ConfigTestSuite) TestBrokenReader() {
 }
 
 func TestConfig(t *testing.T) {
-	t.Parallel()
 	suite.Run(t, &ConfigTestSuite{})
 }

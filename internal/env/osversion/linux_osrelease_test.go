@@ -63,6 +63,5 @@ func (suite *LinuxOSReleaseTestSuite) TestUnknownFile() {
 }
 
 func TestLinuxOSRelease(t *testing.T) {
-	t.Parallel()
 	suite.Run(t, &LinuxOSReleaseTestSuite{})
 }

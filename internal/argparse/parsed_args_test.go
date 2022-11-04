@@ -27,6 +27,5 @@ func (suite *ParsedArgsTestSuite) TestChecksum() {
 }
 
 func TestParsedArgs(t *testing.T) {
-	t.Parallel()
 	suite.Run(t, &ParsedArgsTestSuite{})
 }

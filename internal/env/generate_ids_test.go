@@ -65,6 +65,5 @@ func (suite *GenerateIdsTestSuite) TestChainUnique() {
 }
 
 func TestGenerateIds(t *testing.T) {
-	t.Parallel()
 	suite.Run(t, &GenerateIdsTestSuite{})
 }

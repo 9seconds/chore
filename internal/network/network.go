@@ -13,9 +13,21 @@ const (
 	httpTimeout    = 10 * time.Second
 )
 
+type Dialer interface {
+	DialContext(context.Context, string, string) (net.Conn, error)
+}
+
+type Resolver interface {
+	LookupAddr(context.Context, string) ([]string, error)
+}
+
 var (
-	Dialer = &net.Dialer{
+	NetDialer Dialer = &net.Dialer{
 		Timeout: connectTimeout,
+	}
+
+	DNSResolver Resolver = &net.Resolver{
+		Dial: NetDialer.DialContext,
 	}
 
 	CookieJar = func() *cookiejar.Jar {
@@ -31,7 +43,7 @@ var (
 		Jar: CookieJar,
 		Transport: &http.Transport{
 			Proxy:       http.ProxyFromEnvironment,
-			DialContext: Dialer.DialContext,
+			DialContext: NetDialer.DialContext,
 		},
 		Timeout: httpTimeout,
 	}
@@ -41,7 +53,7 @@ var (
 		Transport: &http.Transport{
 			Proxy: http.ProxyFromEnvironment,
 			DialContext: func(ctx context.Context, _, address string) (net.Conn, error) {
-				return Dialer.DialContext(ctx, "tcp4", address)
+				return NetDialer.DialContext(ctx, "tcp4", address)
 			},
 		},
 		Timeout: httpTimeout,
@@ -52,7 +64,7 @@ var (
 		Transport: &http.Transport{
 			Proxy: http.ProxyFromEnvironment,
 			DialContext: func(ctx context.Context, _, address string) (net.Conn, error) {
-				return Dialer.DialContext(ctx, "tcp6", address)
+				return NetDialer.DialContext(ctx, "tcp6", address)
 			},
 		},
 		Timeout: httpTimeout,

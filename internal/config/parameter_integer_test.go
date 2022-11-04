@@ -134,6 +134,5 @@ func (suite *ParameterIntegerTestSuite) TestIncorrectMinMax() {
 }
 
 func TestParameterInteger(t *testing.T) {
-	t.Parallel()
 	suite.Run(t, &ParameterIntegerTestSuite{})
 }

@@ -148,6 +148,5 @@ func (suite *ParameterFloatTestSuite) TestAllowInf() {
 }
 
 func TestParameterFloat(t *testing.T) {
-	t.Parallel()
 	suite.Run(t, &ParameterFloatTestSuite{})
 }
