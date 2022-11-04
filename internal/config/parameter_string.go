@@ -26,11 +26,11 @@ func (p paramString) String() string {
 }
 
 func (p paramString) Validate(value string) error {
-	if p.re == nil || p.re.MatchString(value) {
-		return nil
+	if p.re != nil && !p.re.MatchString(value) {
+		return fmt.Errorf("value %s does not match %s", value, p.re.String())
 	}
 
-	return fmt.Errorf("value does not match %s", p.re.String())
+	return nil
 }
 
 func NewString(required bool, spec map[string]string) (Parameter, error) {

@@ -41,6 +41,8 @@ func Parse(reader io.Reader) (Config, error) {
 			value, err = NewInteger(param.Required, param.Spec)
 		case ParameterString:
 			value, err = NewString(param.Required, param.Spec)
+		case ParameterFloat:
+			value, err = NewFloat(param.Required, param.Spec)
 		default:
 			return conf, fmt.Errorf("unknown parameter type %s for parameter %s", param.Type, name)
 		}

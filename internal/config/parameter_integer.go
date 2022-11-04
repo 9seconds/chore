@@ -28,11 +28,10 @@ func (p paramInteger) String() string {
 
 func (p paramInteger) Validate(value string) error {
 	parsed, err := strconv.ParseInt(value, 10, 64)
-	if err != nil {
-		return fmt.Errorf("cannot parse as integer: %w", err)
-	}
 
 	switch {
+	case err != nil:
+		return fmt.Errorf("cannot parse as integer: %w", err)
 	case parsed < p.min:
 		return fmt.Errorf("value is less than minimum %d", p.min)
 	case parsed > p.max:
