@@ -35,7 +35,14 @@ func (c *CliCmdRun) Run(ctx Context) error {
 		log.Printf("env: %s", v)
 	}
 
-	cmd := commands.NewOS(ctx, executable, environ, args.Positional)
+	cmd := commands.NewOS(
+		ctx,
+		executable,
+		environ,
+		args.Positional,
+		os.Stdin,
+		os.Stdout,
+		os.Stderr)
 
 	if err := cmd.Start(); err != nil {
 		return fmt.Errorf("cannot start command: %w", err)

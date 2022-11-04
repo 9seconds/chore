@@ -130,7 +130,7 @@ func (suite *ScriptTestSuite) TestEnviron() {
 		require.True(suite.T(), found)
 	}
 
-	suite.Len(data, 30)
+	suite.Len(data, 37)
 	suite.Equal(scr.Namespace, data[env.EnvNamespace])
 	suite.Equal(scr.Executable, data[env.EnvCaller])
 	suite.Equal(scr.Path(), data[env.EnvPathCaller])

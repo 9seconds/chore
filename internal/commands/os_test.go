@@ -1,6 +1,9 @@
 package commands_test
 
 import (
+	"bytes"
+	"io"
+	"os"
 	"testing"
 	"time"
 
@@ -17,12 +20,15 @@ type OSTestSuite struct {
 
 	testlib.CtxTestSuite
 	testlib.CustomRootTestSuite
-	testlib.RedirectStreamsTestSuite
 	testlib.ScriptTestSuite
 
 	s       script.Script
 	args    []string
 	environ []string
+
+	stdin  io.Reader
+	stdout *bytes.Buffer
+	stderr *bytes.Buffer
 }
 
 func (suite *OSTestSuite) SetupTest() {
@@ -30,7 +36,6 @@ func (suite *OSTestSuite) SetupTest() {
 
 	suite.CtxTestSuite.Setup(t)
 	suite.CustomRootTestSuite.Setup(t)
-	suite.RedirectStreamsTestSuite.Setup(t)
 	suite.ScriptTestSuite.Setup(t)
 
 	suite.EnsureScript("x", "y", "echo $CHORE_CALLER $1")
@@ -48,10 +53,28 @@ func (suite *OSTestSuite) SetupTest() {
 	suite.s = scr
 	suite.environ = scr.Environ(suite.Context(), parsedArgs)
 	suite.args = parsedArgs.Positional
+	suite.stdout = &bytes.Buffer{}
+	suite.stderr = &bytes.Buffer{}
+
+	stdin, err := os.Open(os.DevNull)
+	require.NoError(t, err)
+
+	t.Cleanup(func() {
+		stdin.Close()
+	})
+
+	suite.stdin = stdin
 }
 
 func (suite *OSTestSuite) TestExecuteCommand() {
-	cmd := commands.NewOS(suite.Context(), suite.s, suite.environ, suite.args)
+	cmd := commands.NewOS(
+		suite.Context(),
+		suite.s,
+		suite.environ,
+		suite.args,
+		suite.stdin,
+		suite.stdout,
+		suite.stderr)
 
 	suite.Equal(0, cmd.Pid())
 
@@ -64,12 +87,20 @@ func (suite *OSTestSuite) TestExecuteCommand() {
 	suite.Less(result.UserTime, time.Second)
 	suite.Less(result.SystemTime, time.Second)
 	suite.Less(result.ElapsedTime, time.Second)
-	suite.Empty(suite.Stderr())
-	suite.Equal("y a\n", suite.Stdout())
+	suite.Empty(suite.stderr.String())
+	suite.Equal("y a\n", suite.stdout.String())
 }
 
 func (suite *OSTestSuite) TestExitCode() {
-	cmd := commands.NewOS(suite.Context(), suite.s, suite.environ, suite.args)
+	cmd := commands.NewOS(
+		suite.Context(),
+		suite.s,
+		suite.environ,
+		suite.args,
+		suite.stdin,
+		suite.stdout,
+		suite.stderr)
+
 	suite.EnsureScript("x", "y", "exit 3")
 
 	suite.NoError(cmd.Start())

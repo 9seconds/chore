@@ -3,6 +3,7 @@ package commands
 import (
 	"context"
 	"errors"
+	"io"
 	"log"
 	"os"
 	"os/exec"
@@ -108,15 +109,18 @@ func (o *osCommand) Wait() (ExecutionResult, error) {
 	return result, o.finishErr
 }
 
-func NewOS(ctx context.Context, script script.Script, environ, args []string) Command {
+func NewOS(ctx context.Context, script script.Script,
+	environ, args []string,
+	stdin io.Reader, stdout, stderr io.Writer,
+) Command {
 	ctx, cancel := context.WithCancel(ctx)
 
 	cmd := exec.CommandContext(ctx, script.Path(), args...)
 
 	cmd.Env = append(os.Environ(), environ...)
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	cmd.Stdin = stdin
+	cmd.Stdout = stdout
+	cmd.Stderr = stderr
 
 	return &osCommand{
 		cmd:       cmd,

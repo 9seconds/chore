@@ -35,13 +35,13 @@ func ParseMacOSPlist(path string) (OSVersion, error) {
 		return version, fmt.Errorf("cannot parse plist: %w", err)
 	}
 
-	for _, v := range []string{MacOSProductName, MacOSVersion} {
-		if _, ok := data[v]; !ok {
-			return version, fmt.Errorf("cannot find out %s value", v)
+	for _, param := range []string{MacOSProductName, MacOSVersion} {
+		if _, ok := data[param]; !ok {
+			return version, fmt.Errorf("cannot find out %s value", param)
 		}
 
-		if _, ok := data[v].(string); !ok {
-			return version, fmt.Errorf("incorrect string value for %s", v)
+		if _, ok := data[param].(string); !ok {
+			return version, fmt.Errorf("incorrect string value for %s", param)
 		}
 	}
 
