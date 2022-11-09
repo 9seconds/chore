@@ -46,6 +46,36 @@ func (suite *ParameterHexTestSuite) TestString() {
 	suite.NotEmpty(param.String())
 }
 
+func (suite *ParameterHexTestSuite) TestIncorrectLength() {
+	testNames := []string{
+		"min_length",
+		"max_length",
+	}
+	testValues := []string{
+		"",
+		"-1",
+		"x",
+		"wdfsladkf1111",
+	}
+
+	for _, testName := range testNames {
+		testName := testName
+
+		suite.T().Run(testName, func(t *testing.T) {
+			for _, testValue := range testValues {
+				testValue := testValue
+
+				suite.T().Run(testValue, func(t *testing.T) {
+					_, err := config.NewHex(false, map[string]string{
+						testName: testValue,
+					})
+					assert.ErrorContains(t, err, "incorrect "+testName+" value")
+				})
+			}
+		})
+	}
+}
+
 func (suite *ParameterHexTestSuite) TestValidaton() {
 	testTable := map[string]bool{
 		"X":  false,
@@ -75,6 +105,36 @@ func (suite *ParameterHexTestSuite) TestValidaton() {
 				assert.NoError(t, err)
 			} else {
 				assert.ErrorContains(t, err, "incorrectly encoded hex value")
+			}
+		})
+	}
+}
+
+func (suite *ParameterHexTestSuite) TestStringLengthValidation() {
+	testTable := map[string]bool{
+		"":       false,
+		"AA":     true,
+		"CCCC":   true,
+		"ABCDEF": false,
+	}
+
+	param, err := config.NewHex(false, map[string]string{
+		"min_length": "1",
+		"max_length": "4",
+	})
+	suite.NoError(err)
+
+	for testName, isValid := range testTable {
+		testName := testName
+		isValid := isValid
+
+		suite.T().Run(testName, func(t *testing.T) {
+			err := param.Validate(suite.Context(), testName)
+
+			if isValid {
+				assert.NoError(t, err)
+			} else {
+				assert.ErrorContains(t, err, "value length must be")
 			}
 		})
 	}

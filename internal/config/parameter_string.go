@@ -9,6 +9,8 @@ import (
 const ParameterString = "string"
 
 type paramString struct {
+	mixinStringLength
+
 	required bool
 	re       *regexp.Regexp
 }
@@ -22,7 +24,7 @@ func (p paramString) Type() string {
 }
 
 func (p paramString) String() string {
-	return fmt.Sprintf("required=%t, re=%v", p.required, p.re)
+	return fmt.Sprintf("required=%t, re=%v, %s", p.required, p.re, p.mixinStringLength)
 }
 
 func (p paramString) Validate(_ context.Context, value string) error {
@@ -30,12 +32,18 @@ func (p paramString) Validate(_ context.Context, value string) error {
 		return fmt.Errorf("value %s does not match %s", value, p.re.String())
 	}
 
-	return nil
+	return p.mixinStringLength.Validate(value)
 }
 
 func NewString(required bool, spec map[string]string) (Parameter, error) {
 	param := paramString{
 		required: required,
+	}
+
+	if stringLength, err := makeMixinStringLength(spec, "min_length", "max_length"); err == nil {
+		param.mixinStringLength = stringLength
+	} else {
+		return nil, err
 	}
 
 	if value, ok := spec["regexp"]; ok {

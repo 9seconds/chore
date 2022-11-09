@@ -26,6 +26,8 @@ var (
 )
 
 type paramBase64 struct {
+	mixinStringLength
+
 	required     bool
 	encodingName string
 	encoding     *base64.Encoding
@@ -48,7 +50,7 @@ func (p paramBase64) Validate(_ context.Context, value string) error {
 		return fmt.Errorf("incorrectly encoded value: %w", err)
 	}
 
-	return nil
+	return p.mixinStringLength.Validate(value)
 }
 
 func NewBase64(required bool, spec map[string]string) (Parameter, error) {
@@ -67,6 +69,12 @@ func NewBase64(required bool, spec map[string]string) (Parameter, error) {
 		param.encoding = enc
 	} else {
 		return nil, fmt.Errorf("incorrect encoding %s", encoding)
+	}
+
+	if mixin, err := makeMixinStringLength(spec, "min_length", "max_length"); err == nil {
+		param.mixinStringLength = mixin
+	} else {
+		return nil, err
 	}
 
 	return param, nil
