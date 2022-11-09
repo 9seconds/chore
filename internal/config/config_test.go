@@ -54,6 +54,8 @@ func (suite *ConfigTestSuite) TestParameter() {
 		config.ParameterInteger,
 		config.ParameterString,
 		config.ParameterFloat,
+		config.ParameterURL,
+		config.ParameterEmail,
 	}
 
 	for _, testValue := range tableTest {
