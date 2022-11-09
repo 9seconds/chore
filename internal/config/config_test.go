@@ -56,18 +56,27 @@ func (suite *ConfigTestSuite) TestParameter() {
 		config.ParameterFloat,
 		config.ParameterURL,
 		config.ParameterEmail,
+		config.ParameterEnum,
 	}
 
 	for _, testValue := range tableTest {
 		testValue := testValue
 
 		suite.T().Run(testValue, func(t *testing.T) {
+			spec := map[string]interface{}{}
+
+			if testValue == config.ParameterEnum {
+				spec = map[string]interface{}{
+					"choices": "xx",
+				}
+			}
+
 			configRaw := map[string]interface{}{
 				"parameters": map[string]interface{}{
 					"param": map[string]interface{}{
 						"type":     testValue,
 						"required": true,
-						"spec":     map[string]interface{}{},
+						"spec":     spec,
 					},
 				},
 			}
