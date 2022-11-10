@@ -18,6 +18,7 @@ type Dialer interface {
 }
 
 type Resolver interface {
+	LookupHost(context.Context, string) ([]string, error)
 	LookupAddr(context.Context, string) ([]string, error)
 	LookupMX(context.Context, string) ([]*net.MX, error)
 }
