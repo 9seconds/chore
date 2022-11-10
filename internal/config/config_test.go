@@ -60,6 +60,7 @@ func (suite *ConfigTestSuite) TestParameter() {
 		config.ParameterBase64,
 		config.ParameterHex,
 		config.ParameterHostname,
+		config.ParameterMac,
 	}
 
 	for _, testValue := range tableTest {

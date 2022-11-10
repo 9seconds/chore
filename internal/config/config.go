@@ -55,6 +55,8 @@ func Parse(reader io.Reader) (Config, error) {
 			value, err = NewHex(param.Required, param.Spec)
 		case ParameterHostname:
 			value, err = NewHostname(param.Required, param.Spec)
+		case ParameterMac:
+			value, err = NewMac(param.Required, param.Spec)
 		default:
 			return conf, fmt.Errorf("unknown parameter type %s for parameter %s", param.Type, name)
 		}
