@@ -20,6 +20,7 @@ require (
 require (
 	github.com/alecthomas/repr v0.1.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/gofrs/uuid v4.3.1+incompatible // indirect
 	github.com/hexops/gotextdiff v1.0.3 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
