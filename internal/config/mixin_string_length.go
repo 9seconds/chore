@@ -10,17 +10,10 @@ import (
 type mixinStringLength struct {
 	minValue int
 	maxValue int
-	minName  string
-	maxName  string
 }
 
 func (m mixinStringLength) String() string {
-	return fmt.Sprintf(
-		"%s=%d, %s=%d",
-		m.minName,
-		m.minValue,
-		m.maxName,
-		m.maxValue)
+	return fmt.Sprintf("min=%d, max=%d", m.minValue, m.maxValue)
 }
 
 func (m mixinStringLength) Validate(value string) error {
@@ -40,8 +33,6 @@ func makeMixinStringLength(spec map[string]string, minName, maxName string) (mix
 	rValue := mixinStringLength{
 		minValue: 0,
 		maxValue: math.MaxInt,
-		minName:  minName,
-		maxName:  maxName,
 	}
 
 	if min, ok := spec[minName]; ok {

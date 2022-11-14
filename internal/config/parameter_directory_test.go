@@ -106,7 +106,7 @@ func (suite *ParameterDirectoryTestSuite) TestIsNotDir() {
 	suite.NoError(err)
 	suite.ErrorContains(
 		param.Validate(suite.Context(), suite.EnsureScript("x", "y", "")),
-		"is not directory")
+		"is not a directory")
 }
 
 func (suite *ParameterDirectoryTestSuite) TestWrongMode() {
