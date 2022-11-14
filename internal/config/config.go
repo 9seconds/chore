@@ -63,6 +63,8 @@ func Parse(reader io.Reader) (Config, error) {
 			value, err = NewXML(param.Required, param.Spec)
 		case ParameterUUID:
 			value, err = NewUUID(param.Required, param.Spec)
+		case ParameterDirectory:
+			value, err = NewDirectory(param.Required, param.Spec)
 		default:
 			return conf, fmt.Errorf("unknown parameter type %s for parameter %s", param.Type, name)
 		}

@@ -8,6 +8,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/9seconds/chore/internal/access"
 	"github.com/9seconds/chore/internal/argparse"
 	"github.com/9seconds/chore/internal/config"
 	"github.com/9seconds/chore/internal/env"
@@ -112,7 +113,7 @@ func New(namespace, executable string) (Script, error) {
 		Executable: executable,
 	}
 
-	if err := isExecutable(rValue.Path()); err != nil {
+	if err := access.Access(rValue.Path(), false, false, true); err != nil {
 		return rValue, fmt.Errorf("cannot find out executable %s: %w", rValue.Path(), err)
 	}
 

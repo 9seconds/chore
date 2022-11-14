@@ -49,6 +49,10 @@ func (suite *CustomRootTestSuite) Setup(t *testing.T) {
 	xdg.RuntimeDir = filepath.Join(suite.fsRoot, "runtime_dir")
 }
 
+func (suite *CustomRootTestSuite) RootPath() string {
+	return suite.fsRoot
+}
+
 func (suite *CustomRootTestSuite) EnsureDir(path string) string {
 	require.NoError(suite.t, os.MkdirAll(path, defaultDirPermission))
 
@@ -108,12 +112,16 @@ func (suite *CustomRootTestSuite) RuntimeScriptPath(namespace, executable string
 	return filepath.Join(xdg.RuntimeDir, env.ChoreDir, namespace, executable)
 }
 
-func (suite *CustomRootTestSuite) EnsureScript(namespace, executable, content string) {
+func (suite *CustomRootTestSuite) EnsureScript(namespace, executable, content string) string {
 	content = "#!/usr/bin/env bash\nset -eu -o pipefail\n" + content
+	path := suite.ConfigScriptPath(namespace, executable)
+
 	suite.EnsureFile(
 		suite.ConfigScriptPath(namespace, executable),
 		content,
 		defaultScriptPermission)
+
+	return path
 }
 
 func (suite *CustomRootTestSuite) EnsureScriptConfig(namespace, executable string, content interface{}) {
