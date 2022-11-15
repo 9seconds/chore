@@ -130,7 +130,7 @@ func (suite *ScriptTestSuite) TestEnviron() {
 		require.True(suite.T(), found)
 	}
 
-	suite.Len(data, 37)
+	suite.Len(data, 39)
 	suite.Equal(scr.Namespace, data[env.EnvNamespace])
 	suite.Equal(scr.Executable, data[env.EnvCaller])
 	suite.Equal(scr.Path(), data[env.EnvPathCaller])
@@ -161,6 +161,8 @@ func (suite *ScriptTestSuite) TestEnviron() {
 	suite.Contains(data, env.EnvStartedAtOffset)
 	suite.Contains(data, env.EnvStartedAtWeekday)
 	suite.Contains(data, env.EnvStartedAtWeekdayStr)
+	suite.Contains(data, env.EnvHostname)
+	suite.Contains(data, env.EnvHostnameFQDN)
 }
 
 func TestScript(t *testing.T) {

@@ -89,6 +89,7 @@ func (s Script) Environ(ctx context.Context, args argparse.ParsedArgs) []string 
 	env.GenerateMachineID(ctx, values, waiterGroup)
 	env.GenerateIds(ctx, values, waiterGroup, s.Path(), args)
 	env.GenerateOS(ctx, values, waiterGroup)
+	env.GenerateHostname(ctx, values, waiterGroup)
 
 	if s.Config.Network {
 		env.GenerateNetwork(ctx, values, waiterGroup)
