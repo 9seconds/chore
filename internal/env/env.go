@@ -68,4 +68,7 @@ const (
 	EnvNetworkTimezone     = EnvNetworkPrefix + "TIMEZONE"
 	EnvNetworkLatitude     = EnvNetworkPrefix + "LATITUDE"
 	EnvNetworkLongitude    = EnvNetworkPrefix + "LONGITUDE"
+
+	EnvHostname     = Prefix + "HOSTNAME"
+	EnvHostnameFQDN = Prefix + "HOSTNAME_FQDN"
 )

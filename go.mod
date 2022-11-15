@@ -20,6 +20,7 @@ require (
 )
 
 require (
+	github.com/Showmax/go-fqdn v1.0.0 // indirect
 	github.com/alecthomas/repr v0.1.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/hexops/gotextdiff v1.0.3 // indirect
