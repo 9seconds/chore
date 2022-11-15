@@ -7,13 +7,14 @@ GOFUMPT_VERSION       := v0.4.0
 VERSION      := $(shell git describe --exact-match HEAD 2>/dev/null || git describe --tags --always)
 STATIC_FLAGS := -trimpath -mod=readonly -ldflags="-extldflags '-static' -s -w -X 'main.version=$(VERSION)'"
 GOTOOL       := env "GOBIN=$(abspath $(GOBIN))" "PATH=$(abspath $(GOBIN)):$(PATH)"
+GO_FILES     := $(shell find . -name "*.go" -type f | grep -vE '_test\.go$$')
 
 # -----------------------------------------------------------------------------
 
 .PHONY: all
 all: $(APP_NAME)
 
-$(APP_NAME):
+$(APP_NAME): $(GO_FILES) go.sum
 	@go build -o "$(APP_NAME)"
 
 vendor: go.mod go.sum
