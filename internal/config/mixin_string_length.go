@@ -16,7 +16,7 @@ func (m mixinStringLength) String() string {
 	return fmt.Sprintf("min=%d, max=%d", m.minValue, m.maxValue)
 }
 
-func (m mixinStringLength) Validate(value string) error {
+func (m mixinStringLength) validate(value string) error {
 	length := utf8.RuneCountInString(value)
 
 	switch {

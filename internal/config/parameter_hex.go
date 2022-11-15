@@ -31,7 +31,7 @@ func (p paramHex) Validate(_ context.Context, value string) error {
 		return fmt.Errorf("incorrectly encoded hex value: %w", err)
 	}
 
-	return p.mixinStringLength.Validate(value)
+	return p.mixinStringLength.validate(value)
 }
 
 func NewHex(required bool, spec map[string]string) (Parameter, error) {

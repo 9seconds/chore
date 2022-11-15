@@ -36,14 +36,14 @@ func (m mixinPermissions) isExist() bool {
 	return m.exists || m.readable || m.writable || m.executable || m.mode != 0
 }
 
-func (m mixinPermissions) Validate(value string) (fs.FileInfo, error) {
+func (m mixinPermissions) validate(value string, exists bool) (fs.FileInfo, error) {
 	stat, err := os.Stat(value)
 
 	switch {
 	case errors.Is(err, fs.ErrNotExist):
 		stat = nil
 
-		if m.isExist() {
+		if exists {
 			return nil, errDoesNotExist
 		}
 	case err != nil:

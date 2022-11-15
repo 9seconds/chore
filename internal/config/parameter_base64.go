@@ -50,7 +50,7 @@ func (p paramBase64) Validate(_ context.Context, value string) error {
 		return fmt.Errorf("incorrectly encoded value: %w", err)
 	}
 
-	return p.mixinStringLength.Validate(value)
+	return p.mixinStringLength.validate(value)
 }
 
 func NewBase64(required bool, spec map[string]string) (Parameter, error) {

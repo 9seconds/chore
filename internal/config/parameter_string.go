@@ -32,7 +32,7 @@ func (p paramString) Validate(_ context.Context, value string) error {
 		return fmt.Errorf("value %s does not match %s", value, p.re.String())
 	}
 
-	return p.mixinStringLength.Validate(value)
+	return p.mixinStringLength.validate(value)
 }
 
 func NewString(required bool, spec map[string]string) (Parameter, error) {

@@ -31,7 +31,7 @@ func (p paramDirectory) String() string {
 }
 
 func (p paramDirectory) Validate(_ context.Context, value string) error {
-	stat, err := p.mixinPermissions.Validate(value)
+	stat, err := p.mixinPermissions.validate(value, p.isExist())
 
 	switch {
 	case err != nil:

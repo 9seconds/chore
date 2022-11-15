@@ -58,7 +58,7 @@ func (p paramHostname) Validate(ctx context.Context, value string) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	if err := p.mixinStringLength.Validate(value); err != nil {
+	if err := p.mixinStringLength.validate(value); err != nil {
 		return err
 	}
 
