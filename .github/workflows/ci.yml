@@ -1,0 +1,88 @@
+---
+
+name: CI
+
+permissions:
+  actions: read
+  checks: read
+  contents: read
+  deployments: read
+  issues: read
+  discussions: read
+  pull-requests: read
+  repository-projects: read
+  security-events: read
+  statuses: read
+
+on:
+  push:
+    tags:
+      - v*
+    branches:
+      - master
+  release:
+    types:
+      - published
+      - released
+  pull_request:
+    types:
+      - opened
+      - edited
+      - reopened
+      - synchronize
+      - ready_for_review
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        go_version:
+          - ^1.19
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ matrix.go_version }}
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: ${{ runner.os }}-go-
+
+      - name: Run tests
+        run: make full-test
+
+      - name: Collect coverage
+        uses: codecov/codecov-action@v1
+        with:
+          file: ./coverage.out
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.19
+
+      - name: Run linter
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.50.1
