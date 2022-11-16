@@ -10,9 +10,7 @@ import (
 	"github.com/9seconds/chore/internal/access"
 )
 
-var (
-	errDoesNotExist = errors.New("does not exist")
-)
+var errDoesNotExist = errors.New("does not exist")
 
 type mixinPermissions struct {
 	exists     bool
@@ -62,8 +60,7 @@ func (m mixinPermissions) validate(value string, exists bool) (fs.FileInfo, erro
 	return stat, nil
 }
 
-func makeMixinPermissions(spec map[string]string,
-	existsName, readableName, writableName, executableName string) (mixinPermissions, error) {
+func makeMixinPermissions(spec map[string]string) (mixinPermissions, error) {
 	mixin := mixinPermissions{}
 
 	if value, err := parseBool(spec, "exists"); err == nil {

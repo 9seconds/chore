@@ -29,26 +29,28 @@ func (m mixinStringLength) validate(value string) error {
 	return nil
 }
 
-func makeMixinStringLength(spec map[string]string, minName, maxName string) (mixinStringLength, error) {
+func makeMixinStringLength(spec map[string]string) (mixinStringLength, error) {
 	rValue := mixinStringLength{
 		minValue: 0,
 		maxValue: math.MaxInt,
 	}
 
-	if min, ok := spec[minName]; ok {
-		if value, err := strconv.ParseUint(min, 10, 64); err != nil {
-			return rValue, fmt.Errorf("incorrect %s value: %w", minName, err)
-		} else {
-			rValue.minValue = int(value)
+	if min, ok := spec["min_length"]; ok {
+		value, err := strconv.ParseUint(min, 10, 64)
+		if err != nil {
+			return rValue, fmt.Errorf("incorrect 'min_length' value: %w", err)
 		}
+
+		rValue.minValue = int(value)
 	}
 
-	if max, ok := spec[maxName]; ok {
-		if value, err := strconv.ParseUint(max, 10, 64); err != nil {
-			return rValue, fmt.Errorf("incorrect %s value: %w", maxName, err)
-		} else {
-			rValue.maxValue = int(value)
+	if max, ok := spec["max_length"]; ok {
+		value, err := strconv.ParseUint(max, 10, 64)
+		if err != nil {
+			return rValue, fmt.Errorf("incorrect 'max_length' value: %w", err)
 		}
+
+		rValue.maxValue = int(value)
 	}
 
 	if rValue.maxValue < rValue.minValue {

@@ -10,16 +10,14 @@ import (
 
 const ParameterUUID = "uuid"
 
-var (
-	validUUIDVersions = map[byte]bool{
-		1: true,
-		3: true,
-		4: true,
-		5: true,
-		6: true,
-		7: true,
-	}
-)
+var validUUIDVersions = map[byte]bool{
+	1: true,
+	3: true,
+	4: true,
+	5: true,
+	6: true,
+	7: true,
+}
 
 type paramUUID struct {
 	required bool

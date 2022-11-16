@@ -13,5 +13,6 @@ type DialerMock struct {
 
 func (m *DialerMock) DialContext(ctx context.Context, network, address string) (net.Conn, error) {
 	args := m.Called(ctx, network, address)
+
 	return args.Get(0).(net.Conn), args.Error(1)
 }

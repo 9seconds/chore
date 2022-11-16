@@ -28,7 +28,7 @@ func (suite *ParameterFileTestSuite) SetupTest() {
 	suite.path = suite.EnsureFile(
 		filepath.Join(suite.RootPath(), "file"),
 		"<html><head></head><body></body></html>",
-		0600)
+		0o600)
 }
 
 func (suite *ParameterFileTestSuite) TestRequired() {

@@ -167,13 +167,13 @@ func (suite *ScriptTestSuite) TestEnviron() {
 	if value, err := os.Hostname(); err == nil {
 		suite.Equal(value, data[env.EnvHostname])
 
-		count += 1
+		count++
 	}
 
 	if value, err := fqdn.FqdnHostname(); err == nil {
 		suite.Equal(value, data[env.EnvHostnameFQDN])
 
-		count += 1
+		count++
 	}
 
 	suite.Len(data, count)

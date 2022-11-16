@@ -40,7 +40,7 @@ func (p paramURL) String() string {
 		p.resolve)
 }
 
-func (p paramURL) Validate(ctx context.Context, value string) error {
+func (p paramURL) Validate(ctx context.Context, value string) error { //nolint: cyclop
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 

@@ -59,6 +59,7 @@ func (p paramIP) Validate(ctx context.Context, value string) error {
 
 		if subnet.Contains(addr) {
 			found = true
+
 			break
 		}
 	}
@@ -83,7 +84,6 @@ func NewIP(required bool, spec map[string]string) (Parameter, error) {
 
 	for _, v := range parseCSV(spec["allowed_subnets"]) {
 		_, subnet, err := net.ParseCIDR(v)
-
 		if err != nil {
 			return nil, fmt.Errorf("%s is incorrect subnet: %w", v, err)
 		}
@@ -93,7 +93,6 @@ func NewIP(required bool, spec map[string]string) (Parameter, error) {
 
 	for _, v := range parseCSV(spec["forbidden_subnets"]) {
 		_, subnet, err := net.ParseCIDR(v)
-
 		if err != nil {
 			return nil, fmt.Errorf("%s is incorrect subnet: %w", v, err)
 		}

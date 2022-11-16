@@ -10,9 +10,7 @@ import (
 
 const ParameterFile = "file"
 
-var (
-	errIsNotFile = errors.New("is not a file")
-)
+var errIsNotFile = errors.New("is not a file")
 
 type paramFile struct {
 	mixinPermissions
@@ -70,12 +68,7 @@ func NewFile(required bool, spec map[string]string) (Parameter, error) {
 		required: required,
 	}
 
-	mixin, err := makeMixinPermissions(
-		spec,
-		"exists",
-		"readable",
-		"writable",
-		"executable")
+	mixin, err := makeMixinPermissions(spec)
 	if err != nil {
 		return param, err
 	}

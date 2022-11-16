@@ -8,9 +8,7 @@ import (
 
 const ParameterDirectory = "directory"
 
-var (
-	errIsNotDirectory = errors.New("is not a directory")
-)
+var errIsNotDirectory = errors.New("is not a directory")
 
 type paramDirectory struct {
 	mixinPermissions
@@ -48,12 +46,7 @@ func NewDirectory(required bool, spec map[string]string) (Parameter, error) {
 		required: required,
 	}
 
-	mixin, err := makeMixinPermissions(
-		spec,
-		"exists",
-		"readable",
-		"writable",
-		"executable")
+	mixin, err := makeMixinPermissions(spec)
 	if err != nil {
 		return param, err
 	}

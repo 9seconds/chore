@@ -20,7 +20,7 @@ type validatedValue struct {
 	value string
 }
 
-func Parse(ctx context.Context, parameters map[string]config.Parameter, args []string) (ParsedArgs, error) {
+func Parse(ctx context.Context, parameters map[string]config.Parameter, args []string) (ParsedArgs, error) { //nolint: cyclop
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -90,7 +90,8 @@ func validateValue(ctx context.Context,
 	waiters *sync.WaitGroup,
 	spec config.Parameter,
 	name, value string,
-	resChan chan<- validatedValue, errChan chan<- error) {
+	resChan chan<- validatedValue, errChan chan<- error,
+) {
 	waiters.Add(1)
 
 	go func() {
