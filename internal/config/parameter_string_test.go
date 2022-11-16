@@ -76,7 +76,7 @@ func (suite *ParameterStringTestSuite) TestIncorrectLength() {
 					_, err := config.NewString(false, map[string]string{
 						testName: testValue,
 					})
-					assert.ErrorContains(t, err, "incorrect "+testName+" value")
+					assert.ErrorContains(t, err, "incorrect '"+testName+"' value")
 				})
 			}
 		})

@@ -69,7 +69,7 @@ func (suite *ParameterHexTestSuite) TestIncorrectLength() {
 					_, err := config.NewHex(false, map[string]string{
 						testName: testValue,
 					})
-					assert.ErrorContains(t, err, "incorrect "+testName+" value")
+					assert.ErrorContains(t, err, "incorrect '"+testName+"' value")
 				})
 			}
 		})
