@@ -12,18 +12,16 @@ const (
 	Base64EncRawStd  = "raw_std"
 	Base64EncRawURL  = "raw_url"
 	Base64EncStd     = "std"
-	Base64EncUrl     = "url"
+	Base64EncURL     = "url"
 	Base64EncDefault = Base64EncStd
 )
 
-var (
-	base64Encodings = map[string]*base64.Encoding{
-		Base64EncRawStd: base64.RawStdEncoding,
-		Base64EncRawURL: base64.RawURLEncoding,
-		Base64EncStd:    base64.StdEncoding,
-		Base64EncUrl:    base64.URLEncoding,
-	}
-)
+var base64Encodings = map[string]*base64.Encoding{
+	Base64EncRawStd: base64.RawStdEncoding,
+	Base64EncRawURL: base64.RawURLEncoding,
+	Base64EncStd:    base64.StdEncoding,
+	Base64EncURL:    base64.URLEncoding,
+}
 
 type paramBase64 struct {
 	mixinStringLength
@@ -71,7 +69,7 @@ func NewBase64(required bool, spec map[string]string) (Parameter, error) {
 		return nil, fmt.Errorf("incorrect encoding %s", encoding)
 	}
 
-	if mixin, err := makeMixinStringLength(spec, "min_length", "max_length"); err == nil {
+	if mixin, err := makeMixinStringLength(spec); err == nil {
 		param.mixinStringLength = mixin
 	} else {
 		return nil, err

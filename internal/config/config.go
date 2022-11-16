@@ -12,7 +12,7 @@ type Config struct {
 	Parameters  map[string]Parameter
 }
 
-func Parse(reader io.Reader) (Config, error) {
+func Parse(reader io.Reader) (Config, error) { //nolint: cyclop
 	raw, err := parseRaw(reader)
 	if err != nil {
 		return Config{}, err

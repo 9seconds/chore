@@ -39,7 +39,7 @@ func NewHex(required bool, spec map[string]string) (Parameter, error) {
 		required: required,
 	}
 
-	if stringLength, err := makeMixinStringLength(spec, "min_length", "max_length"); err == nil {
+	if stringLength, err := makeMixinStringLength(spec); err == nil {
 		param.mixinStringLength = stringLength
 	} else {
 		return nil, err

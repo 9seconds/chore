@@ -12,14 +12,8 @@ import (
 	"regexp"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/9seconds/chore/internal/network"
-)
-
-const (
-	connectTimeout = 2 * time.Second
-	httpTimeout    = 10 * time.Second
 )
 
 type ipInfoResponse struct {
@@ -38,9 +32,7 @@ type ifConfigResponse struct {
 	IP string `json:"ip"`
 }
 
-var (
-	ipInfoOrgFormat = regexp.MustCompile(`^AS(\d+)\s+(.*?)$`)
-)
+var ipInfoOrgFormat = regexp.MustCompile(`^AS(\d+)\s+(.*?)$`)
 
 func doRequest(ctx context.Context, client *http.Client, url string, target interface{}) error {
 	ctx, cancel := context.WithCancel(ctx)

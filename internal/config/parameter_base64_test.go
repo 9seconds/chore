@@ -69,7 +69,7 @@ func (suite *ParameterBase64TestSuite) TestIncorrectLength() {
 					_, err := config.NewBase64(false, map[string]string{
 						testName: testValue,
 					})
-					assert.ErrorContains(t, err, "incorrect "+testName+" value")
+					assert.ErrorContains(t, err, "incorrect '"+testName+"' value")
 				})
 			}
 		})

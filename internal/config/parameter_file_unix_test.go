@@ -22,7 +22,7 @@ func (suite *ParameterFileTestSuite) TestPermissionsOk() {
 		presentPermission := presentPermission
 
 		suite.T().Run(presentPermission, func(t *testing.T) {
-			var fileMode fs.FileMode = 0
+			var fileMode fs.FileMode
 
 			switch presentPermission {
 			case "readable":
@@ -55,7 +55,7 @@ func (suite *ParameterFileTestSuite) TestPermissionsNOk() {
 		absentPermission := absentPermission
 
 		suite.T().Run(absentPermission, func(t *testing.T) {
-			var fileMode fs.FileMode = permUnixR | permUnixX | permUnixW
+			fileMode := permUnixR | permUnixX | permUnixW
 
 			switch absentPermission {
 			case "readable":

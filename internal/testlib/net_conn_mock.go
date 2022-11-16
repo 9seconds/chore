@@ -13,11 +13,13 @@ type NetConnMock struct {
 
 func (m *NetConnMock) Read(b []byte) (int, error) {
 	args := m.Called(b)
+
 	return args.Int(0), args.Error(1)
 }
 
 func (m *NetConnMock) Write(b []byte) (int, error) {
 	args := m.Called(b)
+
 	return args.Int(0), args.Error(1)
 }
 

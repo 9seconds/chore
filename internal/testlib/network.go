@@ -49,11 +49,11 @@ func (suite *NetworkTestSuite) DNS() *DNSResolverMock {
 }
 
 func (suite *NetworkTestSuite) MakeNetConn() *NetConnMock {
-	rv := &NetConnMock{}
+	connMock := &NetConnMock{}
 
 	suite.t.Cleanup(func() {
-		rv.AssertExpectations(suite.t)
+		connMock.AssertExpectations(suite.t)
 	})
 
-	return rv
+	return connMock
 }

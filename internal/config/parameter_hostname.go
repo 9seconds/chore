@@ -54,7 +54,7 @@ func (p paramHostname) String() string {
 		p.mixinStringLength)
 }
 
-func (p paramHostname) Validate(ctx context.Context, value string) error {
+func (p paramHostname) Validate(ctx context.Context, value string) error { //nolint: cyclop
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -88,7 +88,7 @@ func NewHostname(required bool, spec map[string]string) (Parameter, error) {
 		required: required,
 	}
 
-	if mixin, err := makeMixinStringLength(spec, "min_length", "max_length"); err == nil {
+	if mixin, err := makeMixinStringLength(spec); err == nil {
 		param.mixinStringLength = mixin
 	} else {
 		return nil, err
