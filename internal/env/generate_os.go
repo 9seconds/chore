@@ -3,6 +3,7 @@ package env
 import (
 	"context"
 	"log"
+	"os"
 	"runtime"
 	"strconv"
 	"sync"
@@ -18,6 +19,10 @@ func GenerateOS(ctx context.Context, results chan<- string, waiters *sync.WaitGr
 
 		sendValue(ctx, results, EnvOSType, runtime.GOOS)
 		sendValue(ctx, results, EnvOSArch, runtime.GOARCH)
+
+		if _, ok := os.LookupEnv(EnvOSID); ok {
+			return
+		}
 
 		version, err := osversion.Get()
 		if err != nil {
