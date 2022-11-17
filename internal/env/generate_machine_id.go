@@ -19,6 +19,10 @@ func GenerateMachineID(ctx context.Context, results chan<- string, waiters *sync
 	go func() {
 		defer waiters.Done()
 
+		if _, ok := os.LookupEnv(EnvMachineID); ok {
+			return
+		}
+
 		value, err := machineid.ProtectedID("chore")
 		if err != nil {
 			log.Printf("cannot obtain machine id: %v", err)
