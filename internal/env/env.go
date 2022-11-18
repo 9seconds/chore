@@ -14,6 +14,7 @@ const (
 	EnvIDChainPrefix   = Prefix + "CHAIN_ID_"
 	EnvOSPrefix        = Prefix + "OS_"
 	EnvOSVersionPrefix = EnvOSPrefix + "VERSION_"
+	EnvGitPrefix       = Prefix + "GIT_"
 
 	EnvNamespace = Prefix + "NAMESPACE"
 	EnvCaller    = Prefix + "CALLER"
@@ -71,4 +72,10 @@ const (
 
 	EnvHostname     = Prefix + "HOSTNAME"
 	EnvHostnameFQDN = Prefix + "HOSTNAME_FQDN"
+
+	EnvGitReference       = EnvGitPrefix + "REFERENCE"
+	EnvGitReferenceShort  = EnvGitPrefix + "REFERENCE_SHORT"
+	EnvGitReferenceType   = EnvGitPrefix + "REFERENCE_TYPE"
+	EnvGitCommitHash      = EnvGitPrefix + "COMMIT_HASH"
+	EnvGitCommitHashShort = EnvGitPrefix + "COMMIT_HASH_SHORT"
 )

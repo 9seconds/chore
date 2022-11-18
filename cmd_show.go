@@ -15,6 +15,7 @@ Cache path:     {{ .CachePath  }}
 State path:     {{ .StatePath  }}
 Runtime path:   {{ .RuntimePath  }}
 Network:        {{ print .Config.Network }}
+Git:            {{ print .Config.Git }}
 {{ if .Config.Description }}
 {{ .Config.Description }}
 {{ end }}

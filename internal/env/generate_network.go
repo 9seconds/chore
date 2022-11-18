@@ -66,7 +66,11 @@ func doRequest(ctx context.Context, client *http.Client, url string, target inte
 	return nil
 }
 
-func GenerateNetwork(ctx context.Context, results chan<- string, waiters *sync.WaitGroup) {
+func GenerateNetwork(ctx context.Context, results chan<- string, waiters *sync.WaitGroup, requireNetwork bool) {
+	if !requireNetwork {
+		return
+	}
+
 	waiters.Add(1)
 
 	go func() {
@@ -108,7 +112,11 @@ func GenerateNetwork(ctx context.Context, results chan<- string, waiters *sync.W
 	}()
 }
 
-func GenerateNetworkIPv6(ctx context.Context, results chan<- string, waiters *sync.WaitGroup) {
+func GenerateNetworkIPv6(ctx context.Context, results chan<- string, waiters *sync.WaitGroup, requireNetwork bool) {
+	if !requireNetwork {
+		return
+	}
+
 	waiters.Add(1)
 
 	go func() {

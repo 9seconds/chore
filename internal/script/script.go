@@ -90,11 +90,9 @@ func (s Script) Environ(ctx context.Context, args argparse.ParsedArgs) []string 
 	env.GenerateIds(ctx, values, waiterGroup, s.Path(), args)
 	env.GenerateOS(ctx, values, waiterGroup)
 	env.GenerateHostname(ctx, values, waiterGroup)
-
-	if s.Config.Network {
-		env.GenerateNetwork(ctx, values, waiterGroup)
-		env.GenerateNetworkIPv6(ctx, values, waiterGroup)
-	}
+	env.GenerateGit(ctx, values, waiterGroup, s.Config.Git)
+	env.GenerateNetwork(ctx, values, waiterGroup, s.Config.Network)
+	env.GenerateNetworkIPv6(ctx, values, waiterGroup, s.Config.Network)
 
 	go func() {
 		waiterGroup.Wait()

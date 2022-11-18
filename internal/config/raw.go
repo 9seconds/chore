@@ -8,6 +8,7 @@ import (
 
 type RawConfig struct {
 	Description string                  `json:"description"`
+	Git         string                  `json:"git"`
 	Network     bool                    `json:"network"`
 	Parameters  map[string]RawParameter `json:"parameters"`
 }

@@ -4,10 +4,13 @@ import (
 	"fmt"
 	"io"
 	"unicode"
+
+	"github.com/9seconds/chore/internal/vcs"
 )
 
 type Config struct {
 	Description string
+	Git         vcs.GitAccessMode
 	Network     bool
 	Parameters  map[string]Parameter
 }
@@ -18,9 +21,15 @@ func Parse(reader io.Reader) (Config, error) { //nolint: cyclop
 		return Config{}, err
 	}
 
+	gitMode, err := vcs.GetGitAccessMode(raw.Git)
+	if err != nil {
+		return Config{}, fmt.Errorf("cannot parse git access mode: %w", err)
+	}
+
 	conf := Config{
 		Description: raw.Description,
 		Network:     raw.Network,
+		Git:         gitMode,
 		Parameters:  make(map[string]Parameter),
 	}
 
