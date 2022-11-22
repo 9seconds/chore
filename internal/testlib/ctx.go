@@ -3,7 +3,10 @@ package testlib
 import (
 	"context"
 	"testing"
+	"time"
 )
+
+const ctxTestTimeout = 10 * time.Second
 
 type CtxTestSuite struct {
 	ctx       context.Context
@@ -13,7 +16,7 @@ type CtxTestSuite struct {
 func (suite *CtxTestSuite) Setup(t *testing.T) {
 	t.Helper()
 
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithTimeout(context.Background(), ctxTestTimeout)
 
 	suite.ctx = ctx
 	suite.ctxCancel = cancel
