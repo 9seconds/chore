@@ -23,7 +23,7 @@ func (c *CliCmdRun) Run(ctx cli.Context) error {
 		return fmt.Errorf("cannot initialize script: %w", err)
 	}
 
-	defer os.RemoveAll(executable.TempPath())
+	defer executable.Cleanup()
 
 	args, err := argparse.Parse(ctx, executable.Config.Parameters, c.Args)
 	if err != nil {

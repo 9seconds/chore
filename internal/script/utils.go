@@ -5,21 +5,7 @@ import (
 	"os"
 
 	"github.com/9seconds/chore/internal/config"
-	"github.com/9seconds/chore/internal/env"
 )
-
-func ensureTempDir(script *Script) error {
-	dir, err := os.MkdirTemp(
-		"",
-		fmt.Sprintf("%s-%s-%s--", env.ChoreDir, script.Namespace, script.Executable))
-	if err != nil {
-		return err
-	}
-
-	script.tmpDir = dir
-
-	return nil
-}
 
 func readConfig(script *Script) error {
 	file, err := os.Open(script.ConfigPath())

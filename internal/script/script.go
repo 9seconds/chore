@@ -22,46 +22,63 @@ type Script struct {
 	Executable string
 	Config     config.Config
 
+	lock   sync.Mutex
 	tmpDir string
 }
 
-func (s Script) String() string {
+func (s *Script) String() string {
 	return s.Namespace + "/" + s.Executable
 }
 
-func (s Script) buildPath(base string) string {
+func (s *Script) buildPath(base string) string {
 	return filepath.Join(base, env.ChoreDir, s.Namespace, s.Executable)
 }
 
-func (s Script) Path() string {
+func (s *Script) Path() string {
 	return s.buildPath(xdg.ConfigHome)
 }
 
-func (s Script) ConfigPath() string {
+func (s *Script) ConfigPath() string {
 	return s.Path() + ".json"
 }
 
-func (s Script) DataPath() string {
+func (s *Script) DataPath() string {
 	return s.buildPath(xdg.DataHome)
 }
 
-func (s Script) CachePath() string {
+func (s *Script) CachePath() string {
 	return s.buildPath(xdg.CacheHome)
 }
 
-func (s Script) StatePath() string {
+func (s *Script) StatePath() string {
 	return s.buildPath(xdg.StateHome)
 }
 
-func (s Script) RuntimePath() string {
+func (s *Script) RuntimePath() string {
 	return s.buildPath(xdg.RuntimeDir)
 }
 
-func (s Script) TempPath() string {
+func (s *Script) TempPath() string {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
+	if s.tmpDir != "" {
+		return s.tmpDir
+	}
+
+	dir, err := os.MkdirTemp(
+		"",
+		fmt.Sprintf("%s-%s-%s--", env.ChoreDir, s.Namespace, s.Executable))
+	if err != nil {
+		panic(err)
+	}
+
+	s.tmpDir = dir
+
 	return s.tmpDir
 }
 
-func (s Script) Environ(ctx context.Context, args argparse.ParsedArgs) []string {
+func (s *Script) Environ(ctx context.Context, args argparse.ParsedArgs) []string {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -106,8 +123,23 @@ func (s Script) Environ(ctx context.Context, args argparse.ParsedArgs) []string 
 	return environ
 }
 
-func New(namespace, executable string) (Script, error) {
-	rValue := Script{
+func (s *Script) Cleanup() error {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
+	if s.tmpDir != "" {
+		if err := os.RemoveAll(s.tmpDir); err != nil {
+			return fmt.Errorf("cannot cleanup: %w", err)
+		}
+
+		s.tmpDir = ""
+	}
+
+	return nil
+}
+
+func New(namespace, executable string) (*Script, error) {
+	rValue := &Script{
 		Namespace:  namespace,
 		Executable: executable,
 	}
@@ -132,12 +164,8 @@ func New(namespace, executable string) (Script, error) {
 		return rValue, fmt.Errorf("cannot create runtime path %s: %w", rValue.RuntimePath(), err)
 	}
 
-	if err := readConfig(&rValue); err != nil {
+	if err := readConfig(rValue); err != nil {
 		return rValue, err
-	}
-
-	if err := ensureTempDir(&rValue); err != nil {
-		return rValue, fmt.Errorf("cannot create temporary dir: %w", err)
 	}
 
 	return rValue, nil

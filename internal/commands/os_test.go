@@ -19,10 +19,10 @@ type OSTestSuite struct {
 	suite.Suite
 
 	testlib.CtxTestSuite
-	testlib.CustomRootTestSuite
 	testlib.ScriptTestSuite
+	testlib.CustomRootTestSuite
 
-	s       script.Script
+	s       *script.Script
 	args    []string
 	environ []string
 
@@ -35,8 +35,8 @@ func (suite *OSTestSuite) SetupTest() {
 	t := suite.T()
 
 	suite.CtxTestSuite.Setup(t)
-	suite.CustomRootTestSuite.Setup(t)
 	suite.ScriptTestSuite.Setup(t)
+	suite.CustomRootTestSuite.Setup(t)
 
 	suite.EnsureScript("x", "y", "echo $CHORE_CALLER $1")
 

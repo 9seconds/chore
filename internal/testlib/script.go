@@ -1,11 +1,10 @@
 package testlib
 
 import (
-	"os"
 	"testing"
 
 	"github.com/9seconds/chore/internal/script"
-	"github.com/stretchr/testify/require"
+	"github.com/alecthomas/assert/v2"
 )
 
 type ScriptTestSuite struct {
@@ -18,14 +17,14 @@ func (suite *ScriptTestSuite) Setup(t *testing.T) {
 	suite.t = t
 }
 
-func (suite *ScriptTestSuite) NewScript(namespace, executable string) (script.Script, error) {
-	script, err := script.New(namespace, executable)
+func (suite *ScriptTestSuite) NewScript(namespace, executable string) (*script.Script, error) {
+	scr, err := script.New(namespace, executable)
 
 	if err == nil {
 		suite.t.Cleanup(func() {
-			require.NoError(suite.t, os.RemoveAll(script.TempPath()))
+			assert.NoError(suite.t, scr.Cleanup())
 		})
 	}
 
-	return script, err
+	return scr, err
 }

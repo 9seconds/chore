@@ -43,7 +43,5 @@ func (c *CliCmdShow) Run(_ cli.Context) error {
 		return fmt.Errorf("cannot initialize script: %w", err)
 	}
 
-	defer os.RemoveAll(executable.TempPath())
-
 	return cliCmdShotTemplate.Execute(os.Stdout, executable)
 }

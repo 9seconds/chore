@@ -10,7 +10,6 @@ import (
 
 	"github.com/9seconds/chore/internal/argparse"
 	"github.com/9seconds/chore/internal/env"
-	"github.com/9seconds/chore/internal/script"
 	"github.com/9seconds/chore/internal/testlib"
 	"github.com/Showmax/go-fqdn"
 	"github.com/adrg/xdg"
@@ -30,13 +29,14 @@ type ScriptTestSuite struct {
 
 func (suite *ScriptTestSuite) SetupTest() {
 	t := suite.T()
+
 	suite.CustomRootTestSuite.Setup(t)
 	suite.ScriptTestSuite.Setup(t)
 	suite.NetworkTestSuite.Setup(t)
 }
 
 func (suite *ScriptTestSuite) TestAbsentScript() {
-	_, err := script.New("xx", "1")
+	_, err := suite.NewScript("xx", "1")
 	suite.Error(err)
 }
 
@@ -54,7 +54,7 @@ func (suite *ScriptTestSuite) TestCannotCreatePath() {
 		suite.NoError(os.MkdirAll(testValue, 0o500))
 
 		suite.T().Run(testName, func(t *testing.T) {
-			_, err := script.New("xx", "1")
+			_, err := suite.NewScript("xx", "1")
 			assert.ErrorContains(t, err, "permission denied")
 		})
 	}
@@ -64,19 +64,15 @@ func (suite *ScriptTestSuite) TestCannotReadConfig() {
 	suite.EnsureScript("xx", "1", "echo 1")
 	suite.EnsureScriptConfig("xx", "1", "x")
 
-	_, err := script.New("xx", "1")
+	_, err := suite.NewScript("xx", "1")
 	suite.ErrorContains(err, "cannot parse config file")
 }
 
 func (suite *ScriptTestSuite) TestDirsAreAvailable() {
 	suite.EnsureScript("xx", "1", "echo 1")
 
-	scr, err := script.New("xx", "1")
+	scr, err := suite.NewScript("xx", "1")
 	suite.NoError(err)
-
-	suite.T().Cleanup(func() {
-		suite.NoError(os.RemoveAll(scr.TempPath()))
-	})
 
 	suite.DirExists(scr.DataPath())
 	suite.DirExists(scr.CachePath())
@@ -88,12 +84,8 @@ func (suite *ScriptTestSuite) TestDirsAreAvailable() {
 func (suite *ScriptTestSuite) TestString() {
 	suite.EnsureScript("xx", "1", "echo 1")
 
-	scr, err := script.New("xx", "1")
+	scr, err := suite.NewScript("xx", "1")
 	suite.NoError(err)
-
-	suite.T().Cleanup(func() {
-		suite.NoError(os.RemoveAll(scr.TempPath()))
-	})
 
 	suite.NotEmpty(scr.String())
 }
@@ -106,12 +98,8 @@ func (suite *ScriptTestSuite) TestEnviron() {
 
 	suite.EnsureScript("xx", "1", "echo 1")
 
-	scr, err := script.New("xx", "1")
+	scr, err := suite.NewScript("xx", "1")
 	suite.NoError(err)
-
-	suite.T().Cleanup(func() {
-		suite.NoError(os.RemoveAll(scr.TempPath()))
-	})
 
 	scr.Config.Network = true
 	environ := scr.Environ(context.Background(), argparse.ParsedArgs{

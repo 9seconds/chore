@@ -109,7 +109,7 @@ func (o *osCommand) Wait() (ExecutionResult, error) {
 	return result, o.finishErr
 }
 
-func NewOS(ctx context.Context, script script.Script,
+func NewOS(ctx context.Context, script *script.Script,
 	environ, args []string,
 	stdin io.Reader, stdout, stderr io.Writer,
 ) Command {
