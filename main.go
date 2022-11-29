@@ -9,6 +9,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/9seconds/chore/internal/cli"
 	"github.com/9seconds/chore/internal/commands"
 	"github.com/alecthomas/kong"
 )
@@ -35,18 +36,22 @@ func main() {
 		log.SetOutput(io.Discard)
 	}
 
-	appCtx, cancel := signal.NotifyContext(
+	notifyCtx, cancel := signal.NotifyContext(
 		context.Background(),
 		syscall.SIGINT,
 		syscall.SIGTERM,
 		syscall.SIGQUIT)
 
 	go func() {
-		<-appCtx.Done()
+		<-notifyCtx.Done()
 		log.Println("application context is closed")
 	}()
 
-	err := cliCtx.Run(Context{appCtx})
+	rootCtx := cli.NewContext(notifyCtx)
+	err := cliCtx.Run(rootCtx)
+
+	rootCtx.Close()
+	cancel()
 
 	var exitErr commands.ExitError
 
@@ -54,6 +59,5 @@ func main() {
 		os.Exit(exitErr.Code())
 	}
 
-	cancel()
 	cliCtx.FatalIfErrorf(err)
 }

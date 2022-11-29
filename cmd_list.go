@@ -6,17 +6,18 @@ import (
 	"path/filepath"
 	"sort"
 
+	"github.com/9seconds/chore/internal/cli"
 	"github.com/9seconds/chore/internal/env"
 	"github.com/9seconds/chore/internal/script"
 	"github.com/adrg/xdg"
 )
 
 type CliCmdList struct {
-	Namespace CliNamespace `arg:"" optional:"" help:"Namespace to list."`
+	Namespace cli.Namespace `arg:"" optional:"" help:"Namespace to list."`
 }
 
-func (c *CliCmdList) Run(_ Context) error {
-	if c.Namespace.Value == "" {
+func (c *CliCmdList) Run(_ cli.Context) error {
+	if c.Namespace.Value() == "" {
 		return c.listNamespaces()
 	}
 
@@ -49,17 +50,20 @@ func (c *CliCmdList) listNamespaces() error {
 }
 
 func (c *CliCmdList) listScripts() error {
-	path := filepath.Join(xdg.ConfigHome, env.ChoreDir, c.Namespace.Value)
+	path := filepath.Join(xdg.ConfigHome, env.ChoreDir, c.Namespace.Value())
 
 	entries, err := os.ReadDir(path)
 	if err != nil {
-		return fmt.Errorf("cannot list scripts in namespace %s: %w", c.Namespace.Value, err)
+		return fmt.Errorf(
+			"cannot list scripts in namespace %s: %w",
+			c.Namespace.Value(),
+			err)
 	}
 
 	names := make([]string, 0, len(entries))
 
 	for _, v := range entries {
-		if vv, err := script.New(c.Namespace.Value, v.Name()); err == nil {
+		if vv, err := script.New(c.Namespace.Value(), v.Name()); err == nil {
 			os.RemoveAll(vv.TempPath())
 
 			names = append(names, v.Name())
