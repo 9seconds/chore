@@ -56,6 +56,10 @@ func (c Context) WithLock(lock filelock.Lock) Context {
 }
 
 func (c Context) Start() error {
+	if c.lock == nil {
+		return nil
+	}
+
 	return c.lock.Lock(c)
 }
 
