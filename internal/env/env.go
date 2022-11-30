@@ -78,4 +78,5 @@ const (
 	EnvGitReferenceType   = EnvGitPrefix + "REFERENCE_TYPE"
 	EnvGitCommitHash      = EnvGitPrefix + "COMMIT_HASH"
 	EnvGitCommitHashShort = EnvGitPrefix + "COMMIT_HASH_SHORT"
+	EnvGitIsDirty         = EnvGitPrefix + "IS_DIRTY"
 )

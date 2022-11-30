@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"os"
+	"strconv"
 	"sync"
 
 	"github.com/9seconds/chore/internal/vcs"
@@ -61,5 +62,21 @@ func GenerateGit(ctx context.Context, results chan<- string, waiters *sync.WaitG
 		default:
 			sendValue(ctx, results, EnvGitReferenceType, vcs.GitRefTypeCommit)
 		}
+
+		workTree, err := repo.Worktree()
+		if err != nil {
+			log.Printf("cannot get work tree: %v", err)
+
+			return
+		}
+
+		status, err := workTree.Status()
+		if err != nil {
+			log.Printf("cannot get work tree status: %v", err)
+
+			return
+		}
+
+		sendValue(ctx, results, EnvGitIsDirty, strconv.FormatBool(!status.IsClean()))
 	}()
 }

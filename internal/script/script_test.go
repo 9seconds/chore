@@ -119,7 +119,7 @@ func (suite *ScriptTestSuite) TestEnviron() {
 		require.True(suite.T(), found)
 	}
 
-	count := 42
+	count := 43
 
 	suite.Equal(scr.Namespace, data[env.EnvNamespace])
 	suite.Equal(scr.Executable, data[env.EnvCaller])
@@ -156,6 +156,7 @@ func (suite *ScriptTestSuite) TestEnviron() {
 	suite.Contains(data, env.EnvGitReferenceType)
 	suite.Contains(data, env.EnvGitCommitHash)
 	suite.Contains(data, env.EnvGitCommitHashShort)
+	suite.Contains(data, env.EnvGitIsDirty)
 
 	if value, err := os.Hostname(); err == nil {
 		suite.Equal(value, data[env.EnvHostname])

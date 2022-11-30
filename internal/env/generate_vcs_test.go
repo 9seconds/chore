@@ -27,12 +27,13 @@ func (suite *GenerateGitTestSuite) TestGitAccess() {
 	env.GenerateGit(suite.Context(), suite.values, suite.wg, vcs.GitAccessAlways)
 	data := suite.Collect()
 
-	suite.Len(data, 5)
+	suite.Len(data, 6)
 	suite.Contains(data, env.EnvGitReference)
 	suite.Contains(data, env.EnvGitReferenceShort)
 	suite.Contains(data, env.EnvGitReferenceType)
 	suite.Contains(data, env.EnvGitCommitHash)
 	suite.Contains(data, env.EnvGitCommitHashShort)
+	suite.Contains(data, env.EnvGitIsDirty)
 }
 
 func TestGenerateGit(t *testing.T) {
