@@ -12,8 +12,7 @@ import (
 )
 
 const (
-	SeparatorKeyword    = "="
-	SeparatorPositional = "--"
+	SeparatorKeyword = ":"
 )
 
 type validatedValue struct {
@@ -34,18 +33,21 @@ func Parse(ctx context.Context, parameters map[string]config.Parameter, args []s
 	waiters := &sync.WaitGroup{}
 	errChan := make(chan error)
 	resChan := make(chan validatedValue)
+	keywordStage := true
 
 	for idx, arg := range args {
-		if arg == SeparatorPositional {
-			rValue.Positional = make([]string, len(args)-idx-1)
-			copy(rValue.Positional, args[idx+1:])
+		name, value, found := strings.Cut(arg, SeparatorKeyword)
 
-			break
+		if !found {
+			keywordStage = false
+
+			rValue.Positional = append(rValue.Positional, arg)
+
+			continue
 		}
 
-		name, value, found := strings.Cut(arg, SeparatorKeyword)
-		if !found {
-			return rValue, fmt.Errorf("cannot find %s separator in argument %s", SeparatorKeyword, arg)
+		if !keywordStage {
+			return rValue, fmt.Errorf("unexpected keyword parameter %s", arg)
 		}
 
 		name = strings.ToLower(name)

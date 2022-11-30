@@ -52,7 +52,7 @@ func (suite *ParseTestSuite) TestAbsentRequiredParameter() {
 }
 
 func (suite *ParseTestSuite) TestOnlyRequiredParameter() {
-	args, err := argparse.Parse(suite.Context(), suite.params, []string{"req=1"})
+	args, err := argparse.Parse(suite.Context(), suite.params, []string{"req:1"})
 	suite.NoError(err)
 	suite.Len(args.Keywords, 1)
 	suite.Equal("1", args.Keywords["req"])
@@ -63,7 +63,7 @@ func (suite *ParseTestSuite) TestParseParameters() {
 	args, err := argparse.Parse(
 		suite.Context(),
 		suite.params,
-		[]string{"req=1", "int=1", "str=xx"})
+		[]string{"req:1", "int:1", "str:xx"})
 
 	suite.NoError(err)
 	suite.Len(args.Keywords, 3)
@@ -74,25 +74,25 @@ func (suite *ParseTestSuite) TestParseParameters() {
 }
 
 func (suite *ParseTestSuite) TestInvalidValue() {
-	_, err := argparse.Parse(suite.Context(), suite.params, []string{"req=1", "int=xx"})
+	_, err := argparse.Parse(suite.Context(), suite.params, []string{"req:1", "int:xx"})
 	suite.ErrorContains(err, "incorrect value int for parameter")
 }
 
 func (suite *ParseTestSuite) TestUnknownParameter() {
-	_, err := argparse.Parse(suite.Context(), suite.params, []string{"req=1", "xx=xx"})
+	_, err := argparse.Parse(suite.Context(), suite.params, []string{"req:1", "xx:xx"})
 	suite.ErrorContains(err, "unknown parameter")
 }
 
 func (suite *ParseTestSuite) TestParameterWithoutSeparator() {
 	_, err := argparse.Parse(suite.Context(), suite.params, []string{"xx"})
-	suite.ErrorContains(err, "cannot find = separator")
+	suite.ErrorContains(err, "absent value")
 }
 
 func (suite *ParseTestSuite) TestOnlyPositionals() {
 	args, err := argparse.Parse(
 		suite.Context(),
 		suite.params,
-		[]string{"req=1", "--", "1", "2", "3"})
+		[]string{"req:1", "1", "2", "3"})
 
 	suite.NoError(err)
 	suite.Len(args.Keywords, 1)
@@ -100,7 +100,10 @@ func (suite *ParseTestSuite) TestOnlyPositionals() {
 }
 
 func (suite *ParseTestSuite) TestNoPositionals() {
-	args, err := argparse.Parse(suite.Context(), suite.params, []string{"req=1", "--"})
+	args, err := argparse.Parse(
+		suite.Context(),
+		suite.params,
+		[]string{"req:1"})
 	suite.NoError(err)
 	suite.Len(args.Keywords, 1)
 	suite.Empty(args.Positional)
@@ -110,7 +113,7 @@ func (suite *ParseTestSuite) TestMergeArguments() {
 	args, err := argparse.Parse(
 		suite.Context(),
 		suite.params,
-		[]string{"req=1", "req=xx yy", "req='xx", "req=3"})
+		[]string{"req:1", "req:xx yy", "req:'xx", "req:3"})
 	suite.NoError(err)
 	suite.Len(args.Keywords, 1)
 	suite.Equal("1 'xx yy' ''\"'\"'xx' 3", args.Keywords["req"])
