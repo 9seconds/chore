@@ -9,6 +9,7 @@ var CLI struct {
 	Version kong.VersionFlag `short:"V" help:"Show version."`
 
 	List CliCmdList `cmd:"" aliases:"l" help:"List namespaces and scripts. Empty namespace lists namespaces."`
-	Show CliCmdShow `cmd:"" aliases:"s" help:"Show details on a given script"`
+	Show CliCmdShow `cmd:"" aliases:"s" help:"Show details on a given script."`
+	Edit CliCmdEdit `cmd:"" aliases:"e" help:"Edit chore script."`
 	Run  CliCmdRun  `cmd:"" aliases:"r" help:"Run chore script."`
 }
