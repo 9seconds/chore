@@ -63,9 +63,16 @@ func (c *CliCmdList) listScripts() error {
 	names := make([]string, 0, len(entries))
 
 	for _, v := range entries {
-		if _, err := script.New(c.Namespace.Value(), v.Name()); err == nil {
+		scr := script.Script{
+			Namespace:  c.Namespace.Value(),
+			Executable: v.Name(),
+		}
+
+		if err := scr.Init(); err == nil {
 			names = append(names, v.Name())
 		}
+
+		scr.Cleanup()
 	}
 
 	sort.Strings(names)

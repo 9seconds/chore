@@ -36,8 +36,8 @@ func (suite *ScriptTestSuite) SetupTest() {
 }
 
 func (suite *ScriptTestSuite) TestAbsentScript() {
-	_, err := suite.NewScript("xx", "1")
-	suite.Error(err)
+	scr := suite.NewScript("xx", "1")
+	suite.Error(scr.Init())
 }
 
 func (suite *ScriptTestSuite) TestCannotCreatePath() {
@@ -54,8 +54,8 @@ func (suite *ScriptTestSuite) TestCannotCreatePath() {
 		suite.NoError(os.MkdirAll(testValue, 0o500))
 
 		suite.T().Run(testName, func(t *testing.T) {
-			_, err := suite.NewScript("xx", "1")
-			assert.ErrorContains(t, err, "permission denied")
+			scr := suite.NewScript("xx", "1")
+			assert.ErrorContains(t, scr.Init(), "permission denied")
 		})
 	}
 }
@@ -64,29 +64,30 @@ func (suite *ScriptTestSuite) TestCannotReadConfig() {
 	suite.EnsureScript("xx", "1", "echo 1")
 	suite.EnsureScriptConfig("xx", "1", "x")
 
-	_, err := suite.NewScript("xx", "1")
-	suite.ErrorContains(err, "cannot parse config file")
+	scr := suite.NewScript("xx", "1")
+	suite.ErrorContains(scr.Init(), "cannot parse config file")
 }
 
 func (suite *ScriptTestSuite) TestDirsAreAvailable() {
 	suite.EnsureScript("xx", "1", "echo 1")
 
-	scr, err := suite.NewScript("xx", "1")
-	suite.NoError(err)
+	scr := suite.NewScript("xx", "1")
+	suite.NoError(scr.Init())
 
 	suite.DirExists(scr.DataPath())
 	suite.DirExists(scr.CachePath())
 	suite.DirExists(scr.StatePath())
 	suite.DirExists(scr.RuntimePath())
 	suite.DirExists(scr.TempPath())
+	suite.DirExists(scr.NamespacePath())
+	suite.NoFileExists(scr.ConfigPath())
 }
 
 func (suite *ScriptTestSuite) TestString() {
 	suite.EnsureScript("xx", "1", "echo 1")
 
-	scr, err := suite.NewScript("xx", "1")
-	suite.NoError(err)
-
+	scr := suite.NewScript("xx", "1")
+	suite.NoError(scr.Init())
 	suite.NotEmpty(scr.String())
 }
 
@@ -98,10 +99,10 @@ func (suite *ScriptTestSuite) TestEnviron() {
 
 	suite.EnsureScript("xx", "1", "echo 1")
 
-	scr, err := suite.NewScript("xx", "1")
-	suite.NoError(err)
+	scr := suite.NewScript("xx", "1")
+	suite.NoError(scr.Init())
 
-	scr.Config.Network = true
+	scr.Config().Network = true
 	environ := scr.Environ(context.Background(), argparse.ParsedArgs{
 		Keywords: map[string]string{
 			"k":  "v",

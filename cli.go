@@ -1,6 +1,14 @@
 package main
 
-import "github.com/alecthomas/kong"
+import (
+	"context"
+	"fmt"
+	"os"
+	"os/exec"
+
+	"github.com/9seconds/chore/internal/cli"
+	"github.com/alecthomas/kong"
+)
 
 var version = "dev"
 
@@ -10,6 +18,27 @@ var CLI struct {
 
 	List CliCmdList `cmd:"" aliases:"l" help:"List namespaces and scripts. Empty namespace lists namespaces."`
 	Show CliCmdShow `cmd:"" aliases:"s" help:"Show details on a given script."`
-	Edit CliCmdEdit `cmd:"" aliases:"e" help:"Edit chore script."`
+	Edit CliCmdEdit `cmd:"" aliases:"e,ec" help:"Edit chore script."`
 	Run  CliCmdRun  `cmd:"" aliases:"r" help:"Run chore script."`
+}
+
+type editorCommand struct {
+	Editor cli.Editor `short:"e" help:"Editor to use."`
+
+	Namespace cli.Namespace `arg:"" help:"Script namespace."`
+	Script    string        `arg:"" help:"Script name."`
+}
+
+func (e *editorCommand) Open(ctx context.Context, path string) error {
+	editor, err := e.Editor.Value()
+	if err != nil {
+		return fmt.Errorf("cannot initialize editor: %w", err)
+	}
+
+	cmd := exec.CommandContext(ctx, editor, path)
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	return cmd.Run()
 }

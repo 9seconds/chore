@@ -38,10 +38,16 @@ type CliCmdShow struct {
 }
 
 func (c *CliCmdShow) Run(_ cli.Context) error {
-	executable, err := script.New(c.Namespace.Value(), c.Script)
-	if err != nil {
+	scr := script.Script{
+		Namespace:  c.Namespace.Value(),
+		Executable: c.Script,
+	}
+
+	if err := scr.Init(); err != nil {
 		return fmt.Errorf("cannot initialize script: %w", err)
 	}
 
-	return cliCmdShotTemplate.Execute(os.Stdout, executable)
+	defer scr.Cleanup()
+
+	return cliCmdShotTemplate.Execute(os.Stdout, scr)
 }

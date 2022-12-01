@@ -22,18 +22,22 @@ type CliCmdRun struct {
 }
 
 func (c *CliCmdRun) Run(ctx cli.Context) error {
-	executable, err := script.New(c.Namespace.Value(), c.Script)
-	if err != nil {
+	scr := &script.Script{
+		Namespace:  c.Namespace.Value(),
+		Executable: c.Script,
+	}
+
+	if err := scr.Init(); err != nil {
 		return fmt.Errorf("cannot initialize script: %w", err)
 	}
 
-	defer executable.Cleanup() //nolint: errcheck
+	defer scr.Cleanup() //nolint: errcheck
 
 	if c.Timeout.Value() != 0 {
 		ctx = ctx.WithTimeout(c.Timeout.Value())
 	}
 
-	lock, err := filelock.New(c.Lock.LockMode(), c.Lock.Path(executable.Path()))
+	lock, err := filelock.New(c.Lock.LockMode(), c.Lock.Path(scr.Path()))
 	if err != nil {
 		return fmt.Errorf("cannot initialize lock: %w", err)
 	}
@@ -44,12 +48,12 @@ func (c *CliCmdRun) Run(ctx cli.Context) error {
 		return fmt.Errorf("cannot start context: %w", err)
 	}
 
-	args, err := argparse.Parse(ctx, executable.Config.Parameters, c.Args)
+	args, err := argparse.Parse(ctx, scr.Config().Parameters, c.Args)
 	if err != nil {
 		return fmt.Errorf("cannot parse arguments: %w", err)
 	}
 
-	environ := executable.Environ(ctx, args)
+	environ := scr.Environ(ctx, args)
 
 	for _, v := range environ {
 		log.Printf("env: %s", v)
@@ -57,7 +61,7 @@ func (c *CliCmdRun) Run(ctx cli.Context) error {
 
 	cmd := commands.NewOS(
 		ctx,
-		executable,
+		scr,
 		environ,
 		args.Positional,
 		os.Stdin,
@@ -68,7 +72,7 @@ func (c *CliCmdRun) Run(ctx cli.Context) error {
 		return fmt.Errorf("cannot start command: %w", err)
 	}
 
-	log.Printf("command %s has started as %d", executable, cmd.Pid())
+	log.Printf("command %s has started as %d", scr, cmd.Pid())
 
 	result, err := cmd.Wait()
 	if err != nil {

@@ -20,18 +20,22 @@ const defaultDirPermission = 0o700
 type Script struct {
 	Namespace  string
 	Executable string
-	Config     config.Config
 
-	lock   sync.Mutex
-	tmpDir string
+	config    config.Config
+	closeOnce sync.Once
+	tmpDir    string
 }
 
 func (s *Script) String() string {
 	return s.Namespace + "/" + s.Executable
 }
 
-func (s *Script) buildPath(base string) string {
-	return filepath.Join(base, env.ChoreDir, s.Namespace, s.Executable)
+func (s *Script) Config() *config.Config {
+	return &s.config
+}
+
+func (s *Script) NamespacePath() string {
+	return filepath.Join(xdg.CacheHome, env.ChoreDir, s.Namespace)
 }
 
 func (s *Script) Path() string {
@@ -59,22 +63,6 @@ func (s *Script) RuntimePath() string {
 }
 
 func (s *Script) TempPath() string {
-	s.lock.Lock()
-	defer s.lock.Unlock()
-
-	if s.tmpDir != "" {
-		return s.tmpDir
-	}
-
-	dir, err := os.MkdirTemp(
-		"",
-		fmt.Sprintf("%s-%s-%s--", env.ChoreDir, s.Namespace, s.Executable))
-	if err != nil {
-		panic(err)
-	}
-
-	s.tmpDir = dir
-
 	return s.tmpDir
 }
 
@@ -107,9 +95,9 @@ func (s *Script) Environ(ctx context.Context, args argparse.ParsedArgs) []string
 	env.GenerateIds(ctx, values, waiterGroup, s.Path(), args)
 	env.GenerateOS(ctx, values, waiterGroup)
 	env.GenerateHostname(ctx, values, waiterGroup)
-	env.GenerateGit(ctx, values, waiterGroup, s.Config.Git)
-	env.GenerateNetwork(ctx, values, waiterGroup, s.Config.Network)
-	env.GenerateNetworkIPv6(ctx, values, waiterGroup, s.Config.Network)
+	env.GenerateGit(ctx, values, waiterGroup, s.config.Git)
+	env.GenerateNetwork(ctx, values, waiterGroup, s.config.Network)
+	env.GenerateNetworkIPv6(ctx, values, waiterGroup, s.config.Network)
 
 	go func() {
 		waiterGroup.Wait()
@@ -123,50 +111,68 @@ func (s *Script) Environ(ctx context.Context, args argparse.ParsedArgs) []string
 	return environ
 }
 
-func (s *Script) Cleanup() error {
-	s.lock.Lock()
-	defer s.lock.Unlock()
+func (s *Script) Init() error {
+	if err := access.Access(s.Path(), false, false, true); err != nil {
+		return fmt.Errorf("cannot find out executable %s: %w", s.Path(), err)
+	}
 
-	if s.tmpDir != "" {
-		if err := os.RemoveAll(s.tmpDir); err != nil {
-			return fmt.Errorf("cannot cleanup: %w", err)
+	if err := EnsureDir(s.DataPath()); err != nil {
+		return fmt.Errorf("cannot create data path %s: %w", s.DataPath(), err)
+	}
+
+	if err := EnsureDir(s.CachePath()); err != nil {
+		return fmt.Errorf("cannot create cache path %s: %w", s.CachePath(), err)
+	}
+
+	if err := EnsureDir(s.StatePath()); err != nil {
+		return fmt.Errorf("cannot create state path %s: %w", s.StatePath(), err)
+	}
+
+	if err := EnsureDir(s.RuntimePath()); err != nil {
+		return fmt.Errorf("cannot create runtime path %s: %w", s.RuntimePath(), err)
+	}
+
+	dir, err := os.MkdirTemp(
+		"",
+		fmt.Sprintf("%s-%s-%s--", env.ChoreDir, s.Namespace, s.Executable))
+	if err != nil {
+		return fmt.Errorf("cannot initialize tmp dir: %w", err)
+	}
+
+	s.tmpDir = dir
+
+	file, err := os.Open(s.ConfigPath())
+	if err != nil {
+		if os.IsNotExist(err) {
+			// that'script fine, this means that optional config is just absent
+			return nil
 		}
 
-		s.tmpDir = ""
+		return fmt.Errorf("cannot read script config %script: %w", s.ConfigPath(), err)
 	}
+
+	defer file.Close()
+
+	conf, err := config.Parse(file)
+	if err != nil {
+		return fmt.Errorf("cannot parse config file %script: %w", s.ConfigPath(), err)
+	}
+
+	s.config = conf
 
 	return nil
 }
 
-func New(namespace, executable string) (*Script, error) {
-	rValue := &Script{
-		Namespace:  namespace,
-		Executable: executable,
-	}
+func (s *Script) Cleanup() {
+	s.closeOnce.Do(func() {
+		if s.tmpDir != "" {
+			os.RemoveAll(s.tmpDir)
+		}
 
-	if err := access.Access(rValue.Path(), false, false, true); err != nil {
-		return rValue, fmt.Errorf("cannot find out executable %s: %w", rValue.Path(), err)
-	}
+		s.tmpDir = ""
+	})
+}
 
-	if err := os.MkdirAll(rValue.DataPath(), defaultDirPermission); err != nil {
-		return rValue, fmt.Errorf("cannot create data path %s: %w", rValue.DataPath(), err)
-	}
-
-	if err := os.MkdirAll(rValue.CachePath(), defaultDirPermission); err != nil {
-		return rValue, fmt.Errorf("cannot create cache path %s: %w", rValue.CachePath(), err)
-	}
-
-	if err := os.MkdirAll(rValue.StatePath(), defaultDirPermission); err != nil {
-		return rValue, fmt.Errorf("cannot create state path %s: %w", rValue.StatePath(), err)
-	}
-
-	if err := os.MkdirAll(rValue.RuntimePath(), defaultDirPermission); err != nil {
-		return rValue, fmt.Errorf("cannot create runtime path %s: %w", rValue.RuntimePath(), err)
-	}
-
-	if err := readConfig(rValue); err != nil {
-		return rValue, err
-	}
-
-	return rValue, nil
+func (s *Script) buildPath(base string) string {
+	return filepath.Join(base, env.ChoreDir, s.Namespace, s.Executable)
 }

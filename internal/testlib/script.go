@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/9seconds/chore/internal/script"
-	"github.com/alecthomas/assert/v2"
 )
 
 type ScriptTestSuite struct {
@@ -17,14 +16,13 @@ func (suite *ScriptTestSuite) Setup(t *testing.T) {
 	suite.t = t
 }
 
-func (suite *ScriptTestSuite) NewScript(namespace, executable string) (*script.Script, error) {
-	scr, err := script.New(namespace, executable)
-
-	if err == nil {
-		suite.t.Cleanup(func() {
-			assert.NoError(suite.t, scr.Cleanup())
-		})
+func (suite *ScriptTestSuite) NewScript(namespace, executable string) *script.Script {
+	scr := &script.Script{
+		Namespace:  namespace,
+		Executable: executable,
 	}
 
-	return scr, err
+	suite.t.Cleanup(scr.Cleanup)
+
+	return scr
 }
