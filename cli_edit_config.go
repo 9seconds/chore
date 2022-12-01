@@ -10,15 +10,20 @@ import (
 )
 
 const (
-	cliCmdEditConfigText = `{
-  "description" : "Amazing {{ js .Executable }} of {{ js .Namespace }}!",
-  "git": "if_undefined",
-  "network": false,
-  "parameters": {
-    "param": {
-      "type": "string",
-      "required": false,
-      "spec": {
+	cliCmdEditConfigText = `// this is HJSON: https://hjson.github.io/
+
+{
+  description : Amazing {{ js .Executable }} of {{ js .Namespace }}!
+
+  // valid options are 'if_undefined', 'always' and 'no'
+  git: if_undefined
+  network: false
+
+  parameters: {
+    param: {
+      type: string
+      required: false
+      spec: {
       }
     }
   }

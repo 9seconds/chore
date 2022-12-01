@@ -1,9 +1,10 @@
 package config
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
+
+	"github.com/hjson/hjson-go/v4"
 )
 
 type RawConfig struct {
@@ -22,7 +23,15 @@ type RawParameter struct {
 func parseRaw(reader io.Reader) (RawConfig, error) {
 	raw := RawConfig{}
 
-	if err := json.NewDecoder(reader).Decode(&raw); err != nil {
+	data, err := io.ReadAll(reader)
+	if err != nil {
+		return raw, fmt.Errorf("cannot read config: %w", err)
+	}
+
+	decoderOptions := hjson.DefaultDecoderOptions()
+	decoderOptions.DisallowUnknownFields = true
+
+	if err := hjson.UnmarshalWithOptions(data, &raw, decoderOptions); err != nil {
 		return raw, fmt.Errorf("cannot parse JSON config: %w", err)
 	}
 

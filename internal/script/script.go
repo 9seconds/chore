@@ -41,7 +41,7 @@ func (s *Script) Path() string {
 }
 
 func (s *Script) ConfigPath() string {
-	return s.Path() + ".json"
+	return s.Path() + ".hjson"
 }
 
 func (s *Script) DataPath() string {

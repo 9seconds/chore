@@ -14,6 +14,7 @@ require (
 	github.com/go-git/go-git/v5 v5.4.2
 	github.com/gofrs/flock v0.8.1
 	github.com/gofrs/uuid v4.3.1+incompatible
+	github.com/hjson/hjson-go/v4 v4.2.0
 	github.com/jarcoal/httpmock v1.2.0
 	github.com/stretchr/testify v1.8.1
 	github.com/thlib/go-timezone-local v0.0.0-20210907160436-ef149e42d28e
