@@ -15,8 +15,6 @@ import (
 	"github.com/adrg/xdg"
 )
 
-const defaultDirPermission = 0o700
-
 type Script struct {
 	Namespace  string
 	Executable string

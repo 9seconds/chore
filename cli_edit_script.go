@@ -9,12 +9,12 @@ import (
 	"github.com/9seconds/chore/internal/script"
 )
 
-type CliCmdEdit struct {
+type CliCmdEditScript struct {
 	editorCommand
 }
 
-func (c *CliCmdEdit) Run(ctx cli.Context) error {
-	scr := script.Script{
+func (c *CliCmdEditScript) Run(ctx cli.Context) error {
+	scr := &script.Script{
 		Namespace:  c.Namespace.Value(),
 		Executable: c.Script,
 	}
@@ -40,7 +40,7 @@ func (c *CliCmdEdit) Run(ctx cli.Context) error {
 		return fmt.Errorf("cannot stat script: %w", err)
 	}
 
-	if err := os.Chmod(path, stat.Mode().Perm()|0o100); err != nil {
+	if err := os.Chmod(path, stat.Mode().Perm()|0o100); err != nil { //nolint: gomnd
 		return fmt.Errorf("cannot set permissions: %w", err)
 	}
 

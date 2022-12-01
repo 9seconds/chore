@@ -40,8 +40,8 @@ func (suite *OSTestSuite) SetupTest() {
 
 	suite.EnsureScript("x", "y", "echo $CHORE_CALLER $1")
 
-	scr, err := suite.NewScript("x", "y")
-	require.NoError(t, err)
+	scr := suite.NewScript("x", "y")
+	require.NoError(t, scr.Init())
 
 	parsedArgs := argparse.ParsedArgs{
 		Keywords: map[string]string{

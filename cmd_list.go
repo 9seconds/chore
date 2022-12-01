@@ -62,14 +62,14 @@ func (c *CliCmdList) listScripts() error {
 
 	names := make([]string, 0, len(entries))
 
-	for _, v := range entries {
-		scr := script.Script{
+	for _, entry := range entries {
+		scr := &script.Script{
 			Namespace:  c.Namespace.Value(),
-			Executable: v.Name(),
+			Executable: entry.Name(),
 		}
 
 		if err := scr.Init(); err == nil {
-			names = append(names, v.Name())
+			names = append(names, entry.Name())
 		}
 
 		scr.Cleanup()

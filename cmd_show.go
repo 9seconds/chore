@@ -11,6 +11,7 @@ import (
 
 const (
 	cliCmdShowText = `Path:           {{ .Path }}
+Config path:    {{ .ConfigPath }}
 Data path:      {{ .DataPath  }}
 Cache path:     {{ .CachePath  }}
 State path:     {{ .StatePath  }}
@@ -30,7 +31,8 @@ Parameters:
 {{- end -}}`
 )
 
-var cliCmdShotTemplate = template.Must(template.New("show").Parse(cliCmdShowText))
+var cliCmdShotTemplate = template.Must(
+	template.New("show").Parse(cliCmdShowText))
 
 type CliCmdShow struct {
 	Namespace cli.Namespace `arg:"" help:"Script namespace. Dot takes one from environment variable CHORE_NAMESPACE."`
@@ -38,7 +40,7 @@ type CliCmdShow struct {
 }
 
 func (c *CliCmdShow) Run(_ cli.Context) error {
-	scr := script.Script{
+	scr := &script.Script{
 		Namespace:  c.Namespace.Value(),
 		Executable: c.Script,
 	}

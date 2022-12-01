@@ -31,7 +31,7 @@ func (c *CliCmdRun) Run(ctx cli.Context) error {
 		return fmt.Errorf("cannot initialize script: %w", err)
 	}
 
-	defer scr.Cleanup() //nolint: errcheck
+	defer scr.Cleanup()
 
 	if c.Timeout.Value() != 0 {
 		ctx = ctx.WithTimeout(c.Timeout.Value())
