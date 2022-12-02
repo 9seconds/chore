@@ -12,6 +12,7 @@ type Config struct {
 	Description string
 	Git         vcs.GitAccessMode
 	Network     bool
+	AsUser      string
 	Parameters  map[string]Parameter
 }
 
@@ -29,6 +30,7 @@ func Parse(reader io.Reader) (Config, error) { //nolint: cyclop
 	conf := Config{
 		Description: raw.Description,
 		Network:     raw.Network,
+		AsUser:      raw.AsUser,
 		Git:         gitMode,
 		Parameters:  make(map[string]Parameter),
 	}

@@ -19,6 +19,9 @@ const (
   git: if_undefined
   network: false
 
+  // to run command as a user
+  // as_user: root
+
   parameters: {
     param: {
       type: string

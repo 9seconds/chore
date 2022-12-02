@@ -18,6 +18,7 @@ State path:     {{ .StatePath  }}
 Runtime path:   {{ .RuntimePath  }}
 Network:        {{ print .Config.Network }}
 Git:            {{ print .Config.Git }}
+As user:        {{ print .Config.AsUser }}
 {{ if .Config.Description }}
 {{ .Config.Description }}
 {{ end }}
