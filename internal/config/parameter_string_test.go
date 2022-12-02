@@ -162,6 +162,61 @@ func (suite *ParameterStringTestSuite) TestStringLength() {
 	}
 }
 
+func (suite *ParameterStringTestSuite) TestASCIIParameter() {
+	testTable := map[string]bool{
+		"x":    false,
+		"":     false,
+		"true": true,
+		"1":    true,
+	}
+
+	for testName, isValid := range testTable {
+		testName := testName
+		isValid := isValid
+
+		suite.T().Run(testName, func(t *testing.T) {
+			_, err := config.NewString(false, map[string]string{
+				"ascii": testName,
+			})
+
+			if isValid {
+				assert.NoError(t, err)
+			} else {
+				assert.ErrorContains(t, err, "cannot parse ascii")
+			}
+		})
+	}
+}
+
+func (suite *ParameterStringTestSuite) TestValidateASCIIString() {
+	testTable := map[string]bool{
+		"x":      true,
+		"":       true,
+		"hello":  true,
+		"привет": false,
+	}
+
+	param, err := config.NewString(false, map[string]string{
+		"ascii": "true",
+	})
+	suite.NoError(err)
+
+	for testName, isValid := range testTable {
+		testName := testName
+		isValid := isValid
+
+		suite.T().Run(testName, func(t *testing.T) {
+			err = param.Validate(suite.Context(), testName)
+
+			if isValid {
+				assert.NoError(t, err)
+			} else {
+				assert.ErrorContains(t, err, "contains non-ascii character")
+			}
+		})
+	}
+}
+
 func TestParameterString(t *testing.T) {
 	suite.Run(t, &ParameterStringTestSuite{})
 }
