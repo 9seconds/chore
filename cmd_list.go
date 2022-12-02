@@ -35,7 +35,9 @@ func (c *CliCmdList) listNamespaces() error {
 	names := make([]string, 0, len(entries))
 
 	for _, v := range entries {
-		if v.IsDir() {
+		path := filepath.Join(choreDir, v.Name())
+
+		if stat, err := os.Stat(path); err == nil && stat.IsDir() {
 			names = append(names, v.Name())
 		}
 	}
