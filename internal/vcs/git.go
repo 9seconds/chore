@@ -21,8 +21,8 @@ const (
 type GitAccessMode byte
 
 const (
-	GitAccessIfUndefined GitAccessMode = iota
-	GitAccessNo
+	GitAccessNo GitAccessMode = iota
+	GitAccessIfUndefined
 	GitAccessAlways
 )
 
