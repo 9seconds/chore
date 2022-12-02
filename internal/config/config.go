@@ -78,6 +78,8 @@ func Parse(reader io.Reader) (Config, error) { //nolint: cyclop
 			value, err = NewFile(param.Required, param.Spec)
 		case ParameterSemver:
 			value, err = NewSemver(param.Required, param.Spec)
+		case ParameterDatetime:
+			value, err = NewDatetime(param.Required, param.Spec)
 		default:
 			return conf, fmt.Errorf("unknown parameter type %s for parameter %s", param.Type, name)
 		}

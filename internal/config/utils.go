@@ -5,6 +5,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func parseCSV(value string) []string {
@@ -46,4 +47,21 @@ func parseRegexp(spec map[string]string, name string) (*regexp.Regexp, error) {
 	}
 
 	return nil, nil
+}
+
+func parseDurationNegative(spec map[string]string, name string) (time.Duration, error) {
+	if value, ok := spec[name]; ok {
+		parsed, err := time.ParseDuration(value)
+		if err != nil {
+			return 0, fmt.Errorf("incorrect duration: %w", err)
+		}
+
+		if parsed < 0 {
+			return 0, fmt.Errorf("duration %s should be >=0", parsed)
+		}
+
+		return parsed, nil
+	}
+
+	return -1, nil
 }

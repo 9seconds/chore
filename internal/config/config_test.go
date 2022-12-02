@@ -67,6 +67,7 @@ func (suite *ConfigTestSuite) TestParameter() {
 		config.ParameterDirectory,
 		config.ParameterFile,
 		config.ParameterSemver,
+		config.ParameterDatetime,
 	}
 
 	for _, testValue := range tableTest {

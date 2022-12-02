@@ -15,7 +15,7 @@ GO_FILES     := $(shell find . -name "*.go" -type f | grep -vE '_test\.go$$')
 all: $(APP_NAME)
 
 $(APP_NAME): $(GO_FILES) go.sum
-	@go build -o "$(APP_NAME)"
+	@go build -tags timetzdata -o "$(APP_NAME)"
 
 vendor: go.mod go.sum
 	@$(MOD_ON) go mod vendor
@@ -39,6 +39,7 @@ static:
 	@env CGO_ENABLED=0 GOOS=linux go build \
 		$(STATIC_FLAGS) \
 		-tags netgo \
+		-tags timetzdata \
 		-a \
 		-o "$(APP_NAME)"
 
