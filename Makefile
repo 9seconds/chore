@@ -5,7 +5,7 @@ GOLANGCI_LINT_VERSION := v1.50.1
 GOFUMPT_VERSION       := v0.4.0
 
 VERSION      := $(shell git describe --exact-match HEAD 2>/dev/null || git describe --tags --always)
-STATIC_FLAGS := -trimpath -mod=readonly -ldflags="-extldflags '-static' -s -w -X 'main.version=$(VERSION)'"
+STATIC_FLAGS := -trimpath -mod=readonly -ldflags="-s -w -X 'main.version=$(VERSION)'"
 GOTOOL       := env "GOBIN=$(abspath $(GOBIN))" "PATH=$(abspath $(GOBIN)):$(PATH)"
 GO_FILES     := $(shell find . -name "*.go" -type f | grep -vE '_test\.go$$')
 
@@ -36,7 +36,7 @@ $(GOBIN)/gofumpt: $(GOBIN)/gofumpt-$(GOFUMPT_VERSION)/gofumpt
 
 .PHONY: static
 static:
-	@env CGO_ENABLED=0 GOOS=linux go build \
+	@env go build \
 		$(STATIC_FLAGS) \
 		-tags netgo \
 		-tags timetzdata \
