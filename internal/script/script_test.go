@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"os"
+	"os/user"
 	"regexp"
 	"strings"
 	"testing"
@@ -169,6 +170,12 @@ func (suite *ScriptTestSuite) TestEnviron() {
 		suite.Equal(value, data[env.EnvHostnameFQDN])
 
 		count++
+	}
+
+	if value, err := user.Current(); err == nil {
+		suite.Equal(value.Username, data[env.EnvUserName])
+
+		count += 3
 	}
 
 	suite.Len(data, count)

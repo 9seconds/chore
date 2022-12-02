@@ -15,6 +15,7 @@ const (
 	EnvOSPrefix        = Prefix + "OS_"
 	EnvOSVersionPrefix = EnvOSPrefix + "VERSION_"
 	EnvGitPrefix       = Prefix + "GIT_"
+	EnvUserPrefix      = Prefix + "USER_"
 
 	EnvNamespace = Prefix + "NAMESPACE"
 	EnvCaller    = Prefix + "CALLER"
@@ -79,4 +80,8 @@ const (
 	EnvGitCommitHash      = EnvGitPrefix + "COMMIT_HASH"
 	EnvGitCommitHashShort = EnvGitPrefix + "COMMIT_HASH_SHORT"
 	EnvGitIsDirty         = EnvGitPrefix + "IS_DIRTY"
+
+	EnvUserUID  = EnvUserPrefix + "UID"
+	EnvUserGID  = EnvUserPrefix + "GID"
+	EnvUserName = EnvUserPrefix + "NAME"
 )
