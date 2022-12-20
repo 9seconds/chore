@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"sort"
 	"text/template"
 
 	"github.com/9seconds/chore/internal/cli"
@@ -36,14 +37,43 @@ var cliCmdShotTemplate = template.Must(
 	template.New("show").Parse(cliCmdShowText))
 
 type CliCmdShow struct {
-	Namespace cli.Namespace `arg:"" help:"Script namespace. Dot takes one from environment variable CHORE_NAMESPACE."`
-	Script    string        `arg:"" help:"Script name."`
+	Namespace cli.Namespace `arg:"" optional:"" help:"Script namespace. Dot takes one from environment variable CHORE_NAMESPACE."`
+	Script    string        `arg:"" optional:"" help:"Script name."`
 }
 
 func (c *CliCmdShow) Run(_ cli.Context) error {
-	scr := &script.Script{
-		Namespace:  c.Namespace.Value(),
-		Executable: c.Script,
+	switch {
+	case c.Namespace.Value() == "":
+		names, err := script.ListNamespaces("")
+		if err != nil {
+			return err
+		}
+
+		sort.Strings(names)
+
+		for _, v := range names {
+			fmt.Println(v)
+		}
+
+		return nil
+	case c.Script == "":
+		names, err := script.ListScripts(c.Namespace.Value(), "")
+		if err != nil {
+			return err
+		}
+
+		sort.Strings(names)
+
+		for _, v := range names {
+			fmt.Println(v)
+		}
+
+		return nil
+	}
+
+	scr, err := script.FindScript(c.Namespace.Value(), c.Script)
+	if err != nil {
+		return err
 	}
 
 	if err := scr.Init(); err != nil {
