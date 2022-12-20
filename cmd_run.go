@@ -16,8 +16,8 @@ type CliCmdRun struct {
 	Timeout cli.Timeout `short:"t" help:"Execute with a given timeout. Number mean seconds. Also can pass duration. Default is no timeout."`
 	Lock    cli.Lock    `short:"l" help:"A path to a lock to acquire before execution. Prefix 's:' means shared lock, 'x:' - exclusive (default). '.' means a path to the script itself. Default is no lock."`
 
-	Namespace cli.Namespace `arg:"" help:"Script namespace."`
-	Script    string        `arg:"" help:"Script name."`
+	Namespace cli.Namespace `arg:"" help:"Prefix of the script namespace."`
+	Script    string        `arg:"" help:"Prefix f the script name."`
 	Args      []string      `arg:"" optional:"" help:"Script arguments to use."`
 }
 

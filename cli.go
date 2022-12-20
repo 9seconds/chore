@@ -18,8 +18,8 @@ var CLI struct {
 
 	List       CliCmdList       `cmd:"" aliases:"l" help:"List namespaces and scripts. Empty namespace lists namespaces."`
 	Show       CliCmdShow       `cmd:"" aliases:"s" help:"Show details on a given script."`
-	EditScript CliCmdEditScript `cmd:"" aliases:"e,es" help:"Edit chore script."`
-	EditConfig CliCmdEditConfig `cmd:"" aliases:"ec" help:"Edit chore script config."`
+	EditScript CliCmdEditScript `cmd:"" aliases:"e" help:"Edit chore script."`
+	EditConfig CliCmdEditConfig `cmd:"" aliases:"c" help:"Edit chore script config."`
 	Run        CliCmdRun        `cmd:"" aliases:"r" help:"Run chore script."`
 }
 
