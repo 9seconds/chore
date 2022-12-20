@@ -51,6 +51,7 @@ func Parse(ctx context.Context, parameters map[string]config.Parameter, args []s
 		}
 
 		name = strings.ToLower(name)
+		name = strings.ReplaceAll(name, "-", "_")
 
 		spec, ok := parameters[name]
 		if !ok {
