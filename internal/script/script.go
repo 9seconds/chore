@@ -112,6 +112,7 @@ func (s *Script) Environ(ctx context.Context, args argparse.ParsedArgs) []string
 
 func (s *Script) Valid() error {
 	path := s.Path()
+
 	stat, err := os.Stat(path)
 	if err != nil {
 		return fmt.Errorf("cannot stat path: %w", err)

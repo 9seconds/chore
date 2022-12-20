@@ -22,9 +22,9 @@ type CliCmdRun struct {
 }
 
 func (c *CliCmdRun) Run(ctx cli.Context) error {
-	scr := &script.Script{
-		Namespace:  c.Namespace.Value(),
-		Executable: c.Script,
+	scr, err := script.FindScript(c.Namespace.Value(), c.Script)
+	if err != nil {
+		return fmt.Errorf("cannot find out script: %w", err)
 	}
 
 	if err := scr.Init(); err != nil {
