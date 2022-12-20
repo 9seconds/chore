@@ -110,8 +110,26 @@ func (s *Script) Environ(ctx context.Context, args argparse.ParsedArgs) []string
 	return environ
 }
 
+func (s *Script) Valid() error {
+	path := s.Path()
+	stat, err := os.Stat(path)
+	if err != nil {
+		return fmt.Errorf("cannot stat path: %w", err)
+	}
+
+	if stat.IsDir() {
+		return fmt.Errorf("path is directory: %w", err)
+	}
+
+	if err := access.Access(path, false, false, true); err != nil {
+		return fmt.Errorf("cannot find out executable %s: %w", s.Path(), err)
+	}
+
+	return nil
+}
+
 func (s *Script) Init() error {
-	if err := access.Access(s.Path(), false, false, true); err != nil {
+	if err := s.Valid(); err != nil {
 		return fmt.Errorf("cannot find out executable %s: %w", s.Path(), err)
 	}
 
