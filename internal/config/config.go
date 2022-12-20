@@ -50,8 +50,6 @@ func Parse(reader io.Reader) (Config, error) { //nolint: cyclop
 		switch param.Type {
 		case ParameterInteger:
 			value, err = NewInteger(param.Required, param.Spec)
-		case ParameterBool:
-			value, err = NewBool(param.Required, param.Spec)
 		case ParameterString:
 			value, err = NewString(param.Required, param.Spec)
 		case ParameterFloat:
