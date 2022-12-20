@@ -52,6 +52,7 @@ func (suite *ConfigTestSuite) TestParseDescription() {
 func (suite *ConfigTestSuite) TestParameter() {
 	tableTest := []string{
 		config.ParameterInteger,
+		config.ParameterBool,
 		config.ParameterString,
 		config.ParameterFloat,
 		config.ParameterURL,

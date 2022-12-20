@@ -405,7 +405,7 @@ func (suite *ParameterDatetimeTestSuite) TestLayouts() {
 		})
 	}
 
-	for _, choice := range []string{"u", "u 2"} {
+	for _, choice := range []string{"u", "u 9"} {
 		choice := choice
 
 		suite.T().Run(choice, func(t *testing.T) {
