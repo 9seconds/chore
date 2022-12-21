@@ -9,7 +9,6 @@ require (
 	github.com/adrg/xdg v0.4.0
 	github.com/alecthomas/assert/v2 v2.1.0
 	github.com/alecthomas/kong v0.7.1
-	github.com/alessio/shellescape v1.4.1
 	github.com/denisbrodbeck/machineid v1.0.1
 	github.com/gabriel-vasile/mimetype v1.4.1
 	github.com/go-git/go-git/v5 v5.5.1
