@@ -22,15 +22,21 @@ Git:            {{ print .Config.Git }}
 As user:        {{ print .Config.AsUser }}
 {{ if .Config.Description }}
 {{ .Config.Description }}
-{{ end }}
-
-{{- if .Config.Parameters }}
-Parameters:
-{{ range $key, $value := .Config.Parameters -}}
-	{{- $key }} ({{ $value.Type }}) -> {{ $value }}
 {{ end -}}
 
-{{- end -}}`
+{{ if .Config.Parameters }}
+Parameters:
+{{- range $key, $value := .Config.Parameters }}
+  {{ $key }} ({{ $value.Type }}) -> {{ $value -}}
+{{ end }}
+{{ end }}
+
+{{- if .Config.Flags }}
+Flags:
+{{- range $key, $value := .Config.Flags }}
+  {{ $key }} -> {{ if $value }}required{{ else }}optional{{ end -}}
+{{ end -}}{{- end }}
+`
 )
 
 var cliCmdShotTemplate = template.Must(

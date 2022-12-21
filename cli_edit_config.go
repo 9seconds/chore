@@ -22,6 +22,11 @@ const (
   // to run command as a user
   // as_user: root
 
+  flags: {
+    // true - required, false - optional
+    flag1: true
+  }
+
   parameters: {
     param: {
       type: string
@@ -58,11 +63,11 @@ func (c *CliCmdEditConfig) Run(ctx cli.Context) error {
 		return fmt.Errorf("cannot render default template: %w", err)
 	}
 
-	if err := c.Open(ctx, scr.Path(), defaultContent.Bytes()); err != nil {
+	if err := c.Open(ctx, scr.ConfigPath(), defaultContent.Bytes()); err != nil {
 		return fmt.Errorf("editor failed: %w", err)
 	}
 
-	_, err := c.RemoveIfEmpty(scr.Path())
+	_, err := c.RemoveIfEmpty(scr.ConfigPath())
 
 	return err
 }
