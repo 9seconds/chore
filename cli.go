@@ -1,19 +1,22 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"errors"
 	"fmt"
 	"io/fs"
 	"os"
 	"os/exec"
+	"text/scanner"
+	"unicode"
 
 	"github.com/9seconds/chore/internal/cli"
 	"github.com/alecthomas/kong"
 )
 
 var version = "dev"
+
+const fileDefaultPermission = 0o600
 
 var CLI struct {
 	Debug   bool             `short:"d" env:"CHORE_DEBUG" help:"Run in debug mode."`
@@ -32,69 +35,47 @@ type editorCommand struct {
 	Script    string        `arg:"" help:"Script name."`
 }
 
-func (e *editorCommand) Open(ctx context.Context, path string, defaultContent []byte) error { //nolint: cyclop
+func (e *editorCommand) Open(ctx context.Context, path string, templateContent []byte) error {
 	editor, err := e.Editor.Value()
 	if err != nil {
 		return fmt.Errorf("cannot initialize editor: %w", err)
 	}
 
-	var (
-		templateContent = defaultContent
-		originalContent []byte
-		mode            fs.FileMode = 0o600
-	)
-
-	stat, err := os.Stat(path)
+	_, err = os.Stat(path)
 
 	switch {
-	case err == nil:
-		originalContent, err = os.ReadFile(path)
-		if err != nil {
-			return fmt.Errorf("cannot read from original file: %w", err)
+	case errors.Is(err, fs.ErrNotExist):
+		if err := os.WriteFile(path, templateContent, fileDefaultPermission); err != nil {
+			return fmt.Errorf("cannot populate file with a template content: %w", err)
 		}
-
-		templateContent = originalContent
-		mode = stat.Mode().Perm()
-	case !errors.Is(err, fs.ErrNotExist):
-		return fmt.Errorf("cannot stat original file: %w", err)
+	case err != nil:
+		return fmt.Errorf("cannot stat file: %w", err)
 	}
 
-	tempFile, err := os.CreateTemp("", "")
-	if err != nil {
-		return fmt.Errorf("cannot create temporary file: %w", err)
-	}
-
-	defer os.Remove(tempFile.Name())
-
-	if _, err := tempFile.Write(templateContent); err != nil {
-		return fmt.Errorf("cannot populate temporary file: %w", err)
-	}
-
-	if err := tempFile.Close(); err != nil {
-		return fmt.Errorf("cannot close temporary file: %w", err)
-	}
-
-	cmd := exec.CommandContext(ctx, editor, tempFile.Name())
+	cmd := exec.CommandContext(ctx, editor, path)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("cannot successfully complete text editor: %w", err)
-	}
+	return cmd.Run()
+}
 
-	newContent, err := os.ReadFile(tempFile.Name())
+func (e *editorCommand) RemoveIfEmpty(path string) (bool, error) {
+	file, err := os.Open(path)
 	if err != nil {
-		return fmt.Errorf("cannot read an updated content of the file: %w", err)
+		return false, fmt.Errorf("cannot open file: %w", err)
 	}
 
-	if bytes.Equal(newContent, originalContent) {
-		return nil
+	defer file.Close()
+
+	text := scanner.Scanner{}
+	text.Init(file)
+
+	for tok := text.Scan(); tok != scanner.EOF; tok = text.Scan() {
+		if !unicode.IsSpace(tok) {
+			return false, nil
+		}
 	}
 
-	if err := os.WriteFile(path, newContent, mode); err != nil {
-		return fmt.Errorf("cannot write content back to the original file: %w", err)
-	}
-
-	return nil
+	return true, os.Remove(path)
 }

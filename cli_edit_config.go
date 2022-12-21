@@ -62,5 +62,7 @@ func (c *CliCmdEditConfig) Run(ctx cli.Context) error {
 		return fmt.Errorf("editor failed: %w", err)
 	}
 
-	return nil
+	_, err := c.RemoveIfEmpty(scr.Path())
+
+	return err
 }
