@@ -1,8 +1,8 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
-	"os"
 	"text/template"
 
 	"github.com/9seconds/chore/internal/cli"
@@ -52,22 +52,13 @@ func (c *CliCmdEditConfig) Run(ctx cli.Context) error {
 		return fmt.Errorf("cannot ensure namespace dir: %w", err)
 	}
 
-	path := scr.ConfigPath()
+	defaultContent := bytes.Buffer{}
 
-	if _, err := os.Stat(path); err != nil {
-		file, err := os.Create(path)
-		if err != nil {
-			return fmt.Errorf("cannot create new config %s: %w", path, err)
-		}
-
-		if err := cliCmdEditConfigTemplate.Execute(file, scr); err != nil {
-			return err
-		}
-
-		file.Close()
+	if err := cliCmdEditConfigTemplate.Execute(&defaultContent, scr); err != nil {
+		return fmt.Errorf("cannot render default template: %w", err)
 	}
 
-	if err := c.Open(ctx, path); err != nil {
+	if err := c.Open(ctx, scr.Path(), defaultContent.Bytes()); err != nil {
 		return fmt.Errorf("editor failed: %w", err)
 	}
 

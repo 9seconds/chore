@@ -1,8 +1,11 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"os/exec"
 
@@ -29,16 +32,69 @@ type editorCommand struct {
 	Script    string        `arg:"" help:"Script name."`
 }
 
-func (e *editorCommand) Open(ctx context.Context, path string) error {
+func (e *editorCommand) Open(ctx context.Context, path string, defaultContent []byte) error { //nolint: cyclop
 	editor, err := e.Editor.Value()
 	if err != nil {
 		return fmt.Errorf("cannot initialize editor: %w", err)
 	}
 
-	cmd := exec.CommandContext(ctx, editor, path)
+	var (
+		templateContent = defaultContent
+		originalContent []byte
+		mode            fs.FileMode = 0o600
+	)
+
+	stat, err := os.Stat(path)
+
+	switch {
+	case err == nil:
+		originalContent, err = os.ReadFile(path)
+		if err != nil {
+			return fmt.Errorf("cannot read from original file: %w", err)
+		}
+
+		templateContent = originalContent
+		mode = stat.Mode().Perm()
+	case !errors.Is(err, fs.ErrNotExist):
+		return fmt.Errorf("cannot stat original file: %w", err)
+	}
+
+	tempFile, err := os.CreateTemp("", "")
+	if err != nil {
+		return fmt.Errorf("cannot create temporary file: %w", err)
+	}
+
+	defer os.Remove(tempFile.Name())
+
+	if _, err := tempFile.Write(templateContent); err != nil {
+		return fmt.Errorf("cannot populate temporary file: %w", err)
+	}
+
+	if err := tempFile.Close(); err != nil {
+		return fmt.Errorf("cannot close temporary file: %w", err)
+	}
+
+	cmd := exec.CommandContext(ctx, editor, tempFile.Name())
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
-	return cmd.Run()
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("cannot successfully complete text editor: %w", err)
+	}
+
+	newContent, err := os.ReadFile(tempFile.Name())
+	if err != nil {
+		return fmt.Errorf("cannot read an updated content of the file: %w", err)
+	}
+
+	if bytes.Equal(newContent, originalContent) {
+		return nil
+	}
+
+	if err := os.WriteFile(path, newContent, mode); err != nil {
+		return fmt.Errorf("cannot write content back to the original file: %w", err)
+	}
+
+	return nil
 }

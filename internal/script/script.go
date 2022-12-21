@@ -33,7 +33,7 @@ func (s *Script) Config() *config.Config {
 }
 
 func (s *Script) NamespacePath() string {
-	return filepath.Join(xdg.CacheHome, env.ChoreDir, s.Namespace)
+	return filepath.Join(xdg.ConfigHome, env.ChoreDir, s.Namespace)
 }
 
 func (s *Script) Path() string {

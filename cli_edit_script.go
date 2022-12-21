@@ -9,6 +9,10 @@ import (
 	"github.com/9seconds/chore/internal/script"
 )
 
+const cliCmdEditScriptDefault = `#!/bin/bash
+
+`
+
 type CliCmdEditScript struct {
 	editorCommand
 }
@@ -27,7 +31,7 @@ func (c *CliCmdEditScript) Run(ctx cli.Context) error {
 
 	path := scr.Path()
 
-	if err := c.Open(ctx, path); err != nil {
+	if err := c.Open(ctx, path, []byte(cliCmdEditScriptDefault)); err != nil {
 		return fmt.Errorf("editor failed: %w", err)
 	}
 
