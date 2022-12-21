@@ -18,7 +18,7 @@ func (suite *GenerateIdsTestSuite) SetupTest() {
 	suite.EnvBaseTestSuite.SetupTest()
 
 	suite.args = argparse.ParsedArgs{
-		Keywords: map[string]string{
+		Parameters: map[string]string{
 			"k": "1",
 		},
 		Positional: []string{"1", "2"},
@@ -34,10 +34,10 @@ func (suite *GenerateIdsTestSuite) TestNoEnvs() {
 	suite.NotEmpty(data[env.EnvIDUnique])
 	suite.NotEmpty(data[env.EnvIDChainUnique])
 	suite.Equal(
-		"1lcK3kcAuwj9dF91XbXnmdZybO8Rj51HYMywNbWfWNI",
+		"v3CalS7yGSohMYSBoKlD5xFQCFQ8Bi02nVWOD2DAFZE",
 		data[env.EnvIDIsolated])
 	suite.Equal(
-		"wZkkTeL4GOiyL0PkOKEqGenGbuw0xdIvVvXRnN4qEi0",
+		"1Ek0XW68Lh0bis9SCJqkEjGSWe0STHuldW7l-DABoe4",
 		data[env.EnvIDChainIsolated])
 }
 

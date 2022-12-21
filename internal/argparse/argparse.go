@@ -3,136 +3,143 @@ package argparse
 import (
 	"context"
 	"fmt"
-	"sort"
 	"strings"
 	"sync"
 
 	"github.com/9seconds/chore/internal/config"
-	"github.com/alessio/shellescape"
 )
 
 const (
-	SeparatorKeyword = ":"
+	PrefixFlagPositive = "+"
+	PrefixFlagNegative = "-"
+	PrefixLiteral      = ":"
+	SeparatorKeyword   = "="
 )
 
-type validatedValue struct {
-	index int
-	name  string
-	value string
+func Parse(
+	ctx context.Context,
+	args []string,
+	flags map[string]bool,
+	parameters map[string]config.Parameter,
+) (ParsedArgs, error) {
+	parsed, err := parseArgs(args, flags, parameters)
+	if err != nil {
+		return parsed, err
+	}
+
+	return parsed, validateArgs(ctx, parsed, flags, parameters)
 }
 
-func Parse(ctx context.Context, parameters map[string]config.Parameter, args []string) (ParsedArgs, error) { //nolint: cyclop
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
-	keywords := make(map[string]map[int]string)
-	rValue := ParsedArgs{
-		Keywords: make(map[string]string),
+func parseArgs(
+	args []string,
+	flags map[string]bool,
+	parameters map[string]config.Parameter,
+) (ParsedArgs, error) {
+	parsed := ParsedArgs{
+		Parameters: make(map[string]string),
+		Flags:      make(map[string]bool),
+		Positional: []string{},
 	}
 
-	waiters := &sync.WaitGroup{}
-	errChan := make(chan error)
-	resChan := make(chan validatedValue)
-	keywordStage := true
+	positionalTime := false
 
-	for idx, arg := range args {
-		name, value, found := strings.Cut(arg, SeparatorKeyword)
+	for _, arg := range args {
+		switch {
+		case strings.HasPrefix(arg, PrefixLiteral):
+			positionalTime = true
 
-		if !found {
-			keywordStage = false
-
-			rValue.Positional = append(rValue.Positional, arg)
-
-			continue
-		}
-
-		if !keywordStage {
-			return rValue, fmt.Errorf("unexpected keyword parameter %s", arg)
-		}
-
-		name = strings.ToLower(name)
-		name = strings.ReplaceAll(name, "-", "_")
-
-		spec, ok := parameters[name]
-		if !ok {
-			return rValue, fmt.Errorf("unknown parameter %s", name)
-		}
-
-		validateValue(ctx, waiters, spec, idx, name, value, resChan, errChan)
-	}
-
-	go func() {
-		waiters.Wait()
-		cancel()
-	}()
-
-parametersLoop:
-	for {
-		select {
-		case <-ctx.Done():
-			break parametersLoop
-		case val := <-resChan:
-			if keywords[val.name] == nil {
-				keywords[val.name] = make(map[int]string)
+			parsed.Positional = append(parsed.Positional, strings.TrimPrefix(arg, PrefixLiteral))
+		case strings.HasPrefix(arg, PrefixFlagPositive), strings.HasPrefix(arg, PrefixFlagNegative):
+			if positionalTime {
+				return parsed, fmt.Errorf("unexpected flag %s while processing positionals", arg)
 			}
 
-			keywords[val.name][val.index] = val.value
-		case err := <-errChan:
-			return rValue, err
+			name := normalizeArgName(arg[1:])
+
+			if _, ok := flags[name]; !ok {
+				return parsed, fmt.Errorf("unknown flag %s", name)
+			}
+
+			parsed.Flags[name] = strings.HasPrefix(arg, PrefixFlagPositive)
+		case strings.Contains(arg, SeparatorKeyword):
+			if positionalTime {
+				return parsed, fmt.Errorf("unexpected parameter %s while processing positionals", arg)
+			}
+
+			name, value, _ := strings.Cut(arg, SeparatorKeyword)
+			name = normalizeArgName(name)
+
+			if _, ok := parameters[name]; !ok {
+				return parsed, fmt.Errorf("unknown parameter %s", name)
+			}
+
+			parsed.Parameters[name] = value
+		default:
+			positionalTime = true
+
+			parsed.Positional = append(parsed.Positional, arg)
+		}
+	}
+
+	return parsed, nil
+}
+
+func validateArgs( //nolint: cyclop
+	ctx context.Context,
+	args ParsedArgs,
+	flags map[string]bool,
+	parameters map[string]config.Parameter,
+) error {
+	for name, required := range flags {
+		if _, ok := args.Flags[name]; !ok && required {
+			return fmt.Errorf("flag '%s' is required but value is not provided", name)
 		}
 	}
 
 	for name, param := range parameters {
-		if _, ok := keywords[name]; !ok && param.Required() {
-			return rValue, fmt.Errorf("absent value for parameter %s", name)
+		if _, ok := args.Parameters[name]; !ok && param.Required() {
+			return fmt.Errorf("parameter '%s' is required but value is not provided", name)
 		}
 	}
 
-	for name, values := range keywords {
-		orders := make([]int, 0, len(values))
-		kwValues := make([]string, 0, len(values))
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 
-		for idx := range values {
-			orders = append(orders, idx)
-		}
+	waiters := &sync.WaitGroup{}
+	errChan := make(chan error)
 
-		sort.Ints(orders)
+	waiters.Add(len(args.Parameters))
 
-		for _, idx := range orders {
-			kwValues = append(kwValues, values[idx])
-		}
+	for name, value := range args.Parameters {
+		go func(name, value string) {
+			defer waiters.Done()
 
-		rValue.Keywords[name] = shellescape.QuoteCommand(kwValues)
+			if err := parameters[name].Validate(ctx, value); err != nil {
+				select {
+				case <-ctx.Done():
+					return
+				default:
+				}
+
+				select {
+				case <-ctx.Done():
+				case errChan <- fmt.Errorf("invalid value for parameter %s: %w", name, err):
+				}
+			}
+		}(name, value)
 	}
-
-	return rValue, nil
-}
-
-func validateValue(ctx context.Context,
-	waiters *sync.WaitGroup,
-	spec config.Parameter,
-	index int,
-	name, value string,
-	resChan chan<- validatedValue, errChan chan<- error,
-) {
-	waiters.Add(1)
 
 	go func() {
-		defer waiters.Done()
-
-		err := spec.Validate(ctx, value)
-
-		if err != nil {
-			resChan = nil
-			err = fmt.Errorf("incorrect value %s for parameter %s: %w", name, value, err)
-		} else {
-			errChan = nil
-		}
-
-		select {
-		case <-ctx.Done():
-		case resChan <- validatedValue{index: index, name: name, value: value}:
-		case errChan <- err:
-		}
+		waiters.Wait()
+		close(errChan)
 	}()
+
+	return <-errChan
+}
+
+func normalizeArgName(name string) string {
+	name = strings.ReplaceAll(name, "-", "_")
+	name = strings.ToLower(name)
+
+	return name
 }

@@ -5,27 +5,24 @@ import (
 	"testing"
 
 	"github.com/9seconds/chore/internal/argparse"
-	"github.com/stretchr/testify/suite"
+	"github.com/stretchr/testify/assert"
 )
 
-type ParsedArgsTestSuite struct {
-	suite.Suite
-}
-
-func (suite *ParsedArgsTestSuite) TestChecksum() {
+func TestParsedArgs(t *testing.T) {
 	args := argparse.ParsedArgs{
-		Keywords: map[string]string{
+		Parameters: map[string]string{
 			"v": "k",
 			"k": "2",
+		},
+		Flags: map[string]bool{
+			"cleanup": true,
+			"welcome": false,
 		},
 		Positional: []string{"1", "2", "3 4 5"},
 	}
 
-	suite.Equal(
-		"c773754b585fabf095af52a3113b0e24661fe60e17719cd12b217284a67dce7a",
+	assert.Equal(
+		t,
+		"5fd03abc5a84a11cf3a5ed4d1ed78e249ac5313053dd5536ab8f79cc21f8bdd3",
 		hex.EncodeToString(args.Checksum()))
-}
-
-func TestParsedArgs(t *testing.T) {
-	suite.Run(t, &ParsedArgsTestSuite{})
 }

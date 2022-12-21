@@ -48,7 +48,9 @@ func (c *CliCmdRun) Run(ctx cli.Context) error {
 		return fmt.Errorf("cannot start context: %w", err)
 	}
 
-	args, err := argparse.Parse(ctx, scr.Config().Parameters, c.Args)
+	conf := scr.Config()
+
+	args, err := argparse.Parse(ctx, c.Args, conf.Flags, conf.Parameters)
 	if err != nil {
 		return fmt.Errorf("cannot parse arguments: %w", err)
 	}

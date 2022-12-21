@@ -13,6 +13,7 @@ type RawConfig struct {
 	Network     bool                    `json:"network"`
 	AsUser      string                  `json:"as_user"`
 	Parameters  map[string]RawParameter `json:"parameters"`
+	Flags       map[string]bool         `json:"flags"`
 }
 
 type RawParameter struct {

@@ -1,13 +1,9 @@
 package config
 
-import (
-	"context"
-	"fmt"
-)
+import "context"
 
 type Parameter interface {
-	fmt.Stringer
-
+	String() string
 	Type() string
 	Required() bool
 	Validate(context.Context, string) error

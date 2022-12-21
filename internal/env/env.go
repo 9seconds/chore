@@ -6,7 +6,8 @@ const (
 
 const (
 	Prefix             = "CHORE_"
-	EnvArgPrefix       = Prefix + "ARG_"
+	EnvParameterPrefix = Prefix + "P_"
+	EnvFlagPrefix      = Prefix + "F_"
 	EnvPathPrefix      = Prefix + "PATH_"
 	EnvNetworkPrefix   = Prefix + "NETWORK_"
 	EnvStartedAtPrefix = Prefix + "STARTED_AT_"

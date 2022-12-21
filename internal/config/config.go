@@ -14,6 +14,7 @@ type Config struct {
 	Network     bool
 	AsUser      string
 	Parameters  map[string]Parameter
+	Flags       map[string]bool
 }
 
 func Parse(reader io.Reader) (Config, error) { //nolint: cyclop
@@ -33,6 +34,7 @@ func Parse(reader io.Reader) (Config, error) { //nolint: cyclop
 		AsUser:      raw.AsUser,
 		Git:         gitMode,
 		Parameters:  make(map[string]Parameter),
+		Flags:       raw.Flags,
 	}
 
 	for name, param := range raw.Parameters {

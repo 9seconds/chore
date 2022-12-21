@@ -79,10 +79,16 @@ func (s *Script) Environ(ctx context.Context, args argparse.ParsedArgs) []string
 		env.MakeValue(env.EnvPathTemp, s.TempPath()),
 	}
 
-	for k, v := range args.Keywords {
+	for k, v := range args.Parameters {
 		environ = append(
 			environ,
-			env.MakeValue(env.EnvArgPrefix+strings.ToUpper(k), v))
+			env.MakeValue(env.EnvParameterPrefix+strings.ToUpper(k), v))
+	}
+
+	for k := range args.Flags {
+		environ = append(
+			environ,
+			env.MakeValue(env.EnvFlagPrefix+strings.ToUpper(k), string(args.GetFlagValue(k))))
 	}
 
 	waiterGroup := &sync.WaitGroup{}

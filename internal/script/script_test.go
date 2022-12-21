@@ -109,9 +109,13 @@ func (suite *ScriptTestSuite) TestEnviron() {
 	conf.Git = vcs.GitAccessIfUndefined
 
 	environ := scr.Environ(context.Background(), argparse.ParsedArgs{
-		Keywords: map[string]string{
+		Parameters: map[string]string{
 			"k":  "v",
 			"XX": "y",
+		},
+		Flags: map[string]bool{
+			"cleanup": true,
+			"welcome": false,
 		},
 		Positional: []string{"a", "b", "c"},
 	})
@@ -125,7 +129,7 @@ func (suite *ScriptTestSuite) TestEnviron() {
 		require.True(suite.T(), found)
 	}
 
-	count := 43
+	count := 45
 
 	suite.Equal(scr.Namespace, data[env.EnvNamespace])
 	suite.Equal(scr.Executable, data[env.EnvCaller])
@@ -135,8 +139,10 @@ func (suite *ScriptTestSuite) TestEnviron() {
 	suite.Equal(scr.StatePath(), data[env.EnvPathState])
 	suite.Equal(scr.RuntimePath(), data[env.EnvPathRuntime])
 	suite.Equal(scr.TempPath(), data[env.EnvPathTemp])
-	suite.Equal("v", data[env.EnvArgPrefix+"K"])
-	suite.Equal("y", data[env.EnvArgPrefix+"XX"])
+	suite.Equal("v", data[env.EnvParameterPrefix+"K"])
+	suite.Equal("y", data[env.EnvParameterPrefix+"XX"])
+	suite.EqualValues(argparse.FlagTrue, data[env.EnvFlagPrefix+"CLEANUP"])
+	suite.EqualValues(argparse.FlagFalse, data[env.EnvFlagPrefix+"WELCOME"])
 	suite.Contains(data, env.EnvIDUnique)
 	suite.Contains(data, env.EnvIDChainUnique)
 	suite.Contains(data, env.EnvIDIsolated)
