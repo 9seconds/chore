@@ -7,6 +7,7 @@ import (
 	"io/fs"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"text/scanner"
 	"unicode"
 
@@ -77,5 +78,15 @@ func (e *editorCommand) RemoveIfEmpty(path string) (bool, error) {
 		}
 	}
 
-	return true, os.Remove(path)
+	if err := os.Remove(path); err != nil {
+		return false, fmt.Errorf("cannot remove %s: %w", path, err)
+	}
+
+	rootDir := filepath.Dir(path)
+
+	if items, err := os.ReadDir(rootDir); err == nil && len(items) == 0 {
+		return true, os.RemoveAll(rootDir)
+	}
+
+	return true, nil
 }
