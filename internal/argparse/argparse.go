@@ -5,15 +5,16 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"unicode/utf8"
 
 	"github.com/9seconds/chore/internal/config"
 )
 
 const (
-	PrefixFlagPositive = "+"
-	PrefixFlagNegative = "-"
-	PrefixLiteral      = ":"
-	SeparatorKeyword   = "="
+	PrefixFlagPositive = '+'
+	PrefixFlagNegative = '-'
+	PrefixLiteral      = ':'
+	SeparatorKeyword   = '='
 )
 
 func Parse(
@@ -43,30 +44,39 @@ func parseArgs(
 
 	positionalTime := false
 
-	for _, arg := range args {
+	for idx, arg := range args {
+		if !utf8.ValidString(arg) {
+			return parsed, fmt.Errorf("argument %d is not valid UTF-8 string", idx+1)
+		}
+
+		rune, _ := utf8.DecodeRuneInString(arg)
+
 		switch {
-		case strings.HasPrefix(arg, PrefixLiteral):
+		case rune == PrefixLiteral:
 			positionalTime = true
 
-			parsed.Positional = append(parsed.Positional, strings.TrimPrefix(arg, PrefixLiteral))
-		case strings.HasPrefix(arg, PrefixFlagPositive), strings.HasPrefix(arg, PrefixFlagNegative):
+			parsed.Positional = append(parsed.Positional, arg[1:])
+		case rune == PrefixFlagPositive, rune == PrefixFlagNegative:
+			flagName := arg[1:]
+
 			if positionalTime {
-				return parsed, fmt.Errorf("unexpected flag %s while processing positionals", arg)
+				return parsed, fmt.Errorf("unexpected flag %s while processing positionals", flagName)
 			}
 
-			name := normalizeArgName(arg[1:])
+			name := normalizeArgName(flagName)
 
 			if _, ok := flags[name]; !ok {
-				return parsed, fmt.Errorf("unknown flag %s", name)
+				return parsed, fmt.Errorf("unknown flag %s", flagName)
 			}
 
-			parsed.Flags[name] = strings.HasPrefix(arg, PrefixFlagPositive)
-		case strings.Contains(arg, SeparatorKeyword):
+			parsed.Flags[name] = rune == PrefixFlagPositive
+		case strings.ContainsRune(arg, SeparatorKeyword):
 			if positionalTime {
 				return parsed, fmt.Errorf("unexpected parameter %s while processing positionals", arg)
 			}
 
-			name, value, _ := strings.Cut(arg, SeparatorKeyword)
+			indexRune := strings.IndexRune(arg, SeparatorKeyword)
+			name, value := arg[:indexRune], arg[indexRune+1:]
 			name = normalizeArgName(name)
 
 			if _, ok := parameters[name]; !ok {
@@ -115,12 +125,6 @@ func validateArgs( //nolint: cyclop
 			defer waiters.Done()
 
 			if err := parameters[name].Validate(ctx, value); err != nil {
-				select {
-				case <-ctx.Done():
-					return
-				default:
-				}
-
 				select {
 				case <-ctx.Done():
 				case errChan <- fmt.Errorf("invalid value for parameter %s: %w", name, err):
