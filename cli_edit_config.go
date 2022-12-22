@@ -10,7 +10,8 @@ import (
 )
 
 const (
-	cliCmdEditConfigText = `// this is HJSON: https://hjson.github.io/
+	cliCmdEditConfigText = `// vim: set ft=hjson ts=2 sw=2 sts=2 et:
+// this is HJSON: https://hjson.github.io/
 
 {
   description : Amazing {{ js .Executable }} of {{ js .Namespace }}!
