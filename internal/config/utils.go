@@ -6,7 +6,19 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode"
 )
+
+func NormalizeName(name string) string {
+	return strings.Map(func(char rune) rune {
+		switch {
+		case char == '-', unicode.IsSpace(char):
+			return '_'
+		}
+
+		return unicode.ToLower(char)
+	}, name)
+}
 
 func parseCSV(value string) []string {
 	splitted := strings.Split(value, ",")

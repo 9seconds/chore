@@ -31,7 +31,7 @@ func Parse(
 	return parsed, validateArgs(ctx, parsed, flags, parameters)
 }
 
-func parseArgs(
+func parseArgs( //nolint: cyclop
 	args []string,
 	flags map[string]bool,
 	parameters map[string]config.Parameter,
@@ -63,7 +63,7 @@ func parseArgs(
 				return parsed, fmt.Errorf("unexpected flag %s while processing positionals", flagName)
 			}
 
-			name := normalizeArgName(flagName)
+			name := config.NormalizeName(flagName)
 
 			if _, ok := flags[name]; !ok {
 				return parsed, fmt.Errorf("unknown flag %s", flagName)
@@ -77,7 +77,7 @@ func parseArgs(
 
 			indexRune := strings.IndexRune(arg, SeparatorKeyword)
 			name, value := arg[:indexRune], arg[indexRune+1:]
-			name = normalizeArgName(name)
+			name = config.NormalizeName(name)
 
 			if _, ok := parameters[name]; !ok {
 				return parsed, fmt.Errorf("unknown parameter %s", name)
@@ -139,11 +139,4 @@ func validateArgs( //nolint: cyclop
 	}()
 
 	return <-errChan
-}
-
-func normalizeArgName(name string) string {
-	name = strings.ReplaceAll(name, "-", "_")
-	name = strings.ToLower(name)
-
-	return name
 }

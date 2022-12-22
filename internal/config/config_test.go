@@ -9,7 +9,7 @@ import (
 	"testing/iotest"
 
 	"github.com/9seconds/chore/internal/config"
-	"github.com/alecthomas/assert/v2"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -137,23 +137,6 @@ func (suite *ConfigTestSuite) TestCannotInitializeParameter() {
 
 	_, err := config.Parse(buf)
 	suite.ErrorContains(err, "cannot initialize parameter")
-}
-
-func (suite *ConfigTestSuite) TestIncorrectParameterName() {
-	configRaw := map[string]interface{}{
-		"parameters": map[string]interface{}{
-			"param 11": map[string]interface{}{
-				"type":     "integer",
-				"required": true,
-				"spec":     map[string]interface{}{},
-			},
-		},
-	}
-	data, _ := json.Marshal(configRaw) //nolint: errchkjson
-	buf := bytes.NewBuffer(data)
-
-	_, err := config.Parse(buf)
-	suite.ErrorContains(err, "incorrect parameter name")
 }
 
 func (suite *ConfigTestSuite) TestIncorrectJSON() {

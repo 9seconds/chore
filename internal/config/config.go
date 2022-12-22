@@ -3,7 +3,6 @@ package config
 import (
 	"fmt"
 	"io"
-	"unicode"
 
 	"github.com/9seconds/chore/internal/vcs"
 )
@@ -38,11 +37,7 @@ func Parse(reader io.Reader) (Config, error) { //nolint: cyclop
 	}
 
 	for name, param := range raw.Parameters {
-		for _, r := range name {
-			if unicode.IsSpace(r) {
-				return conf, fmt.Errorf("incorrect parameter name %s", name)
-			}
-		}
+		name := NormalizeName(name)
 
 		var (
 			value Parameter
