@@ -6,12 +6,10 @@ import (
 	"sort"
 )
 
-type FlagValue string
-
 const (
-	FlagUnknown FlagValue = ""
-	FlagTrue    FlagValue = "t"
-	FlagFalse   FlagValue = "f"
+	FlagUnknown = ""
+	FlagTrue    = "t"
+	FlagFalse   = "f"
 )
 
 type ParsedArgs struct {
@@ -20,7 +18,27 @@ type ParsedArgs struct {
 	Positional []string
 }
 
-func (p ParsedArgs) GetFlagValue(name string) FlagValue {
+func (p ParsedArgs) Options() []string {
+	options := make([]string, 0, len(p.Parameters)+len(p.Flags))
+
+	for name, value := range p.Parameters {
+		options = append(options, name+string(SeparatorKeyword)+value)
+	}
+
+	for name, required := range p.Flags {
+		if required {
+			options = append(options, string(PrefixFlagPositive)+name)
+		} else {
+			options = append(options, string(PrefixFlagNegative)+name)
+		}
+	}
+
+	return options
+}
+
+// todo CHORE_RECURSION
+
+func (p ParsedArgs) GetFlagValue(name string) string {
 	value, ok := p.Flags[name]
 
 	switch {

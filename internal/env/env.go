@@ -20,6 +20,7 @@ const (
 
 	EnvNamespace = Prefix + "NAMESPACE"
 	EnvCaller    = Prefix + "CALLER"
+	EnvRecursion = Prefix + "RECURSION"
 
 	EnvPathCaller  = EnvPathPrefix + "CALLER"
 	EnvPathData    = EnvPathPrefix + "DATA"

@@ -94,6 +94,7 @@ func (s *Script) Environ(ctx context.Context, args argparse.ParsedArgs) []string
 	waiterGroup := &sync.WaitGroup{}
 	values := make(chan string, 1)
 
+	env.GenerateRecursion(ctx, values, waiterGroup, s.Namespace, s.Executable, args)
 	env.GenerateTime(ctx, values, waiterGroup)
 	env.GenerateMachineID(ctx, values, waiterGroup)
 	env.GenerateIds(ctx, values, waiterGroup, s.Path(), args)

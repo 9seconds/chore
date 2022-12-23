@@ -129,7 +129,7 @@ func (suite *ScriptTestSuite) TestEnviron() {
 		require.True(suite.T(), found)
 	}
 
-	count := 45
+	count := 46
 
 	suite.Equal(scr.Namespace, data[env.EnvNamespace])
 	suite.Equal(scr.Executable, data[env.EnvCaller])
@@ -143,6 +143,7 @@ func (suite *ScriptTestSuite) TestEnviron() {
 	suite.Equal("y", data[env.EnvParameterPrefix+"XX"])
 	suite.EqualValues(argparse.FlagTrue, data[env.EnvFlagPrefix+"CLEANUP"])
 	suite.EqualValues(argparse.FlagFalse, data[env.EnvFlagPrefix+"WELCOME"])
+	suite.Contains(data, env.EnvRecursion)
 	suite.Contains(data, env.EnvIDUnique)
 	suite.Contains(data, env.EnvIDChainUnique)
 	suite.Contains(data, env.EnvIDIsolated)
