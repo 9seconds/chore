@@ -3,50 +3,18 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"text/template"
 
 	"github.com/9seconds/chore/internal/cli"
 	"github.com/9seconds/chore/internal/script"
 )
-
-const (
-	cliCmdEditConfigText = `// vim: set ft=hjson ts=2 sw=2 sts=2 et:
-// this is HJSON: https://hjson.github.io/
-
-{
-  description : Amazing {{ js .Executable }} of {{ js .Namespace }}!
-
-  // valid options are 'if_undefined', 'always' and 'no'
-  git: if_undefined
-  network: false
-
-  // to run command as a user
-  // as_user: root
-
-  flags: {
-    // true - required, false - optional
-    flag1: true
-  }
-
-  parameters: {
-    param: {
-      type: string
-      required: false
-      spec: {
-      }
-    }
-  }
-}`
-)
-
-var cliCmdEditConfigTemplate = template.Must(
-	template.New("cli-cmd-edit-config").Parse(cliCmdEditConfigText))
 
 type CliCmdEditConfig struct {
 	editorCommand
 }
 
 func (c *CliCmdEditConfig) Run(ctx cli.Context) error {
+	tpl := getTemplate("static/edit-config-template.hjson")
+
 	scr := &script.Script{
 		Namespace:  c.Namespace.Value(),
 		Executable: c.Script,
@@ -60,7 +28,7 @@ func (c *CliCmdEditConfig) Run(ctx cli.Context) error {
 
 	defaultContent := bytes.Buffer{}
 
-	if err := cliCmdEditConfigTemplate.Execute(&defaultContent, scr); err != nil {
+	if err := tpl.Execute(&defaultContent, scr); err != nil {
 		return fmt.Errorf("cannot render default template: %w", err)
 	}
 

@@ -31,7 +31,7 @@ func (suite *ParameterURLTestSuite) TestRequired() {
 		testValue := testValue
 
 		suite.T().Run(strconv.FormatBool(testValue), func(t *testing.T) {
-			param, err := config.NewURL(testValue, nil)
+			param, err := config.NewURL("", testValue, nil)
 			assert.NoError(t, err)
 			assert.Equal(t, testValue, param.Required())
 		})
@@ -39,13 +39,13 @@ func (suite *ParameterURLTestSuite) TestRequired() {
 }
 
 func (suite *ParameterURLTestSuite) TestType() {
-	param, err := config.NewURL(false, nil)
+	param, err := config.NewURL("", false, nil)
 	suite.NoError(err)
 	suite.Equal(config.ParameterURL, param.Type())
 }
 
 func (suite *ParameterURLTestSuite) TestString() {
-	param, err := config.NewURL(false, nil)
+	param, err := config.NewURL("", false, nil)
 	suite.NoError(err)
 	suite.NotEmpty(param.String())
 }
@@ -67,7 +67,7 @@ func (suite *ParameterStringTestSuite) TestIncorrectParameter() {
 				testValue := testValue
 
 				t.Run(testValue, func(t *testing.T) {
-					_, err := config.NewURL(false, map[string]string{
+					_, err := config.NewURL("", false, map[string]string{
 						testName: testValue,
 					})
 					assert.Error(t, err)
@@ -90,7 +90,7 @@ func (suite *ParameterURLTestSuite) TestValidateDomain() {
 		isValid := isValid
 
 		suite.T().Run(testName, func(t *testing.T) {
-			param, err := config.NewURL(false, map[string]string{
+			param, err := config.NewURL("", false, map[string]string{
 				"domain_re": `google\.(ru\.)?com$`,
 			})
 			assert.NoError(t, err)
@@ -120,7 +120,7 @@ func (suite *ParameterURLTestSuite) TestValidateDomainPath() {
 		isValid := isValid
 
 		suite.T().Run(testName, func(t *testing.T) {
-			param, err := config.NewURL(false, map[string]string{
+			param, err := config.NewURL("", false, map[string]string{
 				"domain_re": `google\.(ru\.)?com$`,
 				"path_re":   `p+`,
 			})
@@ -150,7 +150,7 @@ func (suite *ParameterURLTestSuite) TestValidateUser() {
 		isValid := isValid
 
 		suite.T().Run(testName, func(t *testing.T) {
-			param, err := config.NewURL(false, map[string]string{
+			param, err := config.NewURL("", false, map[string]string{
 				"user_re": `aaa`,
 			})
 			assert.NoError(t, err)
@@ -172,7 +172,7 @@ func (suite *ParameterURLTestSuite) TestCannotResolveHTTP() {
 		Once().
 		Return(suite.MakeNetConn(), io.EOF)
 
-	param, err := config.NewURL(false, map[string]string{
+	param, err := config.NewURL("", false, map[string]string{
 		"domain_re": `amazon\.com`,
 		"resolve":   "true",
 	})
@@ -188,7 +188,7 @@ func (suite *ParameterURLTestSuite) TestCannotResolveHTTPS() {
 		Once().
 		Return(suite.MakeNetConn(), io.EOF)
 
-	param, err := config.NewURL(false, map[string]string{
+	param, err := config.NewURL("", false, map[string]string{
 		"domain_re": `amazon\.com`,
 		"resolve":   "true",
 	})
@@ -204,7 +204,7 @@ func (suite *ParameterURLTestSuite) TestCannotResolveGivenPort() {
 		Once().
 		Return(suite.MakeNetConn(), io.EOF)
 
-	param, err := config.NewURL(false, map[string]string{
+	param, err := config.NewURL("", false, map[string]string{
 		"domain_re": `amazon\.com`,
 		"resolve":   "true",
 	})
@@ -226,7 +226,7 @@ func (suite *ParameterURLTestSuite) TestResolveOk() {
 		Once().
 		Return(connMock, nil)
 
-	param, err := config.NewURL(false, map[string]string{
+	param, err := config.NewURL("", false, map[string]string{
 		"domain_re": `amazon\.com`,
 		"resolve":   "true",
 	})

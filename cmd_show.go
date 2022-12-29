@@ -4,43 +4,10 @@ import (
 	"fmt"
 	"os"
 	"sort"
-	"text/template"
 
 	"github.com/9seconds/chore/internal/cli"
 	"github.com/9seconds/chore/internal/script"
 )
-
-const (
-	cliCmdShowText = `Path:           {{ .Path }}
-Config path:    {{ .ConfigPath }}
-Data path:      {{ .DataPath  }}
-Cache path:     {{ .CachePath  }}
-State path:     {{ .StatePath  }}
-Runtime path:   {{ .RuntimePath  }}
-Network:        {{ print .Config.Network }}
-Git:            {{ print .Config.Git }}
-As user:        {{ print .Config.AsUser }}
-{{ if .Config.Description }}
-{{ .Config.Description }}
-{{ end -}}
-
-{{ if .Config.Parameters }}
-Parameters:
-{{- range $key, $value := .Config.Parameters }}
-  {{ $key }} ({{ $value.Type }}) -> {{ $value -}}
-{{ end }}
-{{ end }}
-
-{{- if .Config.Flags }}
-Flags:
-{{- range $key, $value := .Config.Flags }}
-  {{ $key }} -> {{ if $value }}required{{ else }}optional{{ end -}}
-{{ end -}}{{- end }}
-`
-)
-
-var cliCmdShotTemplate = template.Must(
-	template.New("show").Parse(cliCmdShowText))
 
 type CliCmdShow struct {
 	Namespace cli.Namespace `arg:"" optional:"" help:"Script namespace. Dot takes one from environment variable CHORE_NAMESPACE."`
@@ -88,5 +55,5 @@ func (c *CliCmdShow) Run(_ cli.Context) error {
 
 	defer scr.Cleanup()
 
-	return cliCmdShotTemplate.Execute(os.Stdout, scr)
+	return getTemplate("static/show.txt").Execute(os.Stdout, scr)
 }

@@ -29,7 +29,7 @@ func (suite *ParameterUUIDTestSuite) TestRequired() {
 		testValue := testValue
 
 		suite.T().Run(strconv.FormatBool(testValue), func(t *testing.T) {
-			param, err := config.NewUUID(testValue, nil)
+			param, err := config.NewUUID("", testValue, nil)
 			assert.NoError(t, err)
 			assert.Equal(t, testValue, param.Required())
 		})
@@ -37,13 +37,13 @@ func (suite *ParameterUUIDTestSuite) TestRequired() {
 }
 
 func (suite *ParameterUUIDTestSuite) TestType() {
-	param, err := config.NewUUID(false, nil)
+	param, err := config.NewUUID("", false, nil)
 	suite.NoError(err)
 	suite.Equal(config.ParameterUUID, param.Type())
 }
 
 func (suite *ParameterUUIDTestSuite) TestString() {
-	param, err := config.NewUUID(false, nil)
+	param, err := config.NewUUID("", false, nil)
 	suite.NoError(err)
 	suite.NotEmpty(param.String())
 }
@@ -71,7 +71,7 @@ func (suite *ParameterUUIDTestSuite) TestIncorrectVersion() {
 		isValid := isValid
 
 		suite.T().Run(testName, func(t *testing.T) {
-			_, err := config.NewUUID(false, map[string]string{
+			_, err := config.NewUUID("", false, map[string]string{
 				"version": testName,
 			})
 
@@ -103,12 +103,12 @@ func (suite *ParameterUUIDTestSuite) TestValidation() {
 		uuid.Must(uuid.NewV7()),
 	}
 
-	v4Only, err := config.NewUUID(false, map[string]string{
+	v4Only, err := config.NewUUID("", false, map[string]string{
 		"version": "4",
 	})
 	suite.NoError(err)
 
-	allOk, err := config.NewUUID(false, nil)
+	allOk, err := config.NewUUID("", false, nil)
 	suite.NoError(err)
 
 	for _, testValue := range wrongValues {

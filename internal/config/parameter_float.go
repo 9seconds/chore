@@ -30,13 +30,10 @@ var (
 )
 
 type paramFloat struct {
-	required bool
-	min      float64
-	max      float64
-}
+	baseParameter
 
-func (p paramFloat) Required() bool {
-	return p.required
+	min float64
+	max float64
 }
 
 func (p paramFloat) Type() string {
@@ -44,7 +41,12 @@ func (p paramFloat) Type() string {
 }
 
 func (p paramFloat) String() string {
-	return fmt.Sprintf("required=%t, min=%v, max=%v", p.required, p.min, p.max)
+	return fmt.Sprintf(
+		"%q (required=%t, min=%v, max=%v)",
+		p.description,
+		p.required,
+		p.min,
+		p.max)
 }
 
 func (p paramFloat) Validate(_ context.Context, value string) error {
@@ -64,11 +66,14 @@ func (p paramFloat) Validate(_ context.Context, value string) error {
 	return nil
 }
 
-func NewFloat(required bool, spec map[string]string) (Parameter, error) {
+func NewFloat(description string, required bool, spec map[string]string) (Parameter, error) {
 	rValue := paramFloat{
-		required: required,
-		min:      paramFloatMin,
-		max:      paramFloatMax,
+		baseParameter: baseParameter{
+			required:    required,
+			description: description,
+		},
+		min: paramFloatMin,
+		max: paramFloatMax,
 	}
 
 	if strValue, ok := spec["min"]; ok {

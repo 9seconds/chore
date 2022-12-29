@@ -23,10 +23,11 @@ var CLI struct {
 	Debug   bool             `short:"d" env:"CHORE_DEBUG" help:"Run in debug mode."`
 	Version kong.VersionFlag `short:"V" help:"Show version."`
 
-	Show       CliCmdShow       `cmd:"" aliases:"s" help:"Show details on namespaces or scripts."`
-	EditScript CliCmdEditScript `cmd:"" aliases:"e" help:"Edit chore script."`
-	EditConfig CliCmdEditConfig `cmd:"" aliases:"c" help:"Edit chore script config."`
-	Run        CliCmdRun        `cmd:"" aliases:"r" help:"Run chore script."`
+	Show           CliCmdShow        `cmd:"" aliases:"s" help:"Show details on namespaces or scripts."`
+	EditScript     CliCmdEditScript  `cmd:"" aliases:"e" help:"Edit chore script."`
+	EditConfig     CliCmdEditConfig  `cmd:"" aliases:"c" help:"Edit chore script config."`
+	Run            CliCmdRun         `cmd:"" aliases:"r" help:"Run chore script."`
+	FishCompletion CliFishCompletion `cmd:"" help:"Generate fish shell completion."`
 }
 
 type editorCommand struct {

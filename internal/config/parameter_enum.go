@@ -15,12 +15,9 @@ var (
 const ParameterEnum = "enum"
 
 type paramEnum struct {
-	required bool
-	choices  map[string]struct{}
-}
+	baseParameter
 
-func (p paramEnum) Required() bool {
-	return p.required
+	choices map[string]struct{}
 }
 
 func (p paramEnum) Type() string {
@@ -36,7 +33,11 @@ func (p paramEnum) String() string {
 
 	sort.Strings(choices)
 
-	return fmt.Sprintf("required=%t, choices=%v", p.required, choices)
+	return fmt.Sprintf(
+		"%q (required=%t, choices=%v)",
+		p.description,
+		p.required,
+		choices)
 }
 
 func (p paramEnum) Validate(_ context.Context, value string) error {
@@ -47,10 +48,13 @@ func (p paramEnum) Validate(_ context.Context, value string) error {
 	return nil
 }
 
-func NewEnum(required bool, spec map[string]string) (Parameter, error) {
+func NewEnum(description string, required bool, spec map[string]string) (Parameter, error) {
 	param := paramEnum{
-		required: required,
-		choices:  make(map[string]struct{}),
+		baseParameter: baseParameter{
+			required:    required,
+			description: description,
+		},
+		choices: make(map[string]struct{}),
 	}
 
 	for _, v := range parseCSV(spec["choices"]) {

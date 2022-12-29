@@ -20,12 +20,9 @@ var validUUIDVersions = map[byte]bool{
 }
 
 type paramUUID struct {
-	required bool
-	version  byte
-}
+	baseParameter
 
-func (p paramUUID) Required() bool {
-	return p.required
+	version byte
 }
 
 func (p paramUUID) Type() string {
@@ -33,7 +30,7 @@ func (p paramUUID) Type() string {
 }
 
 func (p paramUUID) String() string {
-	return fmt.Sprintf("required=%t, version=%d", p.required, p.version)
+	return fmt.Sprintf("%q (required=%t, version=%d)", p.description, p.required, p.version)
 }
 
 func (p paramUUID) Validate(_ context.Context, value string) error {
@@ -51,9 +48,12 @@ func (p paramUUID) Validate(_ context.Context, value string) error {
 	return nil
 }
 
-func NewUUID(required bool, spec map[string]string) (Parameter, error) {
+func NewUUID(description string, required bool, spec map[string]string) (Parameter, error) {
 	param := paramUUID{
-		required: required,
+		baseParameter: baseParameter{
+			required:    required,
+			description: description,
+		},
 	}
 
 	if value, ok := spec["version"]; ok {

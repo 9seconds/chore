@@ -9,11 +9,7 @@ import (
 const ParameterJSON = "json"
 
 type paramJSON struct {
-	required bool
-}
-
-func (p paramJSON) Required() bool {
-	return p.required
+	baseParameter
 }
 
 func (p paramJSON) Type() string {
@@ -21,7 +17,7 @@ func (p paramJSON) Type() string {
 }
 
 func (p paramJSON) String() string {
-	return fmt.Sprintf("required=%t", p.required)
+	return fmt.Sprintf("%q (required=%t)", p.description, p.required)
 }
 
 func (p paramJSON) Validate(_ context.Context, value string) error {
@@ -34,8 +30,11 @@ func (p paramJSON) Validate(_ context.Context, value string) error {
 	return nil
 }
 
-func NewJSON(required bool, spec map[string]string) (Parameter, error) {
+func NewJSON(description string, required bool, spec map[string]string) (Parameter, error) {
 	return paramJSON{
-		required: required,
+		baseParameter: baseParameter{
+			required:    required,
+			description: description,
+		},
 	}, nil
 }

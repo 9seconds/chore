@@ -24,15 +24,11 @@ var base64Encodings = map[string]*base64.Encoding{
 }
 
 type paramBase64 struct {
+	baseParameter
 	mixinStringLength
 
-	required     bool
 	encodingName string
 	encoding     *base64.Encoding
-}
-
-func (p paramBase64) Required() bool {
-	return p.required
 }
 
 func (p paramBase64) Type() string {
@@ -40,7 +36,11 @@ func (p paramBase64) Type() string {
 }
 
 func (p paramBase64) String() string {
-	return fmt.Sprintf("required=%t, encoding=%s", p.required, p.encodingName)
+	return fmt.Sprintf(
+		"%q (required=%t, encoding=%s)",
+		p.description,
+		p.required,
+		p.encodingName)
 }
 
 func (p paramBase64) Validate(_ context.Context, value string) error {
@@ -51,9 +51,12 @@ func (p paramBase64) Validate(_ context.Context, value string) error {
 	return p.mixinStringLength.validate(value)
 }
 
-func NewBase64(required bool, spec map[string]string) (Parameter, error) {
+func NewBase64(description string, required bool, spec map[string]string) (Parameter, error) {
 	param := paramBase64{
-		required:     required,
+		baseParameter: baseParameter{
+			required:    required,
+			description: description,
+		},
 		encodingName: spec["encoding"],
 	}
 

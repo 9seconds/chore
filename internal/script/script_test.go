@@ -113,9 +113,9 @@ func (suite *ScriptTestSuite) TestEnviron() {
 			"k":  "v",
 			"XX": "y",
 		},
-		Flags: map[string]bool{
-			"cleanup": true,
-			"welcome": false,
+		Flags: map[string]argparse.FlagValue{
+			"cleanup": argparse.FlagTrue,
+			"welcome": argparse.FlagFalse,
 		},
 		Positional: []string{"a", "b", "c"},
 	})

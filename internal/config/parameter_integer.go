@@ -10,13 +10,10 @@ import (
 const ParameterInteger = "integer"
 
 type paramInteger struct {
-	required bool
-	min      int64
-	max      int64
-}
+	baseParameter
 
-func (p paramInteger) Required() bool {
-	return p.required
+	min int64
+	max int64
 }
 
 func (p paramInteger) Type() string {
@@ -24,7 +21,12 @@ func (p paramInteger) Type() string {
 }
 
 func (p paramInteger) String() string {
-	return fmt.Sprintf("required=%t, min=%d, max=%d", p.required, p.min, p.max)
+	return fmt.Sprintf(
+		"%q (required=%t, min=%d, max=%d)",
+		p.description,
+		p.required,
+		p.min,
+		p.max)
 }
 
 func (p paramInteger) Validate(_ context.Context, value string) error {
@@ -42,11 +44,14 @@ func (p paramInteger) Validate(_ context.Context, value string) error {
 	return nil
 }
 
-func NewInteger(required bool, spec map[string]string) (Parameter, error) {
+func NewInteger(description string, required bool, spec map[string]string) (Parameter, error) {
 	rValue := paramInteger{
-		required: required,
-		min:      math.MinInt64,
-		max:      math.MaxInt64,
+		baseParameter: baseParameter{
+			required:    required,
+			description: description,
+		},
+		min: math.MinInt64,
+		max: math.MaxInt64,
 	}
 
 	if strValue, ok := spec["min"]; ok {

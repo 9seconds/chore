@@ -27,7 +27,7 @@ func (suite *ParameterXMLTestSuite) TestRequired() {
 		testValue := testValue
 
 		suite.T().Run(strconv.FormatBool(testValue), func(t *testing.T) {
-			param, err := config.NewXML(testValue, nil)
+			param, err := config.NewXML("", testValue, nil)
 			assert.NoError(t, err)
 			assert.Equal(t, testValue, param.Required())
 		})
@@ -35,13 +35,13 @@ func (suite *ParameterXMLTestSuite) TestRequired() {
 }
 
 func (suite *ParameterXMLTestSuite) TestType() {
-	param, err := config.NewXML(false, nil)
+	param, err := config.NewXML("", false, nil)
 	suite.NoError(err)
 	suite.Equal(config.ParameterXML, param.Type())
 }
 
 func (suite *ParameterXMLTestSuite) TestString() {
-	param, err := config.NewXML(false, nil)
+	param, err := config.NewXML("", false, nil)
 	suite.NoError(err)
 	suite.NotEmpty(param.String())
 }
@@ -68,7 +68,7 @@ func (suite *ParameterXMLTestSuite) TestValidaton() {
 		"<xxx aa='1'>111</xxx>": true,
 	}
 
-	param, err := config.NewXML(false, nil)
+	param, err := config.NewXML("", false, nil)
 	suite.NoError(err)
 
 	for testName, isValid := range testTable {

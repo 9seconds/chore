@@ -28,16 +28,12 @@ var (
 )
 
 type paramHostname struct {
+	baseParameter
 	mixinStringLength
 
-	required bool
-	isFQDN   bool
-	resolve  bool
-	re       *regexp.Regexp
-}
-
-func (p paramHostname) Required() bool {
-	return p.required
+	isFQDN  bool
+	resolve bool
+	re      *regexp.Regexp
 }
 
 func (p paramHostname) Type() string {
@@ -46,7 +42,8 @@ func (p paramHostname) Type() string {
 
 func (p paramHostname) String() string {
 	return fmt.Sprintf(
-		"required=%t, is_fqdn=%t, resolve=%t, re=%v, %s",
+		"%q (required=%t, is_fqdn=%t, resolve=%t, re=%v, %s)",
+		p.description,
 		p.required,
 		p.isFQDN,
 		p.resolve,
@@ -83,9 +80,12 @@ func (p paramHostname) Validate(ctx context.Context, value string) error { //nol
 	return nil
 }
 
-func NewHostname(required bool, spec map[string]string) (Parameter, error) {
+func NewHostname(description string, required bool, spec map[string]string) (Parameter, error) {
 	param := paramHostname{
-		required: required,
+		baseParameter: baseParameter{
+			required:    required,
+			description: description,
+		},
 	}
 
 	if mixin, err := makeMixinStringLength(spec); err == nil {

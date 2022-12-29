@@ -13,13 +13,19 @@ type RawConfig struct {
 	Network     bool                    `json:"network"`
 	AsUser      string                  `json:"as_user"`
 	Parameters  map[string]RawParameter `json:"parameters"`
-	Flags       map[string]bool         `json:"flags"`
+	Flags       map[string]RawFlag      `json:"flags"`
 }
 
 type RawParameter struct {
-	Type     string            `json:"type"`
-	Required bool              `json:"required"`
-	Spec     map[string]string `json:"spec"`
+	Type        string            `json:"type"`
+	Required    bool              `json:"required"`
+	Description string            `json:"description"`
+	Spec        map[string]string `json:"spec"`
+}
+
+type RawFlag struct {
+	Required    bool   `json:"required"`
+	Description string `json:"description"`
 }
 
 func parseRaw(reader io.Reader) (RawConfig, error) {

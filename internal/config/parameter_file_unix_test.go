@@ -35,7 +35,7 @@ func (suite *ParameterFileTestSuite) TestPermissionsOk() {
 
 			assert.NoError(t, os.Chmod(suite.path, fileMode))
 
-			param, err := config.NewFile(false, map[string]string{
+			param, err := config.NewFile("", false, map[string]string{
 				presentPermission: "true",
 			})
 			assert.NoError(t, err)
@@ -68,7 +68,7 @@ func (suite *ParameterFileTestSuite) TestPermissionsNOk() {
 
 			assert.NoError(t, os.Chmod(suite.path, fileMode))
 
-			param, err := config.NewFile(false, map[string]string{
+			param, err := config.NewFile("", false, map[string]string{
 				absentPermission: "true",
 			})
 			assert.NoError(t, err)

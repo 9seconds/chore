@@ -13,16 +13,13 @@ import (
 const ParameterURL = "url"
 
 type paramURL struct {
-	required bool
+	baseParameter
+
 	resolve  bool
 	scheme   string
 	domainRE *regexp.Regexp
 	pathRE   *regexp.Regexp
 	userRE   *regexp.Regexp
-}
-
-func (p paramURL) Required() bool {
-	return p.required
 }
 
 func (p paramURL) Type() string {
@@ -31,7 +28,8 @@ func (p paramURL) Type() string {
 
 func (p paramURL) String() string {
 	return fmt.Sprintf(
-		"required=%t, scheme=%s, domain_re=%v, path_re=%v, user_re=%v, resolve=%t",
+		"%q (required=%t, scheme=%s, domain_re=%v, path_re=%v, user_re=%v, resolve=%t)",
+		p.description,
 		p.required,
 		p.scheme,
 		p.domainRE,
@@ -82,10 +80,13 @@ func (p paramURL) Validate(ctx context.Context, value string) error { //nolint: 
 	return nil
 }
 
-func NewURL(required bool, spec map[string]string) (Parameter, error) {
+func NewURL(description string, required bool, spec map[string]string) (Parameter, error) {
 	param := paramURL{
-		required: required,
-		scheme:   spec["scheme"],
+		baseParameter: baseParameter{
+			required:    required,
+			description: description,
+		},
+		scheme: spec["scheme"],
 	}
 
 	if parsed, err := parseBool(spec, "resolve"); err == nil {

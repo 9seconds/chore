@@ -9,13 +9,6 @@ import (
 	"github.com/9seconds/chore/internal/script"
 )
 
-const cliCmdEditScriptDefault = `#!/bin/bash
-# vim: set ft=bash sw=2 ts=2 sts=2 et:
-set -eu -o pipefail
-
-
-`
-
 type CliCmdEditScript struct {
 	editorCommand
 }
@@ -34,7 +27,12 @@ func (c *CliCmdEditScript) Run(ctx cli.Context) error {
 
 	path := scr.Path()
 
-	if err := c.Open(ctx, path, []byte(cliCmdEditScriptDefault)); err != nil {
+	defaultContent, err := staticFS.ReadFile("static/edit-script.sh")
+	if err != nil {
+		panic(err)
+	}
+
+	if err := c.Open(ctx, path, defaultContent); err != nil {
 		return fmt.Errorf("editor failed: %w", err)
 	}
 

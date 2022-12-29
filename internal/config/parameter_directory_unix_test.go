@@ -41,7 +41,7 @@ func (suite *ParameterDirectoryTestSuite) TestPermissionsOk() {
 
 			assert.NoError(t, os.Chmod(suite.dir, fileMode))
 
-			param, err := config.NewDirectory(false, map[string]string{
+			param, err := config.NewDirectory("", false, map[string]string{
 				presentPermission: "true",
 			})
 			assert.NoError(t, err)
@@ -74,7 +74,7 @@ func (suite *ParameterDirectoryTestSuite) TestPermissionsNOk() {
 
 			assert.NoError(t, os.Chmod(suite.dir, fileMode))
 
-			param, err := config.NewDirectory(false, map[string]string{
+			param, err := config.NewDirectory("", false, map[string]string{
 				absentPermission: "true",
 			})
 			assert.NoError(t, err)

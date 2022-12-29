@@ -9,11 +9,7 @@ import (
 const ParameterMac = "mac"
 
 type paramMac struct {
-	required bool
-}
-
-func (p paramMac) Required() bool {
-	return p.required
+	baseParameter
 }
 
 func (p paramMac) Type() string {
@@ -21,7 +17,7 @@ func (p paramMac) Type() string {
 }
 
 func (p paramMac) String() string {
-	return fmt.Sprintf("required=%t", p.required)
+	return fmt.Sprintf("%q (required=%t)", p.description, p.required)
 }
 
 func (p paramMac) Validate(_ context.Context, value string) error {
@@ -32,8 +28,11 @@ func (p paramMac) Validate(_ context.Context, value string) error {
 	return nil
 }
 
-func NewMac(required bool, _ map[string]string) (Parameter, error) {
+func NewMac(description string, required bool, _ map[string]string) (Parameter, error) {
 	return paramMac{
-		required: required,
+		baseParameter: baseParameter{
+			required:    required,
+			description: description,
+		},
 	}, nil
 }

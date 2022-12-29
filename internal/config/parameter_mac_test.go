@@ -27,7 +27,7 @@ func (suite *ParameterMacTestSuite) TestRequired() {
 		testValue := testValue
 
 		suite.T().Run(strconv.FormatBool(testValue), func(t *testing.T) {
-			param, err := config.NewMac(testValue, nil)
+			param, err := config.NewMac("", testValue, nil)
 			assert.NoError(t, err)
 			assert.Equal(t, testValue, param.Required())
 		})
@@ -35,13 +35,13 @@ func (suite *ParameterMacTestSuite) TestRequired() {
 }
 
 func (suite *ParameterMacTestSuite) TestType() {
-	param, err := config.NewMac(false, nil)
+	param, err := config.NewMac("", false, nil)
 	suite.NoError(err)
 	suite.Equal(config.ParameterMac, param.Type())
 }
 
 func (suite *ParameterMacTestSuite) TestString() {
-	param, err := config.NewMac(false, nil)
+	param, err := config.NewMac("", false, nil)
 	suite.NoError(err)
 	suite.NotEmpty(param.String())
 }
@@ -65,7 +65,7 @@ func (suite *ParameterMacTestSuite) TestValidaton() {
 		"0000.0000.fe80.0000.0000.0000.0200.5e10.0000.0001": true,
 	}
 
-	param, err := config.NewMac(false, nil)
+	param, err := config.NewMac("", false, nil)
 	suite.NoError(err)
 
 	for testName, isValid := range testTable {

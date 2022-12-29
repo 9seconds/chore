@@ -22,9 +22,9 @@ func (suite *GenerateRecursionTestSuite) SetupTest() {
 			"param1": "33",
 			"param2": "34 35",
 		},
-		Flags: map[string]bool{
-			"flag1": true,
-			"flag2": false,
+		Flags: map[string]argparse.FlagValue{
+			"flag1": argparse.FlagTrue,
+			"flag2": argparse.FlagFalse,
 		},
 		Positional: []string{"pos1", "pos2", "pos3"},
 	}

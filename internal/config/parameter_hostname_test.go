@@ -31,7 +31,7 @@ func (suite *ParameterHostnameTestSuite) TestRequired() {
 		testValue := testValue
 
 		suite.T().Run(strconv.FormatBool(testValue), func(t *testing.T) {
-			param, err := config.NewHostname(testValue, nil)
+			param, err := config.NewHostname("", testValue, nil)
 			assert.NoError(t, err)
 			assert.Equal(t, testValue, param.Required())
 		})
@@ -39,13 +39,13 @@ func (suite *ParameterHostnameTestSuite) TestRequired() {
 }
 
 func (suite *ParameterHostnameTestSuite) TestType() {
-	param, err := config.NewHostname(false, nil)
+	param, err := config.NewHostname("", false, nil)
 	suite.NoError(err)
 	suite.Equal(config.ParameterHostname, param.Type())
 }
 
 func (suite *ParameterHostnameTestSuite) TestString() {
-	param, err := config.NewHostname(false, nil)
+	param, err := config.NewHostname("", false, nil)
 	suite.NoError(err)
 	suite.NotEmpty(param.String())
 }
@@ -68,7 +68,7 @@ func (suite *ParameterHostnameTestSuite) TestIncorrectParameter() {
 				testValue := testValue
 
 				t.Run(testValue, func(t *testing.T) {
-					_, err := config.NewHostname(false, map[string]string{
+					_, err := config.NewHostname("", false, map[string]string{
 						testName: testValue,
 					})
 					assert.Error(t, err)
@@ -87,7 +87,7 @@ func (suite *ParameterHostnameTestSuite) TestValidateHostname() {
 		"xx-xx/xx":  false,
 	}
 
-	param, err := config.NewHostname(false, nil)
+	param, err := config.NewHostname("", false, nil)
 	suite.NoError(err)
 
 	for testName, isValid := range testTable {
@@ -117,7 +117,7 @@ func (suite *ParameterHostnameTestSuite) TestValidateFQDN() {
 		"company.com": true,
 	}
 
-	param, err := config.NewHostname(false, map[string]string{
+	param, err := config.NewHostname("", false, map[string]string{
 		"is_fqdn": "true",
 	})
 	suite.NoError(err)
@@ -149,7 +149,7 @@ func (suite *ParameterHostnameTestSuite) TestValidateRegexp() {
 		"company.com": false,
 	}
 
-	param, err := config.NewHostname(false, map[string]string{
+	param, err := config.NewHostname("", false, map[string]string{
 		"regexp": "x+",
 	})
 	suite.NoError(err)
@@ -176,7 +176,7 @@ func (suite *ParameterHostnameTestSuite) TestResolveDNSFailure() {
 		Once().
 		Return([]string{}, io.EOF)
 
-	param, err := config.NewHostname(false, map[string]string{
+	param, err := config.NewHostname("", false, map[string]string{
 		"resolve": "true",
 	})
 	suite.NoError(err)
@@ -191,7 +191,7 @@ func (suite *ParameterHostnameTestSuite) TestResolveDNSNoRecords() {
 		Once().
 		Return([]string{}, nil)
 
-	param, err := config.NewHostname(false, map[string]string{
+	param, err := config.NewHostname("", false, map[string]string{
 		"resolve": "true",
 	})
 	suite.NoError(err)
@@ -206,7 +206,7 @@ func (suite *ParameterHostnameTestSuite) TestResolveOk() {
 		Once().
 		Return([]string{"xx"}, nil)
 
-	param, err := config.NewHostname(false, map[string]string{
+	param, err := config.NewHostname("", false, map[string]string{
 		"resolve": "true",
 	})
 	suite.NoError(err)

@@ -9,13 +9,8 @@ import (
 const ParameterHex = "hex"
 
 type paramHex struct {
+	baseParameter
 	mixinStringLength
-
-	required bool
-}
-
-func (p paramHex) Required() bool {
-	return p.required
 }
 
 func (p paramHex) Type() string {
@@ -23,7 +18,11 @@ func (p paramHex) Type() string {
 }
 
 func (p paramHex) String() string {
-	return fmt.Sprintf("required=%t, %s", p.required, p.mixinStringLength)
+	return fmt.Sprintf(
+		"%q (required=%t, %s)",
+		p.description,
+		p.required,
+		p.mixinStringLength)
 }
 
 func (p paramHex) Validate(_ context.Context, value string) error {
@@ -34,9 +33,12 @@ func (p paramHex) Validate(_ context.Context, value string) error {
 	return p.mixinStringLength.validate(value)
 }
 
-func NewHex(required bool, spec map[string]string) (Parameter, error) {
+func NewHex(description string, required bool, spec map[string]string) (Parameter, error) {
 	param := paramHex{
-		required: required,
+		baseParameter: baseParameter{
+			required:    required,
+			description: description,
+		},
 	}
 
 	if stringLength, err := makeMixinStringLength(spec); err == nil {

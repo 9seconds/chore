@@ -10,12 +10,9 @@ import (
 const ParameterSemver = "semver"
 
 type parameterSemver struct {
-	required   bool
-	constraint *semver.Constraints
-}
+	baseParameter
 
-func (p parameterSemver) Required() bool {
-	return p.required
+	constraint *semver.Constraints
 }
 
 func (p parameterSemver) Type() string {
@@ -23,7 +20,11 @@ func (p parameterSemver) Type() string {
 }
 
 func (p parameterSemver) String() string {
-	return fmt.Sprintf("required=%t, constraint=%s", p.required, p.constraint)
+	return fmt.Sprintf(
+		"%q (required=%t, constraint=%s)",
+		p.description,
+		p.required,
+		p.constraint)
 }
 
 func (p parameterSemver) Validate(_ context.Context, value string) error {
@@ -43,9 +44,12 @@ func (p parameterSemver) Validate(_ context.Context, value string) error {
 	return nil
 }
 
-func NewSemver(required bool, spec map[string]string) (Parameter, error) {
+func NewSemver(description string, required bool, spec map[string]string) (Parameter, error) {
 	param := parameterSemver{
-		required: required,
+		baseParameter: baseParameter{
+			required:    required,
+			description: description,
+		},
 	}
 
 	if value, ok := spec["constraint"]; ok {

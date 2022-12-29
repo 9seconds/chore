@@ -13,14 +13,10 @@ const ParameterFile = "file"
 var errIsNotFile = errors.New("is not a file")
 
 type paramFile struct {
+	baseParameter
 	mixinPermissions
 
-	required  bool
 	mimetypes []string
-}
-
-func (p paramFile) Required() bool {
-	return p.required
 }
 
 func (p paramFile) Type() string {
@@ -29,7 +25,8 @@ func (p paramFile) Type() string {
 
 func (p paramFile) String() string {
 	return fmt.Sprintf(
-		"required=%t, mimetypes=%v, %s",
+		"%q (required=%t, mimetypes=%v, %s)",
+		p.description,
 		p.required,
 		p.mimetypes,
 		p.mixinPermissions)
@@ -63,9 +60,12 @@ func (p paramFile) Validate(_ context.Context, value string) error {
 	return nil
 }
 
-func NewFile(required bool, spec map[string]string) (Parameter, error) {
+func NewFile(description string, required bool, spec map[string]string) (Parameter, error) {
 	param := paramFile{
-		required: required,
+		baseParameter: baseParameter{
+			required:    required,
+			description: description,
+		},
 	}
 
 	mixin, err := makeMixinPermissions(spec)

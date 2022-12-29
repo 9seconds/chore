@@ -31,7 +31,7 @@ func GenerateRecursion(
 
 		cli := append(
 			[]string{executable, "run", namespace, script},
-			args.Options()...)
+			args.OptionsAsCli()...)
 
 		sendValue(ctx, results, EnvRecursion, shellescape.QuoteCommand(cli))
 	}()

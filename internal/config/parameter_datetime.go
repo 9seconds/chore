@@ -11,16 +11,13 @@ import (
 const ParameterDatetime = "datetime"
 
 type parameterDatetime struct {
-	required    bool
+	baseParameter
+
 	futureDelta time.Duration
 	pastDelta   time.Duration
 	roundedTo   time.Duration
 	location    *time.Location
 	layout      string
-}
-
-func (p parameterDatetime) Required() bool {
-	return p.required
 }
 
 func (p parameterDatetime) Type() string {
@@ -29,7 +26,8 @@ func (p parameterDatetime) Type() string {
 
 func (p parameterDatetime) String() string {
 	return fmt.Sprintf(
-		"required=%t, future_delta=%s, past_delta=%s, rounded_to=%s, location=%s, layout=%s",
+		"%q (required=%t, future_delta=%s, past_delta=%s, rounded_to=%s, location=%s, layout=%s)",
+		p.description,
 		p.required,
 		p.futureDelta,
 		p.pastDelta,
@@ -89,9 +87,12 @@ func (p parameterDatetime) Validate(_ context.Context, value string) error { //n
 	return nil
 }
 
-func NewDatetime(required bool, spec map[string]string) (Parameter, error) { //nolint: cyclop
+func NewDatetime(description string, required bool, spec map[string]string) (Parameter, error) { //nolint: cyclop
 	param := parameterDatetime{
-		required:    required,
+		baseParameter: baseParameter{
+			required:    required,
+			description: description,
+		},
 		futureDelta: -1,
 		pastDelta:   -1,
 	}

@@ -38,7 +38,7 @@ func (suite *ParameterFileTestSuite) TestRequired() {
 		testValue := testValue
 
 		suite.T().Run(strconv.FormatBool(testValue), func(t *testing.T) {
-			param, err := config.NewFile(testValue, nil)
+			param, err := config.NewFile("", testValue, nil)
 			assert.NoError(t, err)
 			assert.Equal(t, testValue, param.Required())
 		})
@@ -46,13 +46,13 @@ func (suite *ParameterFileTestSuite) TestRequired() {
 }
 
 func (suite *ParameterFileTestSuite) TestType() {
-	param, err := config.NewFile(false, nil)
+	param, err := config.NewFile("", false, nil)
 	suite.NoError(err)
 	suite.Equal(config.ParameterFile, param.Type())
 }
 
 func (suite *ParameterFileTestSuite) TestString() {
-	param, err := config.NewDirectory(false, nil)
+	param, err := config.NewDirectory("", false, nil)
 	suite.NoError(err)
 	suite.NotEmpty(param.String())
 }
@@ -76,7 +76,7 @@ func (suite *ParameterFileTestSuite) TestIncorrectParameter() {
 				testValue := testValue
 
 				t.Run(testValue, func(t *testing.T) {
-					_, err := config.NewFile(false, map[string]string{
+					_, err := config.NewFile("", false, map[string]string{
 						testName: testValue,
 					})
 					assert.Error(t, err)
@@ -87,7 +87,7 @@ func (suite *ParameterFileTestSuite) TestIncorrectParameter() {
 }
 
 func (suite *ParameterFileTestSuite) TestRequireExistButAbsent() {
-	param, err := config.NewFile(false, map[string]string{
+	param, err := config.NewFile("", false, map[string]string{
 		"exists": "true",
 	})
 	suite.NoError(err)
@@ -97,7 +97,7 @@ func (suite *ParameterFileTestSuite) TestRequireExistButAbsent() {
 }
 
 func (suite *ParameterFileTestSuite) TestDirectory() {
-	param, err := config.NewFile(false, nil)
+	param, err := config.NewFile("", false, nil)
 	suite.NoError(err)
 	suite.ErrorContains(
 		param.Validate(suite.Context(), suite.RootPath()),
@@ -105,13 +105,13 @@ func (suite *ParameterFileTestSuite) TestDirectory() {
 }
 
 func (suite *ParameterFileTestSuite) TestAbsent() {
-	param, err := config.NewFile(false, nil)
+	param, err := config.NewFile("", false, nil)
 	suite.NoError(err)
 	suite.NoError(param.Validate(suite.Context(), "aaa"))
 }
 
 func (suite *ParameterFileTestSuite) TestWrongMode() {
-	param, err := config.NewFile(false, map[string]string{
+	param, err := config.NewFile("", false, map[string]string{
 		"mode": "055",
 	})
 	suite.NoError(err)
@@ -135,7 +135,7 @@ func (suite *ParameterFileTestSuite) TestMimetype() {
 		isValid := isValid
 
 		suite.T().Run(testName, func(t *testing.T) {
-			param, err := config.NewFile(false, map[string]string{
+			param, err := config.NewFile("", false, map[string]string{
 				"mimetypes": testName,
 			})
 			require.NoError(t, err)

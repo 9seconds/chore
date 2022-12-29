@@ -10,15 +10,11 @@ import (
 const ParameterString = "string"
 
 type paramString struct {
+	baseParameter
 	mixinStringLength
 
-	required bool
-	ascii    bool
-	re       *regexp.Regexp
-}
-
-func (p paramString) Required() bool {
-	return p.required
+	ascii bool
+	re    *regexp.Regexp
 }
 
 func (p paramString) Type() string {
@@ -27,7 +23,8 @@ func (p paramString) Type() string {
 
 func (p paramString) String() string {
 	return fmt.Sprintf(
-		"required=%t, ascii=%t, re=%v, %s",
+		"%q (required=%t, ascii=%t, re=%v, %s)",
+		p.description,
 		p.required,
 		p.ascii,
 		p.re,
@@ -50,9 +47,12 @@ func (p paramString) Validate(_ context.Context, value string) error {
 	return p.mixinStringLength.validate(value)
 }
 
-func NewString(required bool, spec map[string]string) (Parameter, error) {
+func NewString(description string, required bool, spec map[string]string) (Parameter, error) {
 	param := paramString{
-		required: required,
+		baseParameter: baseParameter{
+			required:    required,
+			description: description,
+		},
 	}
 
 	if stringLength, err := makeMixinStringLength(spec); err == nil {

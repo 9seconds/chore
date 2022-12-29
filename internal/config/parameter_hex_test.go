@@ -27,7 +27,7 @@ func (suite *ParameterHexTestSuite) TestRequired() {
 		testValue := testValue
 
 		suite.T().Run(strconv.FormatBool(testValue), func(t *testing.T) {
-			param, err := config.NewHex(testValue, nil)
+			param, err := config.NewHex("", testValue, nil)
 			assert.NoError(t, err)
 			assert.Equal(t, testValue, param.Required())
 		})
@@ -35,13 +35,13 @@ func (suite *ParameterHexTestSuite) TestRequired() {
 }
 
 func (suite *ParameterHexTestSuite) TestType() {
-	param, err := config.NewHex(false, nil)
+	param, err := config.NewHex("", false, nil)
 	suite.NoError(err)
 	suite.Equal(config.ParameterHex, param.Type())
 }
 
 func (suite *ParameterHexTestSuite) TestString() {
-	param, err := config.NewHex(false, nil)
+	param, err := config.NewHex("", false, nil)
 	suite.NoError(err)
 	suite.NotEmpty(param.String())
 }
@@ -66,7 +66,7 @@ func (suite *ParameterHexTestSuite) TestIncorrectLength() {
 				testValue := testValue
 
 				suite.T().Run(testValue, func(t *testing.T) {
-					_, err := config.NewHex(false, map[string]string{
+					_, err := config.NewHex("", false, map[string]string{
 						testName: testValue,
 					})
 					assert.ErrorContains(t, err, "incorrect '"+testName+"' value")
@@ -91,7 +91,7 @@ func (suite *ParameterHexTestSuite) TestValidaton() {
 		"BB": true,
 	}
 
-	param, err := config.NewHex(false, nil)
+	param, err := config.NewHex("", false, nil)
 	suite.NoError(err)
 
 	for testName, isValid := range testTable {
@@ -118,7 +118,7 @@ func (suite *ParameterHexTestSuite) TestStringLengthValidation() {
 		"ABCDEF": false,
 	}
 
-	param, err := config.NewHex(false, map[string]string{
+	param, err := config.NewHex("", false, map[string]string{
 		"min_length": "1",
 		"max_length": "4",
 	})

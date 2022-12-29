@@ -21,7 +21,7 @@ type CliCmdRun struct {
 	Args      []string      `arg:"" optional:"" help:"Script arguments to use."`
 }
 
-func (c *CliCmdRun) Run(ctx cli.Context) error {
+func (c *CliCmdRun) Run(ctx cli.Context) error { //nolint: cyclop
 	scr, err := script.FindScript(c.Namespace.Value(), c.Script)
 	if err != nil {
 		return fmt.Errorf("cannot find out script: %w", err)
@@ -50,9 +50,13 @@ func (c *CliCmdRun) Run(ctx cli.Context) error {
 
 	conf := scr.Config()
 
-	args, err := argparse.Parse(ctx, c.Args, conf.Flags, conf.Parameters)
+	args, err := argparse.Parse(c.Args)
 	if err != nil {
 		return fmt.Errorf("cannot parse arguments: %w", err)
+	}
+
+	if err := args.Validate(ctx, conf.Flags, conf.Parameters); err != nil {
+		return fmt.Errorf("cannot validate arguments: %w", err)
 	}
 
 	environ := scr.Environ(ctx, args)

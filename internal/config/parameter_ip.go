@@ -17,14 +17,11 @@ var (
 )
 
 type paramIP struct {
-	required         bool
+	baseParameter
+
 	resolve          bool
 	allowedSubnets   []*net.IPNet
 	forbiddenSubnets []*net.IPNet
-}
-
-func (p paramIP) Required() bool {
-	return p.required
 }
 
 func (p paramIP) Type() string {
@@ -33,7 +30,8 @@ func (p paramIP) Type() string {
 
 func (p paramIP) String() string {
 	return fmt.Sprintf(
-		"required=%t, resolve=%t, allowedSubnets=%v, forbiddenSubnets=%v",
+		"%q (required=%t, resolve=%t, allowedSubnets=%v, forbiddenSubnets=%v)",
+		p.description,
 		p.required,
 		p.resolve,
 		p.allowedSubnets,
@@ -77,9 +75,12 @@ func (p paramIP) Validate(ctx context.Context, value string) error {
 	return nil
 }
 
-func NewIP(required bool, spec map[string]string) (Parameter, error) {
+func NewIP(description string, required bool, spec map[string]string) (Parameter, error) {
 	param := paramIP{
-		required: required,
+		baseParameter: baseParameter{
+			required:    required,
+			description: description,
+		},
 	}
 
 	for _, v := range parseCSV(spec["allowed_subnets"]) {

@@ -27,7 +27,7 @@ func (suite *ParameterEnumTestSuite) TestRequired() {
 		testValue := testValue
 
 		suite.T().Run(strconv.FormatBool(testValue), func(t *testing.T) {
-			param, err := config.NewEnum(testValue, map[string]string{
+			param, err := config.NewEnum("", testValue, map[string]string{
 				"choices": "xxx",
 			})
 			assert.NoError(t, err)
@@ -37,7 +37,7 @@ func (suite *ParameterEnumTestSuite) TestRequired() {
 }
 
 func (suite *ParameterEnumTestSuite) TestType() {
-	param, err := config.NewEnum(false, map[string]string{
+	param, err := config.NewEnum("", false, map[string]string{
 		"choices": "xxx",
 	})
 	suite.NoError(err)
@@ -45,7 +45,7 @@ func (suite *ParameterEnumTestSuite) TestType() {
 }
 
 func (suite *ParameterEnumTestSuite) TestString() {
-	param, err := config.NewEnum(false, map[string]string{
+	param, err := config.NewEnum("", false, map[string]string{
 		"choices": "xxx",
 	})
 	suite.NoError(err)
@@ -53,7 +53,7 @@ func (suite *ParameterEnumTestSuite) TestString() {
 }
 
 func (suite *ParameterEnumTestSuite) TestNoChoices() {
-	_, err := config.NewEnum(false, map[string]string{
+	_, err := config.NewEnum("", false, map[string]string{
 		"choices": ",,,,",
 	})
 	suite.ErrorContains(err, "no choices are prodvided")
@@ -71,7 +71,7 @@ func (suite *ParameterEnumTestSuite) TestValidate() {
 		"a,b,c,dd": false,
 	}
 
-	param, err := config.NewEnum(false, map[string]string{
+	param, err := config.NewEnum("", false, map[string]string{
 		"choices": "a,b,c,dd",
 	})
 	suite.NoError(err)

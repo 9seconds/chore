@@ -34,7 +34,7 @@ func (suite *ParameterDirectoryTestSuite) TestRequired() {
 		testValue := testValue
 
 		suite.T().Run(strconv.FormatBool(testValue), func(t *testing.T) {
-			param, err := config.NewDirectory(testValue, nil)
+			param, err := config.NewDirectory("", testValue, nil)
 			assert.NoError(t, err)
 			assert.Equal(t, testValue, param.Required())
 		})
@@ -42,13 +42,13 @@ func (suite *ParameterDirectoryTestSuite) TestRequired() {
 }
 
 func (suite *ParameterDirectoryTestSuite) TestType() {
-	param, err := config.NewDirectory(false, nil)
+	param, err := config.NewDirectory("", false, nil)
 	suite.NoError(err)
 	suite.Equal(config.ParameterDirectory, param.Type())
 }
 
 func (suite *ParameterDirectoryTestSuite) TestString() {
-	param, err := config.NewDirectory(false, nil)
+	param, err := config.NewDirectory("", false, nil)
 	suite.NoError(err)
 	suite.NotEmpty(param.String())
 }
@@ -71,7 +71,7 @@ func (suite *ParameterDirectoryTestSuite) TestIncorrectParameter() {
 				testValue := testValue
 
 				t.Run(testValue, func(t *testing.T) {
-					_, err := config.NewDirectory(false, map[string]string{
+					_, err := config.NewDirectory("", false, map[string]string{
 						testName: testValue,
 					})
 					assert.Error(t, err)
@@ -82,7 +82,7 @@ func (suite *ParameterDirectoryTestSuite) TestIncorrectParameter() {
 }
 
 func (suite *ParameterDirectoryTestSuite) TestExistRequiredButAbsent() {
-	param, err := config.NewDirectory(false, map[string]string{
+	param, err := config.NewDirectory("", false, map[string]string{
 		"exists": "true",
 	})
 	suite.NoError(err)
@@ -92,7 +92,7 @@ func (suite *ParameterDirectoryTestSuite) TestExistRequiredButAbsent() {
 }
 
 func (suite *ParameterDirectoryTestSuite) TestAbsent() {
-	param, err := config.NewDirectory(false, map[string]string{
+	param, err := config.NewDirectory("", false, map[string]string{
 		"exists": "false",
 	})
 	suite.NoError(err)
@@ -100,7 +100,7 @@ func (suite *ParameterDirectoryTestSuite) TestAbsent() {
 }
 
 func (suite *ParameterDirectoryTestSuite) TestIsNotDir() {
-	param, err := config.NewDirectory(false, map[string]string{
+	param, err := config.NewDirectory("", false, map[string]string{
 		"exists": "false",
 	})
 	suite.NoError(err)
@@ -110,7 +110,7 @@ func (suite *ParameterDirectoryTestSuite) TestIsNotDir() {
 }
 
 func (suite *ParameterDirectoryTestSuite) TestWrongMode() {
-	param, err := config.NewDirectory(false, map[string]string{
+	param, err := config.NewDirectory("", false, map[string]string{
 		"mode": "055",
 	})
 	suite.NoError(err)

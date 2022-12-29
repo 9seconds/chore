@@ -27,7 +27,7 @@ func (suite *ParameterBase64TestSuite) TestRequired() {
 		testValue := testValue
 
 		suite.T().Run(strconv.FormatBool(testValue), func(t *testing.T) {
-			param, err := config.NewBase64(testValue, nil)
+			param, err := config.NewBase64("", testValue, nil)
 			assert.NoError(t, err)
 			assert.Equal(t, testValue, param.Required())
 		})
@@ -35,13 +35,13 @@ func (suite *ParameterBase64TestSuite) TestRequired() {
 }
 
 func (suite *ParameterBase64TestSuite) TestType() {
-	param, err := config.NewBase64(false, nil)
+	param, err := config.NewBase64("", false, nil)
 	suite.NoError(err)
 	suite.Equal(config.ParameterBase64, param.Type())
 }
 
 func (suite *ParameterBase64TestSuite) TestString() {
-	param, err := config.NewBase64(false, nil)
+	param, err := config.NewBase64("", false, nil)
 	suite.NoError(err)
 	suite.NotEmpty(param.String())
 }
@@ -66,7 +66,7 @@ func (suite *ParameterBase64TestSuite) TestIncorrectLength() {
 				testValue := testValue
 
 				suite.T().Run(testValue, func(t *testing.T) {
-					_, err := config.NewBase64(false, map[string]string{
+					_, err := config.NewBase64("", false, map[string]string{
 						testName: testValue,
 					})
 					assert.ErrorContains(t, err, "incorrect '"+testName+"' value")
@@ -85,7 +85,7 @@ func (suite *ParameterBase64TestSuite) TestValidation() {
 		"UVFX": true,
 	}
 
-	param, err := config.NewBase64(false, map[string]string{
+	param, err := config.NewBase64("", false, map[string]string{
 		"encoding": config.Base64EncRawURL,
 	})
 	suite.NoError(err)
@@ -113,7 +113,7 @@ func (suite *ParameterBase64TestSuite) TestStringLengthValidation() {
 		"QUFBQQ==": false,
 	}
 
-	param, err := config.NewBase64(false, map[string]string{
+	param, err := config.NewBase64("", false, map[string]string{
 		"encoding":   config.Base64EncStd,
 		"min_length": "1",
 		"max_length": "5",

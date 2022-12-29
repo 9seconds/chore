@@ -27,7 +27,7 @@ func (suite *ParameterSemverTestSuite) TestRequired() {
 		testValue := testValue
 
 		suite.T().Run(strconv.FormatBool(testValue), func(t *testing.T) {
-			param, err := config.NewSemver(testValue, nil)
+			param, err := config.NewSemver("", testValue, nil)
 			assert.NoError(t, err)
 			assert.Equal(t, testValue, param.Required())
 		})
@@ -35,19 +35,19 @@ func (suite *ParameterSemverTestSuite) TestRequired() {
 }
 
 func (suite *ParameterSemverTestSuite) TestType() {
-	param, err := config.NewSemver(false, nil)
+	param, err := config.NewSemver("", false, nil)
 	suite.NoError(err)
 	suite.Equal(config.ParameterSemver, param.Type())
 }
 
 func (suite *ParameterSemverTestSuite) TestString() {
-	param, err := config.NewSemver(false, nil)
+	param, err := config.NewSemver("", false, nil)
 	suite.NoError(err)
 	suite.NotEmpty(param.String())
 }
 
 func (suite *ParameterSemverTestSuite) TestIncorrectSemver() {
-	param, err := config.NewSemver(false, nil)
+	param, err := config.NewSemver("", false, nil)
 	suite.NoError(err)
 
 	testTable := map[string]bool{
@@ -78,7 +78,7 @@ func (suite *ParameterSemverTestSuite) TestIncorrectSemver() {
 }
 
 func (suite *ParameterSemverTestSuite) TestValidateConstraint() {
-	param, err := config.NewSemver(false, map[string]string{
+	param, err := config.NewSemver("", false, map[string]string{
 		"constraint": "~1.2.3",
 	})
 	suite.NoError(err)

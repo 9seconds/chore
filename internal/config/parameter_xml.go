@@ -9,11 +9,7 @@ import (
 const ParameterXML = "xml"
 
 type paramXML struct {
-	required bool
-}
-
-func (p paramXML) Required() bool {
-	return p.required
+	baseParameter
 }
 
 func (p paramXML) Type() string {
@@ -21,7 +17,7 @@ func (p paramXML) Type() string {
 }
 
 func (p paramXML) String() string {
-	return fmt.Sprintf("required=%t", p.required)
+	return fmt.Sprintf("%q (required=%t)", p.description, p.required)
 }
 
 func (p paramXML) Validate(_ context.Context, value string) error {
@@ -34,8 +30,11 @@ func (p paramXML) Validate(_ context.Context, value string) error {
 	return nil
 }
 
-func NewXML(required bool, spec map[string]string) (Parameter, error) {
+func NewXML(description string, required bool, spec map[string]string) (Parameter, error) {
 	return paramXML{
-		required: required,
+		baseParameter: baseParameter{
+			required:    required,
+			description: description,
+		},
 	}, nil
 }

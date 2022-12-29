@@ -32,7 +32,7 @@ func (suite *ParameterEmailTestSuite) TestRequired() {
 		testValue := testValue
 
 		suite.T().Run(strconv.FormatBool(testValue), func(t *testing.T) {
-			param, err := config.NewEmail(testValue, nil)
+			param, err := config.NewEmail("", testValue, nil)
 			assert.NoError(t, err)
 			assert.Equal(t, testValue, param.Required())
 		})
@@ -40,13 +40,13 @@ func (suite *ParameterEmailTestSuite) TestRequired() {
 }
 
 func (suite *ParameterEmailTestSuite) TestType() {
-	param, err := config.NewEmail(false, nil)
+	param, err := config.NewEmail("", false, nil)
 	suite.NoError(err)
 	suite.Equal(config.ParameterEmail, param.Type())
 }
 
 func (suite *ParameterEmailTestSuite) TestString() {
-	param, err := config.NewEmail(false, nil)
+	param, err := config.NewEmail("", false, nil)
 	suite.NoError(err)
 	suite.NotEmpty(param.String())
 }
@@ -67,7 +67,7 @@ func (suite *ParameterEmailTestSuite) TestIncorrectParameter() {
 				testValue := testValue
 
 				t.Run(testValue, func(t *testing.T) {
-					_, err := config.NewEmail(false, map[string]string{
+					_, err := config.NewEmail("", false, map[string]string{
 						testName: testValue,
 					})
 					assert.Error(t, err)
@@ -96,7 +96,7 @@ func (suite *ParameterEmailTestSuite) TestValidateEmail() {
 		isValid := isValid
 
 		suite.T().Run(testName, func(t *testing.T) {
-			param, err := config.NewEmail(false, nil)
+			param, err := config.NewEmail("", false, nil)
 			assert.NoError(t, err)
 
 			err = param.Validate(suite.Context(), testName)
@@ -123,7 +123,7 @@ func (suite *ParameterEmailTestSuite) TestValidateEmailDomain() {
 		isValid := isValid
 
 		suite.T().Run(testName, func(t *testing.T) {
-			param, err := config.NewEmail(false, map[string]string{
+			param, err := config.NewEmail("", false, map[string]string{
 				"domain_re": `^gmail\.com$`,
 			})
 			assert.NoError(t, err)
@@ -153,7 +153,7 @@ func (suite *ParameterEmailTestSuite) TestValidateEmailName() {
 		isValid := isValid
 
 		suite.T().Run(testName, func(t *testing.T) {
-			param, err := config.NewEmail(false, map[string]string{
+			param, err := config.NewEmail("", false, map[string]string{
 				"name_re": `^yy$`,
 			})
 			assert.NoError(t, err)
@@ -175,7 +175,7 @@ func (suite *ParameterEmailTestSuite) TestValidateCannotResolve() {
 		Once().
 		Return([]*net.MX{}, io.EOF)
 
-	param, err := config.NewEmail(false, map[string]string{
+	param, err := config.NewEmail("", false, map[string]string{
 		"resolve": "true",
 	})
 	suite.NoError(err)
@@ -190,7 +190,7 @@ func (suite *ParameterEmailTestSuite) TestValidateResolveNoMXRecords() {
 		Once().
 		Return([]*net.MX{}, nil)
 
-	param, err := config.NewEmail(false, map[string]string{
+	param, err := config.NewEmail("", false, map[string]string{
 		"resolve": "true",
 	})
 	suite.NoError(err)
@@ -205,7 +205,7 @@ func (suite *ParameterEmailTestSuite) TestValidateResolveOk() {
 		Once().
 		Return([]*net.MX{nil}, nil)
 
-	param, err := config.NewEmail(false, map[string]string{
+	param, err := config.NewEmail("", false, map[string]string{
 		"resolve": "true",
 	})
 	suite.NoError(err)

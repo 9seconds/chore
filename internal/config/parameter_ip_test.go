@@ -31,7 +31,7 @@ func (suite *ParameterIPTestSuite) TestRequired() {
 		testValue := testValue
 
 		suite.T().Run(strconv.FormatBool(testValue), func(t *testing.T) {
-			param, err := config.NewIP(testValue, nil)
+			param, err := config.NewIP("", testValue, nil)
 			assert.NoError(t, err)
 			assert.Equal(t, testValue, param.Required())
 		})
@@ -39,13 +39,13 @@ func (suite *ParameterIPTestSuite) TestRequired() {
 }
 
 func (suite *ParameterIPTestSuite) TestType() {
-	param, err := config.NewIP(false, nil)
+	param, err := config.NewIP("", false, nil)
 	suite.NoError(err)
 	suite.Equal(config.ParameterIP, param.Type())
 }
 
 func (suite *ParameterIPTestSuite) TestString() {
-	param, err := config.NewIP(false, nil)
+	param, err := config.NewIP("", false, nil)
 	suite.NoError(err)
 	suite.NotEmpty(param.String())
 }
@@ -66,7 +66,7 @@ func (suite *ParameterIPTestSuite) TestIncorrectParameter() {
 				testValue := testValue
 
 				t.Run(testValue, func(t *testing.T) {
-					_, err := config.NewIP(false, map[string]string{
+					_, err := config.NewIP("", false, map[string]string{
 						testName: testValue,
 					})
 					assert.Error(t, err)
@@ -86,7 +86,7 @@ func (suite *ParameterIPTestSuite) TestValidateForbiddenSubnet() {
 		"":           false,
 	}
 
-	param, err := config.NewIP(false, map[string]string{
+	param, err := config.NewIP("", false, map[string]string{
 		"forbidden_subnets": "127.0.0.0/8,127.0.1.0/24",
 	})
 	suite.NoError(err)
@@ -118,7 +118,7 @@ func (suite *ParameterIPTestSuite) TestValidateAllowedSubnet() {
 		"":           false,
 	}
 
-	param, err := config.NewIP(false, map[string]string{
+	param, err := config.NewIP("", false, map[string]string{
 		"allowed_subnets": "127.0.0.0/8,10.0.1.0/24",
 	})
 	suite.NoError(err)
@@ -145,7 +145,7 @@ func (suite *ParameterIPTestSuite) TestValidateResolveFailed() {
 		Once().
 		Return([]string(nil), io.EOF)
 
-	param, err := config.NewIP(false, map[string]string{
+	param, err := config.NewIP("", false, map[string]string{
 		"allowed_subnets": "127.0.0.0/8,10.0.1.0/24",
 		"resolve":         "true",
 	})
@@ -162,7 +162,7 @@ func (suite *ParameterIPTestSuite) TestValidateResolveOk() {
 		Once().
 		Return([]string{"xxx"}, nil)
 
-	param, err := config.NewIP(false, map[string]string{
+	param, err := config.NewIP("", false, map[string]string{
 		"allowed_subnets": "127.0.0.0/8,10.0.1.0/24",
 		"resolve":         "true",
 	})

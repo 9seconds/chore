@@ -27,7 +27,7 @@ func (suite *ParameterJSONTestSuite) TestRequired() {
 		testValue := testValue
 
 		suite.T().Run(strconv.FormatBool(testValue), func(t *testing.T) {
-			param, err := config.NewJSON(testValue, nil)
+			param, err := config.NewJSON("", testValue, nil)
 			assert.NoError(t, err)
 			assert.Equal(t, testValue, param.Required())
 		})
@@ -35,13 +35,13 @@ func (suite *ParameterJSONTestSuite) TestRequired() {
 }
 
 func (suite *ParameterJSONTestSuite) TestType() {
-	param, err := config.NewJSON(false, nil)
+	param, err := config.NewJSON("", false, nil)
 	suite.NoError(err)
 	suite.Equal(config.ParameterJSON, param.Type())
 }
 
 func (suite *ParameterJSONTestSuite) TestString() {
-	param, err := config.NewJSON(false, nil)
+	param, err := config.NewJSON("", false, nil)
 	suite.NoError(err)
 	suite.NotEmpty(param.String())
 }
@@ -60,7 +60,7 @@ func (suite *ParameterJSONTestSuite) TestValidaton() {
 		`{"x": [1,2,3]}`: true,
 	}
 
-	param, err := config.NewJSON(false, nil)
+	param, err := config.NewJSON("", false, nil)
 	suite.NoError(err)
 
 	for testName, isValid := range testTable {

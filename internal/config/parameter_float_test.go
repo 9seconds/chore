@@ -27,7 +27,7 @@ func (suite *ParameterFloatTestSuite) TestRequired() {
 		testValue := testValue
 
 		suite.T().Run(strconv.FormatBool(testValue), func(t *testing.T) {
-			param, err := config.NewFloat(testValue, nil)
+			param, err := config.NewFloat("", testValue, nil)
 			assert.NoError(t, err)
 			assert.Equal(t, testValue, param.Required())
 		})
@@ -35,19 +35,19 @@ func (suite *ParameterFloatTestSuite) TestRequired() {
 }
 
 func (suite *ParameterFloatTestSuite) TestType() {
-	param, err := config.NewFloat(false, nil)
+	param, err := config.NewFloat("", false, nil)
 	suite.NoError(err)
 	suite.Equal(config.ParameterFloat, param.Type())
 }
 
 func (suite *ParameterFloatTestSuite) TestString() {
-	param, err := config.NewInteger(false, nil)
+	param, err := config.NewFloat("", false, nil)
 	suite.NoError(err)
 	suite.NotEmpty(param.String())
 }
 
 func (suite *ParameterFloatTestSuite) TestIncorrectValues() {
-	param, err := config.NewFloat(false, map[string]string{
+	param, err := config.NewFloat("", false, map[string]string{
 		"min": "10",
 		"max": "20",
 	})
@@ -76,7 +76,7 @@ func (suite *ParameterFloatTestSuite) TestIncorrectValues() {
 }
 
 func (suite *ParameterFloatTestSuite) TestCorrectValues() {
-	param, err := config.NewFloat(false, map[string]string{
+	param, err := config.NewFloat("", false, map[string]string{
 		"min": "10",
 		"max": "20",
 	})
@@ -123,7 +123,7 @@ func (suite *ParameterFloatTestSuite) TestIncorrectSpec() {
 					spec := map[string]string{}
 					spec[testValue] = tv
 
-					_, err := config.NewInteger(false, spec)
+					_, err := config.NewFloat("", false, spec)
 					assert.Error(t, err)
 				})
 			}
@@ -132,7 +132,7 @@ func (suite *ParameterFloatTestSuite) TestIncorrectSpec() {
 }
 
 func (suite *ParameterFloatTestSuite) TestIncorrectMinMax() {
-	_, err := config.NewFloat(false, map[string]string{
+	_, err := config.NewFloat("", false, map[string]string{
 		"min": "100",
 		"max": "-100",
 	})
@@ -140,7 +140,7 @@ func (suite *ParameterFloatTestSuite) TestIncorrectMinMax() {
 }
 
 func (suite *ParameterFloatTestSuite) TestAllowInf() {
-	_, err := config.NewFloat(false, map[string]string{
+	_, err := config.NewFloat("", false, map[string]string{
 		"min": "-inf",
 		"max": "inf",
 	})

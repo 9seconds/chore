@@ -24,14 +24,11 @@ var (
 )
 
 type paramEmail struct {
-	required bool
+	baseParameter
+
 	resolve  bool
 	domainRE *regexp.Regexp
 	nameRE   *regexp.Regexp
-}
-
-func (p paramEmail) Required() bool {
-	return p.required
 }
 
 func (p paramEmail) Type() string {
@@ -40,7 +37,8 @@ func (p paramEmail) Type() string {
 
 func (p paramEmail) String() string {
 	return fmt.Sprintf(
-		"required=%t, resolve=%t, domain_re=%v, name_re=%v",
+		"%q (required=%t, resolve=%t, domain_re=%v, name_re=%v)",
+		p.description,
 		p.required,
 		p.resolve,
 		p.domainRE,
@@ -75,9 +73,12 @@ func (p paramEmail) Validate(ctx context.Context, value string) error {
 	return nil
 }
 
-func NewEmail(required bool, spec map[string]string) (Parameter, error) {
+func NewEmail(description string, required bool, spec map[string]string) (Parameter, error) {
 	param := paramEmail{
-		required: required,
+		baseParameter: baseParameter{
+			required:    required,
+			description: description,
+		},
 	}
 
 	if parsed, err := parseBool(spec, "resolve"); err == nil {
