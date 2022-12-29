@@ -18,7 +18,7 @@ type CliCmdRun struct {
 
 	Namespace cli.Namespace `arg:"" help:"Prefix of the script namespace."`
 	Script    string        `arg:"" help:"Prefix of the script name."`
-	Args      []string      `arg:"" optional:"" help:"Script arguments to use."`
+	Args      []string      `arg:"" optional:"" passthrough:"" help:"Script arguments to use."`
 }
 
 func (c *CliCmdRun) Run(ctx cli.Context) error { //nolint: cyclop
