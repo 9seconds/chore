@@ -81,7 +81,7 @@ end
 function __chore_script_completion
   set -l args (commandline -poc)
 
-  chore show $args[3]
+  chore show $args[3] 2>/dev/null
 end
 
 
