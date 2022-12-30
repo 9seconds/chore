@@ -175,3 +175,7 @@ complete -f -c chore \
 complete -f -c chore \
   -n '__chore_using_subcommand f forget; and __chore_require_options' \
   -s r -l keep-runtime -d 'Keep runtime'
+
+complete -f -c chore \
+  -n '__chore_using_subcommand gc' \
+  -s n -l dry-run -d 'Dry run'
