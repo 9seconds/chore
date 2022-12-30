@@ -7,9 +7,6 @@ import (
 	"io/fs"
 	"os"
 	"os/exec"
-	"path/filepath"
-	"text/scanner"
-	"unicode"
 
 	"github.com/9seconds/chore/internal/cli"
 	"github.com/alecthomas/kong"
@@ -60,34 +57,4 @@ func (e *editorCommand) Open(ctx context.Context, path string, templateContent [
 	cmd.Stderr = os.Stderr
 
 	return cmd.Run()
-}
-
-func (e *editorCommand) RemoveIfEmpty(path string) (bool, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return false, fmt.Errorf("cannot open file: %w", err)
-	}
-
-	defer file.Close()
-
-	text := scanner.Scanner{}
-	text.Init(file)
-
-	for tok := text.Scan(); tok != scanner.EOF; tok = text.Scan() {
-		if !unicode.IsSpace(tok) {
-			return false, nil
-		}
-	}
-
-	if err := os.Remove(path); err != nil {
-		return false, fmt.Errorf("cannot remove %s: %w", path, err)
-	}
-
-	rootDir := filepath.Dir(path)
-
-	if items, err := os.ReadDir(rootDir); err == nil && len(items) == 0 {
-		return true, os.RemoveAll(rootDir)
-	}
-
-	return true, nil
 }

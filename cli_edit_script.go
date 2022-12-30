@@ -36,15 +36,6 @@ func (c *CliCmdEditScript) Run(ctx cli.Context) error {
 		return fmt.Errorf("editor failed: %w", err)
 	}
 
-	removed, err := c.RemoveIfEmpty(path)
-
-	switch {
-	case err != nil:
-		return err
-	case removed:
-		return nil
-	}
-
 	if err := access.Access(path, false, false, true); err == nil {
 		return nil
 	}
