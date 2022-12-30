@@ -70,6 +70,16 @@ func (suite *ScriptTestSuite) TestCannotReadConfig() {
 	suite.ErrorContains(scr.Init(), "cannot parse config file")
 }
 
+func (suite *ScriptTestSuite) TestEmptyScript() {
+	suite.EnsureFile(
+		suite.ConfigScriptPath("xx", "1"),
+		"\t \r\n",
+		0o700)
+
+	scr := suite.NewScript("xx", "1")
+	suite.ErrorContains(scr.Init(), "script is empty")
+}
+
 func (suite *ScriptTestSuite) TestDirsAreAvailable() {
 	suite.EnsureScript("xx", "1", "echo 1")
 

@@ -1,13 +1,16 @@
 package script
 
 import (
+	"bufio"
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
 	"sync"
+	"unicode"
 
 	"github.com/9seconds/chore/internal/access"
 	"github.com/9seconds/chore/internal/argparse"
@@ -129,15 +132,27 @@ func (s *Script) Valid() error {
 		return fmt.Errorf("path is directory: %w", err)
 	}
 
-	if stat.Size() == 0 {
-		return errors.New("script is empty")
-	}
-
 	if err := access.Access(path, false, false, true); err != nil {
 		return fmt.Errorf("cannot find out executable %s: %w", s.Path(), err)
 	}
 
-	return nil
+	file, _ := os.Open(path)
+	reader := bufio.NewReader(file)
+
+	defer file.Close()
+
+	for {
+		char, _, err := reader.ReadRune()
+
+		switch {
+		case errors.Is(err, io.EOF):
+			return errors.New("script is empty")
+		case err != nil:
+			return fmt.Errorf("cannot scan script: %w", err)
+		case !unicode.IsSpace(char):
+			return nil
+		}
+	}
 }
 
 func (s *Script) Init() error {
