@@ -161,9 +161,7 @@ func (s *Script) Init() error {
 		return fmt.Errorf("cannot create runtime path %s: %w", s.RuntimePath(), err)
 	}
 
-	dir, err := os.MkdirTemp(
-		"",
-		fmt.Sprintf("%s-%s-%s--", env.ChoreDir, s.Namespace, s.Executable))
+	dir, err := os.MkdirTemp("", env.ChoreDir+"-")
 	if err != nil {
 		return fmt.Errorf("cannot initialize tmp dir: %w", err)
 	}
