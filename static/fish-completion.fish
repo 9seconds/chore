@@ -99,7 +99,7 @@ function __chore_complete_script -d 'Complete chore script'
   # run ns
   set -l args (__chore_get_commandline)
 
-  chore show $args[2] 2>/dev/null
+  chore show -- $args[2] 2>/dev/null
 end
 
 
@@ -119,7 +119,7 @@ function __chore_complete_options -d 'Complete chore script options'
   # run ns script ...
   set -l args (__chore_get_commandline)
 
-  chore fish-completion $args[2..-1]
+  chore fish-completion -- $args[2..-1]
 end
 
 
@@ -136,24 +136,42 @@ end
 # -----------------------------------------------------------------------------
 
 
-complete -f -c chore -n '__fish_use_subcommand; and __chore_no_subcommands'  -s h -l help    -d 'Show help'
-complete -f -c chore -n '__fish_use_subcommand; and __chore_no_subcommands;' -s d -l debug   -d 'Run in debug mode'
-complete -f -c chore -n '__fish_use_subcommand; and __chore_no_subcommands'  -s V -l version -d 'Show version'
+complete -f -c chore -n '__fish_use_subcommand; and __chore_no_subcommands' -s h -l help    -d 'Show help'
+complete -f -c chore -n '__fish_use_subcommand; and __chore_no_subcommands' -s d -l debug   -d 'Run in debug mode'
+complete -f -c chore -n '__fish_use_subcommand; and __chore_no_subcommands' -s V -l version -d 'Show version'
 
 complete -f -c chore -n '__chore_no_subcommands' -a run         -d 'Run chore script'
 complete -f -c chore -n '__chore_no_subcommands' -a edit-script -d 'Edit chore script'
 complete -f -c chore -n '__chore_no_subcommands' -a edit-config -d 'Edit chore script config'
 complete -f -c chore -n '__chore_no_subcommands' -a show        -d 'Show details on namespaces or scripts'
+complete -f -c chore -n '__chore_no_subcommands' -a gc          -d 'Cleanup garbage from chore directories'
+complete -f -c chore -n '__chore_no_subcommands' -a forget      -d 'Forget a state of the script'
 #
 complete -f -c chore \
-  -n '__chore_using_subcommand r run e edit-script c edit-config s show; and __chore_require_namespace' \
+  -n '__chore_using_subcommand r run e edit-script c edit-config s show f forget; and __chore_require_namespace' \
   -a '(__chore_complete_namespace)'
 complete -f -c chore \
-  -n '__chore_using_subcommand r run e edit-script c edit-config s show; and __chore_require_script' \
+  -n '__chore_using_subcommand r run e edit-script c edit-config s show f forget; and __chore_require_script' \
   -a '(__chore_complete_script)'
 complete -f -c chore \
   -n '__chore_using_subcommand r run; and __chore_require_options' \
   -a '(__chore_complete_options)'
-complete -F -c chore \
-  -n '__chore_using_subcommand r run; and __chore_options_are_completed' \
-  -a '(__fish_complete_path)'
+complete -f -c chore \
+  -n '__chore_using_subcommand r run; and __chore_require_options' \
+  -a '(__chore_complete_options)'
+
+complete -f -c chore \
+  -n '__chore_using_subcommand f forget; and __chore_require_options' \
+  -s g -l clean-config -d 'Remove config file'
+complete -f -c chore \
+  -n '__chore_using_subcommand f forget; and __chore_require_options' \
+  -s t -l keep-data -d 'Keep data'
+complete -f -c chore \
+  -n '__chore_using_subcommand f forget; and __chore_require_options' \
+  -s c -l keep-cache -d 'Keep cache'
+complete -f -c chore \
+  -n '__chore_using_subcommand f forget; and __chore_require_options' \
+  -s s -l keep-state -d 'Keep state'
+complete -f -c chore \
+  -n '__chore_using_subcommand f forget; and __chore_require_options' \
+  -s r -l keep-runtime -d 'Keep runtime'

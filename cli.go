@@ -25,6 +25,7 @@ var CLI struct {
 	EditConfig     CliCmdEditConfig  `cmd:"" aliases:"c" help:"Edit chore script config."`
 	Run            CliCmdRun         `cmd:"" aliases:"r" help:"Run chore script."`
 	GC             CliCmdGC          `cmd:"gc" help:"Cleanup garbage from chore directories."`
+	Forget         CliCmdForget      `cmd:"" aliases:"f" help:"Forget a state of the script."`
 	FishCompletion CliFishCompletion `cmd:"" help:"Generate fish shell completion."`
 }
 
