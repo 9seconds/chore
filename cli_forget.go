@@ -21,7 +21,7 @@ type CliCmdForget struct {
 	KeepRuntime bool `short:"r" help:"Keep runtime."`
 }
 
-func (c *CliCmdForget) Run(_ cli.Context) error {
+func (c *CliCmdForget) Run(_ cli.Context) error { //nolint: cyclop
 	scr := &script.Script{
 		Namespace:  c.Namespace.Value(),
 		Executable: c.Script,

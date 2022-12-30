@@ -101,6 +101,7 @@ func Remove(paths []string) error {
 
 	for _, seed := range paths {
 		queue.PushBack(seed)
+
 		seenPaths[seed] = true
 	}
 
@@ -123,6 +124,7 @@ func Remove(paths []string) error {
 			return fmt.Errorf("cannot read directory %s: %w", path, err)
 		case len(content) == 0 && !seenPaths[rootPath]:
 			seenPaths[rootPath] = true
+
 			queue.PushBack(rootPath)
 		}
 	}
