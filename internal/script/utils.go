@@ -45,7 +45,7 @@ func ListNamespaces(prefix string) ([]string, error) {
 }
 
 func ListScripts(namespace, prefix string) ([]string, error) {
-	dir := filepath.Join(xdg.ConfigHome, env.ChoreDir, namespace)
+	dir := filepath.Join(env.RootPathConfig(), namespace)
 
 	entries, err := os.ReadDir(dir)
 	if err != nil {

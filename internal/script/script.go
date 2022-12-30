@@ -13,7 +13,6 @@ import (
 	"github.com/9seconds/chore/internal/argparse"
 	"github.com/9seconds/chore/internal/config"
 	"github.com/9seconds/chore/internal/env"
-	"github.com/adrg/xdg"
 )
 
 type Script struct {
@@ -34,11 +33,11 @@ func (s *Script) Config() *config.Config {
 }
 
 func (s *Script) NamespacePath() string {
-	return filepath.Join(xdg.ConfigHome, env.ChoreDir, s.Namespace)
+	return filepath.Join(env.RootPathConfig(), s.Namespace)
 }
 
 func (s *Script) Path() string {
-	return s.buildPath(xdg.ConfigHome)
+	return filepath.Join(s.NamespacePath(), s.Executable)
 }
 
 func (s *Script) ConfigPath() string {
@@ -46,19 +45,19 @@ func (s *Script) ConfigPath() string {
 }
 
 func (s *Script) DataPath() string {
-	return s.buildPath(xdg.DataHome)
+	return filepath.Join(env.RootPathData(), s.Namespace, s.Executable)
 }
 
 func (s *Script) CachePath() string {
-	return s.buildPath(xdg.CacheHome)
+	return filepath.Join(env.RootPathCache(), s.Namespace, s.Executable)
 }
 
 func (s *Script) StatePath() string {
-	return s.buildPath(xdg.StateHome)
+	return filepath.Join(env.RootPathState(), s.Namespace, s.Executable)
 }
 
 func (s *Script) RuntimePath() string {
-	return s.buildPath(xdg.RuntimeDir)
+	return filepath.Join(env.RootPathRuntime(), s.Namespace, s.Executable)
 }
 
 func (s *Script) TempPath() string {
@@ -201,8 +200,4 @@ func (s *Script) Cleanup() {
 
 		s.tmpDir = ""
 	})
-}
-
-func (s *Script) buildPath(base string) string {
-	return filepath.Join(base, env.ChoreDir, s.Namespace, s.Executable)
 }

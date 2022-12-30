@@ -1,5 +1,11 @@
 package env
 
+import (
+	"path/filepath"
+
+	"github.com/adrg/xdg"
+)
+
 const (
 	ChoreDir = "chore"
 )
@@ -87,3 +93,23 @@ const (
 	EnvUserGID  = EnvUserPrefix + "GID"
 	EnvUserName = EnvUserPrefix + "NAME"
 )
+
+func RootPathConfig() string {
+	return filepath.Join(xdg.ConfigHome, ChoreDir)
+}
+
+func RootPathData() string {
+	return filepath.Join(xdg.DataHome, ChoreDir)
+}
+
+func RootPathCache() string {
+	return filepath.Join(xdg.CacheHome, ChoreDir)
+}
+
+func RootPathState() string {
+	return filepath.Join(xdg.StateHome, ChoreDir)
+}
+
+func RootPathRuntime() string {
+	return filepath.Join(xdg.RuntimeDir, ChoreDir)
+}

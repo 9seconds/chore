@@ -69,11 +69,11 @@ func (suite *CustomRootTestSuite) EnsureFile(
 }
 
 func (suite *CustomRootTestSuite) ConfigNamespacePath(namespace string) string {
-	return filepath.Join(xdg.ConfigHome, env.ChoreDir, namespace)
+	return filepath.Join(env.RootPathConfig(), namespace)
 }
 
 func (suite *CustomRootTestSuite) ConfigScriptPath(namespace, executable string) string {
-	return filepath.Join(xdg.ConfigHome, env.ChoreDir, namespace, executable)
+	return filepath.Join(suite.ConfigNamespacePath(namespace), executable)
 }
 
 func (suite *CustomRootTestSuite) ConfigScriptConfigPath(namespace, executable string) string {
@@ -81,35 +81,35 @@ func (suite *CustomRootTestSuite) ConfigScriptConfigPath(namespace, executable s
 }
 
 func (suite *CustomRootTestSuite) DataNamespacePath(namespace string) string {
-	return filepath.Join(xdg.DataHome, env.ChoreDir, namespace)
+	return filepath.Join(env.RootPathData(), namespace)
 }
 
 func (suite *CustomRootTestSuite) DataScriptPath(namespace, executable string) string {
-	return filepath.Join(xdg.DataHome, env.ChoreDir, namespace, executable)
+	return filepath.Join(suite.DataNamespacePath(namespace), executable)
 }
 
 func (suite *CustomRootTestSuite) CacheNamespacePath(namespace string) string {
-	return filepath.Join(xdg.CacheHome, env.ChoreDir, namespace)
+	return filepath.Join(env.RootPathCache(), namespace)
 }
 
 func (suite *CustomRootTestSuite) CacheScriptPath(namespace, executable string) string {
-	return filepath.Join(xdg.CacheHome, env.ChoreDir, namespace, executable)
+	return filepath.Join(suite.CacheNamespacePath(namespace), executable)
 }
 
 func (suite *CustomRootTestSuite) StateNamespacePath(namespace string) string {
-	return filepath.Join(xdg.StateHome, env.ChoreDir, namespace)
+	return filepath.Join(env.RootPathState(), namespace)
 }
 
 func (suite *CustomRootTestSuite) StateScriptPath(namespace, executable string) string {
-	return filepath.Join(xdg.StateHome, env.ChoreDir, namespace, executable)
+	return filepath.Join(suite.StateNamespacePath(namespace), executable)
 }
 
 func (suite *CustomRootTestSuite) RuntimeNamespacePath(namespace string) string {
-	return filepath.Join(xdg.RuntimeDir, env.ChoreDir, namespace)
+	return filepath.Join(env.RootPathRuntime(), namespace)
 }
 
 func (suite *CustomRootTestSuite) RuntimeScriptPath(namespace, executable string) string {
-	return filepath.Join(xdg.RuntimeDir, env.ChoreDir, namespace, executable)
+	return filepath.Join(suite.RuntimeNamespacePath(namespace), executable)
 }
 
 func (suite *CustomRootTestSuite) EnsureScript(namespace, executable, content string) string {
