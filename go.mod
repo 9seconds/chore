@@ -17,6 +17,7 @@ require (
 	github.com/hjson/hjson-go/v4 v4.3.0
 	github.com/jarcoal/httpmock v1.2.0
 	github.com/stretchr/testify v1.8.1
+	github.com/tchap/go-patricia/v2 v2.3.1
 	github.com/thlib/go-timezone-local v0.0.0-20210907160436-ef149e42d28e
 	golang.org/x/sys v0.3.0
 	gopkg.in/ini.v1 v1.67.0
@@ -32,7 +33,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/go-git/gcfg v1.5.0 // indirect
-	github.com/go-git/go-billy/v5 v5.3.1 // indirect
+	github.com/go-git/go-billy/v5 v5.4.0 // indirect
 	github.com/hexops/gotextdiff v1.0.3 // indirect
 	github.com/imdario/mergo v0.3.13 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
@@ -42,7 +43,6 @@ require (
 	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/skeema/knownhosts v1.1.0 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
-	github.com/tchap/go-patricia/v2 v2.3.1 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	golang.org/x/crypto v0.4.0 // indirect
 	golang.org/x/mod v0.7.0 // indirect
