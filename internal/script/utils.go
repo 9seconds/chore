@@ -1,13 +1,18 @@
 package script
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
+	"unicode"
 
+	"github.com/9seconds/chore/internal/access"
+	"github.com/9seconds/chore/internal/config"
 	"github.com/9seconds/chore/internal/env"
 	"github.com/adrg/xdg"
 )
@@ -66,7 +71,7 @@ func ListScripts(namespace, prefix string) ([]string, error) {
 			Executable: name,
 		}
 
-		if err := scr.Valid(); err == nil {
+		if err := ValidateScript(scr.Path()); err == nil {
 			names = append(names, name)
 		}
 	}
@@ -130,4 +135,60 @@ func FindScript(namespacePrefix, scriptPrefix string) (*Script, error) {
 
 		return nil, fmt.Errorf("ambigous specification: do you mean %s?", strings.Join(names, ", "))
 	}
+}
+
+func ValidateScript(path string) error {
+	stat, err := os.Stat(path)
+	if err != nil {
+		return fmt.Errorf("cannot stat path: %w", err)
+	}
+
+	if stat.IsDir() {
+		return fmt.Errorf("path is directory: %w", err)
+	}
+
+	if err := access.Access(path, false, false, true); err != nil {
+		return fmt.Errorf("cannot find out executable %s: %w", path, err)
+	}
+
+	file, _ := os.Open(path)
+	reader := bufio.NewReader(file)
+
+	defer file.Close()
+
+	for {
+		char, _, err := reader.ReadRune()
+
+		switch {
+		case errors.Is(err, io.EOF):
+			return errors.New("script is empty")
+		case err != nil:
+			return fmt.Errorf("cannot scan script: %w", err)
+		case !unicode.IsSpace(char):
+			return nil
+		}
+	}
+}
+
+func ValidateConfig(path string) (config.Config, error) {
+	conf := config.Config{}
+
+	file, err := os.Open(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			// that'script fine, this means that optional config is just absent
+			return conf, nil
+		}
+
+		return conf, fmt.Errorf("cannot read script config %script: %w", path, err)
+	}
+
+	defer file.Close()
+
+	conf, err = config.Parse(file)
+	if err != nil {
+		err = fmt.Errorf("cannot parse config file %script: %w", path, err)
+	}
+
+	return conf, err
 }

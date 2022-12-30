@@ -1,18 +1,13 @@
 package script
 
 import (
-	"bufio"
 	"context"
-	"errors"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"strings"
 	"sync"
-	"unicode"
 
-	"github.com/9seconds/chore/internal/access"
 	"github.com/9seconds/chore/internal/argparse"
 	"github.com/9seconds/chore/internal/config"
 	"github.com/9seconds/chore/internal/env"
@@ -120,44 +115,9 @@ func (s *Script) Environ(ctx context.Context, args argparse.ParsedArgs) []string
 	return environ
 }
 
-func (s *Script) Valid() error {
-	path := s.Path()
-
-	stat, err := os.Stat(path)
-	if err != nil {
-		return fmt.Errorf("cannot stat path: %w", err)
-	}
-
-	if stat.IsDir() {
-		return fmt.Errorf("path is directory: %w", err)
-	}
-
-	if err := access.Access(path, false, false, true); err != nil {
-		return fmt.Errorf("cannot find out executable %s: %w", s.Path(), err)
-	}
-
-	file, _ := os.Open(path)
-	reader := bufio.NewReader(file)
-
-	defer file.Close()
-
-	for {
-		char, _, err := reader.ReadRune()
-
-		switch {
-		case errors.Is(err, io.EOF):
-			return errors.New("script is empty")
-		case err != nil:
-			return fmt.Errorf("cannot scan script: %w", err)
-		case !unicode.IsSpace(char):
-			return nil
-		}
-	}
-}
-
 func (s *Script) Init() error {
-	if err := s.Valid(); err != nil {
-		return fmt.Errorf("cannot find out executable %s: %w", s.Path(), err)
+	if err := ValidateScript(s.Path()); err != nil {
+		return fmt.Errorf("invalid script: %w", err)
 	}
 
 	if err := EnsureDir(s.DataPath()); err != nil {
@@ -183,21 +143,9 @@ func (s *Script) Init() error {
 
 	s.tmpDir = dir
 
-	file, err := os.Open(s.ConfigPath())
+	conf, err := ValidateConfig(s.ConfigPath())
 	if err != nil {
-		if os.IsNotExist(err) {
-			// that'script fine, this means that optional config is just absent
-			return nil
-		}
-
-		return fmt.Errorf("cannot read script config %script: %w", s.ConfigPath(), err)
-	}
-
-	defer file.Close()
-
-	conf, err := config.Parse(file)
-	if err != nil {
-		return fmt.Errorf("cannot parse config file %script: %w", s.ConfigPath(), err)
+		return fmt.Errorf("invalid config: %w", err)
 	}
 
 	s.config = conf
