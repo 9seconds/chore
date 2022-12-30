@@ -14,6 +14,7 @@ import (
 const (
 	defaultDirPermission    = 0o700
 	defaultScriptPermission = 0o700
+	defaultConfigPermission = 0o600
 )
 
 type CustomRootTestSuite struct {
@@ -142,5 +143,5 @@ func (suite *CustomRootTestSuite) EnsureScriptConfig(namespace, executable strin
 	suite.EnsureFile(
 		suite.ConfigScriptConfigPath(namespace, executable),
 		strContent,
-		defaultScriptPermission)
+		defaultConfigPermission)
 }
