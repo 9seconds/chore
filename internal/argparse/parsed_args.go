@@ -12,9 +12,10 @@ import (
 )
 
 type ParsedArgs struct {
-	Parameters map[string]string
-	Flags      map[string]FlagValue
-	Positional []string
+	Parameters         map[string]string
+	Flags              map[string]FlagValue
+	Positional         []string
+	ExplicitPositional bool
 }
 
 func (p ParsedArgs) Validate( //nolint: cyclop
@@ -76,7 +77,7 @@ func (p ParsedArgs) Validate( //nolint: cyclop
 }
 
 func (p ParsedArgs) IsPositionalTime() bool {
-	return len(p.Positional) > 0
+	return p.ExplicitPositional || len(p.Positional) > 0
 }
 
 func (p ParsedArgs) OptionsAsCli() []string {

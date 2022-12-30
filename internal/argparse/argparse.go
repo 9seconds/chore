@@ -13,6 +13,8 @@ const (
 	PrefixFlagNegative = '-'
 	PrefixLiteral      = ':'
 	SeparatorKeyword   = '='
+
+	PositionalDelimiter = "--"
 )
 
 type FlagValue rune
@@ -37,6 +39,8 @@ func Parse(args []string) (ParsedArgs, error) { //nolint: cyclop
 		rune, _ := utf8.DecodeRuneInString(arg)
 
 		switch {
+		case arg == PositionalDelimiter && !parsed.ExplicitPositional:
+			parsed.ExplicitPositional = true
 		case rune == PrefixLiteral:
 			parsed.Positional = append(parsed.Positional, arg[1:])
 		case rune == PrefixFlagPositive, rune == PrefixFlagNegative:

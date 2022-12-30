@@ -78,6 +78,21 @@ func (suite *ParseTestSuite) TestMixed() {
 	suite.Equal([]string{"arg1", "arg2", "-j", "k=v"}, parsed.Positional)
 }
 
+func (suite *ParseTestSuite) TestExplicitPositionals() {
+	suite.T().Run("empty", func(t *testing.T) {
+		parsed, err := argparse.Parse([]string{})
+		assert.NoError(t, err)
+		assert.False(t, parsed.IsPositionalTime())
+	})
+
+	suite.T().Run("non-empty", func(t *testing.T) {
+		parsed, err := argparse.Parse([]string{"--", "a", ":--", "b"})
+		assert.NoError(t, err)
+		assert.True(t, parsed.IsPositionalTime())
+		assert.Equal(t, []string{"a", "--", "b"}, parsed.Positional)
+	})
+}
+
 func TestParse(t *testing.T) {
 	suite.Run(t, &ParseTestSuite{})
 }
