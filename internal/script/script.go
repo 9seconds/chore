@@ -2,6 +2,7 @@ package script
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -127,6 +128,10 @@ func (s *Script) Valid() error {
 
 	if stat.IsDir() {
 		return fmt.Errorf("path is directory: %w", err)
+	}
+
+	if stat.Size() == 0 {
+		return errors.New("script is empty")
 	}
 
 	if err := access.Access(path, false, false, true); err != nil {
