@@ -74,13 +74,8 @@ func ListScripts(namespace, prefix string) ([]string, error) {
 	return names, nil
 }
 
-func FindScript(namespacePrefix, scriptPrefix string) (*Script, error) {
-	type foundPair struct {
-		namespace  string
-		executable string
-	}
-
-	var results []foundPair
+func SearchScripts(namespacePrefix, scriptPrefix string) ([]*Script, error) {
+	scripts := []*Script{}
 
 	namespaces, err := ListNamespaces(namespacePrefix)
 	if err != nil {
@@ -88,7 +83,7 @@ func FindScript(namespacePrefix, scriptPrefix string) (*Script, error) {
 	}
 
 	for _, namespace := range namespaces {
-		scripts, err := ListScripts(namespace, scriptPrefix)
+		names, err := ListScripts(namespace, scriptPrefix)
 		if err != nil {
 			return nil, fmt.Errorf(
 				"cannot find out scripts for %s namespace: %w",
@@ -96,38 +91,43 @@ func FindScript(namespacePrefix, scriptPrefix string) (*Script, error) {
 				err)
 		}
 
-		for _, scr := range scripts {
-			results = append(results, foundPair{namespace, scr})
+		for _, name := range names {
+			scripts = append(scripts, &Script{
+				Namespace:  namespace,
+				Executable: name,
+			})
 		}
 	}
 
-	switch len(results) {
+	sort.Slice(scripts, func(i, j int) bool {
+		if scripts[i].Namespace != scripts[j].Namespace {
+			return scripts[i].Namespace < scripts[j].Namespace
+		}
+
+		return scripts[i].Executable < scripts[j].Executable
+	})
+
+	return scripts, nil
+}
+
+func FindScript(namespacePrefix, scriptPrefix string) (*Script, error) {
+	scripts, err := SearchScripts(namespacePrefix, scriptPrefix)
+	if err != nil {
+		return nil, err
+	}
+
+	switch len(scripts) {
 	case 0:
 		return nil, errors.New("cannot find such script")
 	case 1:
-		return &Script{
-			Namespace:  results[0].namespace,
-			Executable: results[0].executable,
-		}, nil
-	}
+		return scripts[0], nil
+	default:
+		names := make([]string, len(scripts))
 
-	sort.Slice(results, func(i, j int) bool {
-		if results[i].namespace < results[j].namespace {
-			return false
+		for idx, v := range scripts {
+			names[idx] = v.Namespace + "/" + v.Executable
 		}
 
-		if results[i].executable < results[j].executable {
-			return false
-		}
-
-		return true
-	})
-
-	names := make([]string, len(results))
-
-	for idx, v := range results {
-		names[idx] = v.namespace + "/" + v.executable
+		return nil, fmt.Errorf("ambigous specification: do you mean %s?", strings.Join(names, ", "))
 	}
-
-	return nil, fmt.Errorf("ambigous specification: do you mean %s?", strings.Join(names, ", "))
 }
