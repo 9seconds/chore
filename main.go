@@ -36,21 +36,22 @@ func main() {
 		log.SetOutput(io.Discard)
 	}
 
-	notifyCtx, cancel := signal.NotifyContext(
+	ctx, cancel := signal.NotifyContext(
 		context.Background(),
 		syscall.SIGINT,
 		syscall.SIGTERM,
 		syscall.SIGQUIT)
 
 	go func() {
-		<-notifyCtx.Done()
+		<-ctx.Done()
+		cancel()
 		log.Println("application context is closed")
 	}()
 
-	rootCtx := cli.NewContext(notifyCtx)
-	err := cliCtx.Run(rootCtx)
+	err := cliCtx.Run(cli.Context{
+		Context: ctx,
+	})
 
-	rootCtx.Close()
 	cancel()
 
 	var exitErr commands.ExitError

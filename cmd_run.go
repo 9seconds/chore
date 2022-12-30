@@ -8,20 +8,16 @@ import (
 	"github.com/9seconds/chore/internal/argparse"
 	"github.com/9seconds/chore/internal/cli"
 	"github.com/9seconds/chore/internal/commands"
-	"github.com/9seconds/chore/internal/filelock"
 	"github.com/9seconds/chore/internal/script"
 )
 
 type CliCmdRun struct {
-	Timeout cli.Timeout `short:"t" help:"Execute with a given timeout. Number mean seconds. Also can pass duration. Default is no timeout."`
-	Lock    cli.Lock    `short:"l" help:"A path to a lock to acquire before execution. Prefix 's:' means shared lock, 'x:' - exclusive (default). '.' means a path to the script itself. Default is no lock."`
-
 	Namespace cli.Namespace `arg:"" help:"Prefix of the script namespace."`
 	Script    string        `arg:"" help:"Prefix of the script name."`
 	Args      []string      `arg:"" optional:"" passthrough:"" help:"Script arguments to use."`
 }
 
-func (c *CliCmdRun) Run(ctx cli.Context) error { //nolint: cyclop
+func (c *CliCmdRun) Run(ctx cli.Context) error {
 	scr, err := script.FindScript(c.Namespace.Value(), c.Script)
 	if err != nil {
 		return fmt.Errorf("cannot find out script: %w", err)
@@ -32,21 +28,6 @@ func (c *CliCmdRun) Run(ctx cli.Context) error { //nolint: cyclop
 	}
 
 	defer scr.Cleanup()
-
-	if c.Timeout.Value() != 0 {
-		ctx = ctx.WithTimeout(c.Timeout.Value())
-	}
-
-	lock, err := filelock.New(c.Lock.LockMode(), c.Lock.Path(scr.Path()))
-	if err != nil {
-		return fmt.Errorf("cannot initialize lock: %w", err)
-	}
-
-	ctx = ctx.WithLock(lock)
-
-	if err := ctx.Start(); err != nil {
-		return fmt.Errorf("cannot start context: %w", err)
-	}
 
 	conf := scr.Config()
 
