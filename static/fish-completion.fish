@@ -161,20 +161,23 @@ complete -f -c chore \
   -a '(__chore_complete_options)'
 
 complete -f -c chore \
-  -n '__chore_using_subcommand f forget; and __chore_require_options' \
-  -s g -l clean-config -d 'Remove config file'
+  -n '__chore_using_subcommand s show; and __chore_require_options' \
+  -s p -l show-path -d 'Show path to the script'
 complete -f -c chore \
-  -n '__chore_using_subcommand f forget; and __chore_require_options' \
-  -s t -l keep-data -d 'Keep data'
+  -n '__chore_using_subcommand s show; and __chore_require_options' \
+  -s c -l show-config -d 'Show path to the script config'
 complete -f -c chore \
-  -n '__chore_using_subcommand f forget; and __chore_require_options' \
-  -s c -l keep-cache -d 'Keep cache'
+  -n '__chore_using_subcommand s show; and __chore_require_options' \
+  -s t -l show-data -d 'Show path to the script data directory'
 complete -f -c chore \
-  -n '__chore_using_subcommand f forget; and __chore_require_options' \
-  -s s -l keep-state -d 'Keep state'
+  -n '__chore_using_subcommand s show; and __chore_require_options' \
+  -s a -l show-cache -d 'Show path to the script cache directory'
 complete -f -c chore \
-  -n '__chore_using_subcommand f forget; and __chore_require_options' \
-  -s r -l keep-runtime -d 'Keep runtime'
+  -n '__chore_using_subcommand s show; and __chore_require_options' \
+  -s s -l show-state -d 'Show path to the script state directory'
+complete -f -c chore \
+  -n '__chore_using_subcommand s show; and __chore_require_options' \
+  -s r -l show-runtime -d 'Show path to the script runtime directory'
 
 complete -f -c chore \
   -n '__chore_using_subcommand gc' \
