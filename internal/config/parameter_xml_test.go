@@ -40,12 +40,6 @@ func (suite *ParameterXMLTestSuite) TestType() {
 	suite.Equal(config.ParameterXML, param.Type())
 }
 
-func (suite *ParameterXMLTestSuite) TestString() {
-	param, err := config.NewXML("", false, nil)
-	suite.NoError(err)
-	suite.NotEmpty(param.String())
-}
-
 func (suite *ParameterXMLTestSuite) TestValidaton() {
 	testTable := map[string]bool{
 		"":               false,

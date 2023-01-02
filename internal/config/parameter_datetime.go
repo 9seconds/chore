@@ -24,18 +24,6 @@ func (p parameterDatetime) Type() string {
 	return ParameterDatetime
 }
 
-func (p parameterDatetime) String() string {
-	return fmt.Sprintf(
-		"%q (required=%t, future_delta=%s, past_delta=%s, rounded_to=%s, location=%s, layout=%s)",
-		p.description,
-		p.required,
-		p.futureDelta,
-		p.pastDelta,
-		p.roundedTo,
-		p.location,
-		p.layout)
-}
-
 func (p parameterDatetime) Validate(_ context.Context, value string) error { //nolint: cyclop
 	var (
 		sec uint64
@@ -90,8 +78,9 @@ func (p parameterDatetime) Validate(_ context.Context, value string) error { //n
 func NewDatetime(description string, required bool, spec map[string]string) (Parameter, error) { //nolint: cyclop
 	param := parameterDatetime{
 		baseParameter: baseParameter{
-			required:    required,
-			description: description,
+			required:      required,
+			description:   description,
+			specification: spec,
 		},
 		futureDelta: -1,
 		pastDelta:   -1,

@@ -47,12 +47,6 @@ func (suite *ParameterDirectoryTestSuite) TestType() {
 	suite.Equal(config.ParameterDirectory, param.Type())
 }
 
-func (suite *ParameterDirectoryTestSuite) TestString() {
-	param, err := config.NewDirectory("", false, nil)
-	suite.NoError(err)
-	suite.NotEmpty(param.String())
-}
-
 func (suite *ParameterDirectoryTestSuite) TestIncorrectParameter() {
 	testTable := map[string][]string{
 		"exists":     {"xx", ""},

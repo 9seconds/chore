@@ -23,15 +23,6 @@ func (p paramFile) Type() string {
 	return ParameterFile
 }
 
-func (p paramFile) String() string {
-	return fmt.Sprintf(
-		"%q (required=%t, mimetypes=%v, %s)",
-		p.description,
-		p.required,
-		p.mimetypes,
-		p.mixinPermissions)
-}
-
 func (p paramFile) isExist() bool {
 	return p.mixinPermissions.isExist() || len(p.mimetypes) > 0
 }
@@ -63,8 +54,9 @@ func (p paramFile) Validate(_ context.Context, value string) error {
 func NewFile(description string, required bool, spec map[string]string) (Parameter, error) {
 	param := paramFile{
 		baseParameter: baseParameter{
-			required:    required,
-			description: description,
+			required:      required,
+			description:   description,
+			specification: spec,
 		},
 	}
 

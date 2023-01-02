@@ -40,17 +40,6 @@ func (p paramHostname) Type() string {
 	return ParameterHostname
 }
 
-func (p paramHostname) String() string {
-	return fmt.Sprintf(
-		"%q (required=%t, is_fqdn=%t, resolve=%t, re=%v, %s)",
-		p.description,
-		p.required,
-		p.isFQDN,
-		p.resolve,
-		p.re,
-		p.mixinStringLength)
-}
-
 func (p paramHostname) Validate(ctx context.Context, value string) error { //nolint: cyclop
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -83,8 +72,9 @@ func (p paramHostname) Validate(ctx context.Context, value string) error { //nol
 func NewHostname(description string, required bool, spec map[string]string) (Parameter, error) {
 	param := paramHostname{
 		baseParameter: baseParameter{
-			required:    required,
-			description: description,
+			required:      required,
+			description:   description,
+			specification: spec,
 		},
 	}
 

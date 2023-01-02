@@ -44,12 +44,6 @@ func (suite *ParameterHostnameTestSuite) TestType() {
 	suite.Equal(config.ParameterHostname, param.Type())
 }
 
-func (suite *ParameterHostnameTestSuite) TestString() {
-	param, err := config.NewHostname("", false, nil)
-	suite.NoError(err)
-	suite.NotEmpty(param.String())
-}
-
 func (suite *ParameterHostnameTestSuite) TestIncorrectParameter() {
 	testTable := map[string][]string{
 		"is_fqdn":    {"xx", ""},

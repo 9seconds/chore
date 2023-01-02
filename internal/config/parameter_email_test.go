@@ -45,12 +45,6 @@ func (suite *ParameterEmailTestSuite) TestType() {
 	suite.Equal(config.ParameterEmail, param.Type())
 }
 
-func (suite *ParameterEmailTestSuite) TestString() {
-	param, err := config.NewEmail("", false, nil)
-	suite.NoError(err)
-	suite.NotEmpty(param.String())
-}
-
 func (suite *ParameterEmailTestSuite) TestIncorrectParameter() {
 	testTable := map[string][]string{
 		"resolve":   {"xx", ""},

@@ -40,15 +40,6 @@ func (p paramFloat) Type() string {
 	return ParameterFloat
 }
 
-func (p paramFloat) String() string {
-	return fmt.Sprintf(
-		"%q (required=%t, min=%v, max=%v)",
-		p.description,
-		p.required,
-		p.min,
-		p.max)
-}
-
 func (p paramFloat) Validate(_ context.Context, value string) error {
 	parsed, err := strconv.ParseFloat(value, 64)
 
@@ -69,8 +60,9 @@ func (p paramFloat) Validate(_ context.Context, value string) error {
 func NewFloat(description string, required bool, spec map[string]string) (Parameter, error) {
 	rValue := paramFloat{
 		baseParameter: baseParameter{
-			required:    required,
-			description: description,
+			required:      required,
+			description:   description,
+			specification: spec,
 		},
 		min: paramFloatMin,
 		max: paramFloatMax,

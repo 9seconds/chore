@@ -42,12 +42,6 @@ func (suite *ParameterUUIDTestSuite) TestType() {
 	suite.Equal(config.ParameterUUID, param.Type())
 }
 
-func (suite *ParameterUUIDTestSuite) TestString() {
-	param, err := config.NewUUID("", false, nil)
-	suite.NoError(err)
-	suite.NotEmpty(param.String())
-}
-
 func (suite *ParameterUUIDTestSuite) TestIncorrectVersion() {
 	testTable := map[string]bool{
 		"":      false,

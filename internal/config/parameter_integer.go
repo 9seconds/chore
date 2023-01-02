@@ -20,15 +20,6 @@ func (p paramInteger) Type() string {
 	return ParameterInteger
 }
 
-func (p paramInteger) String() string {
-	return fmt.Sprintf(
-		"%q (required=%t, min=%d, max=%d)",
-		p.description,
-		p.required,
-		p.min,
-		p.max)
-}
-
 func (p paramInteger) Validate(_ context.Context, value string) error {
 	parsed, err := strconv.ParseInt(value, 10, 64)
 
@@ -47,8 +38,9 @@ func (p paramInteger) Validate(_ context.Context, value string) error {
 func NewInteger(description string, required bool, spec map[string]string) (Parameter, error) {
 	rValue := paramInteger{
 		baseParameter: baseParameter{
-			required:    required,
-			description: description,
+			required:      required,
+			description:   description,
+			specification: spec,
 		},
 		min: math.MinInt64,
 		max: math.MaxInt64,

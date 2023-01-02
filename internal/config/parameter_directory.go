@@ -3,7 +3,6 @@ package config
 import (
 	"context"
 	"errors"
-	"fmt"
 )
 
 const ParameterDirectory = "directory"
@@ -17,14 +16,6 @@ type paramDirectory struct {
 
 func (p paramDirectory) Type() string {
 	return ParameterDirectory
-}
-
-func (p paramDirectory) String() string {
-	return fmt.Sprintf(
-		"%q (required=%t, %s)",
-		p.description,
-		p.required,
-		p.mixinPermissions)
 }
 
 func (p paramDirectory) Validate(_ context.Context, value string) error {
@@ -43,8 +34,9 @@ func (p paramDirectory) Validate(_ context.Context, value string) error {
 func NewDirectory(description string, required bool, spec map[string]string) (Parameter, error) {
 	param := paramDirectory{
 		baseParameter: baseParameter{
-			description: description,
-			required:    required,
+			description:   description,
+			required:      required,
+			specification: spec,
 		},
 	}
 

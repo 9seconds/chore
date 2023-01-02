@@ -3,7 +3,7 @@ package config
 import "context"
 
 type Parameter interface {
-	String() string
+	Specification() map[string]string
 	Description() string
 	Type() string
 	Required() bool
@@ -11,8 +11,9 @@ type Parameter interface {
 }
 
 type baseParameter struct {
-	required    bool
-	description string
+	required      bool
+	description   string
+	specification map[string]string
 }
 
 func (b baseParameter) Required() bool {
@@ -21,4 +22,8 @@ func (b baseParameter) Required() bool {
 
 func (b baseParameter) Description() string {
 	return b.description
+}
+
+func (b baseParameter) Specification() map[string]string {
+	return b.specification
 }

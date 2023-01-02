@@ -40,12 +40,6 @@ func (suite *ParameterIntegerTestSuite) TestType() {
 	suite.Equal(config.ParameterInteger, param.Type())
 }
 
-func (suite *ParameterIntegerTestSuite) TestString() {
-	param, err := config.NewInteger("", false, nil)
-	suite.NoError(err)
-	suite.NotEmpty(param.String())
-}
-
 func (suite *ParameterIntegerTestSuite) TestIncorrectValues() {
 	param, err := config.NewInteger("", false, map[string]string{
 		"min": "10",

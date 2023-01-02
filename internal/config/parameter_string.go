@@ -21,16 +21,6 @@ func (p paramString) Type() string {
 	return ParameterString
 }
 
-func (p paramString) String() string {
-	return fmt.Sprintf(
-		"%q (required=%t, ascii=%t, re=%v, %s)",
-		p.description,
-		p.required,
-		p.ascii,
-		p.re,
-		p.mixinStringLength)
-}
-
 func (p paramString) Validate(_ context.Context, value string) error {
 	if p.re != nil && !p.re.MatchString(value) {
 		return fmt.Errorf("value %s does not match %s", value, p.re.String())
@@ -50,8 +40,9 @@ func (p paramString) Validate(_ context.Context, value string) error {
 func NewString(description string, required bool, spec map[string]string) (Parameter, error) {
 	param := paramString{
 		baseParameter: baseParameter{
-			required:    required,
-			description: description,
+			required:      required,
+			description:   description,
+			specification: spec,
 		},
 	}
 

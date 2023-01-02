@@ -40,12 +40,6 @@ func (suite *ParameterMacTestSuite) TestType() {
 	suite.Equal(config.ParameterMac, param.Type())
 }
 
-func (suite *ParameterMacTestSuite) TestString() {
-	param, err := config.NewMac("", false, nil)
-	suite.NoError(err)
-	suite.NotEmpty(param.String())
-}
-
 func (suite *ParameterMacTestSuite) TestValidaton() {
 	testTable := map[string]bool{
 		"X":   false,

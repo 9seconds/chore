@@ -35,16 +35,6 @@ func (p paramEmail) Type() string {
 	return ParameterEmail
 }
 
-func (p paramEmail) String() string {
-	return fmt.Sprintf(
-		"%q (required=%t, resolve=%t, domain_re=%v, name_re=%v)",
-		p.description,
-		p.required,
-		p.resolve,
-		p.domainRE,
-		p.nameRE)
-}
-
 func (p paramEmail) Validate(ctx context.Context, value string) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -76,8 +66,9 @@ func (p paramEmail) Validate(ctx context.Context, value string) error {
 func NewEmail(description string, required bool, spec map[string]string) (Parameter, error) {
 	param := paramEmail{
 		baseParameter: baseParameter{
-			required:    required,
-			description: description,
+			required:      required,
+			description:   description,
+			specification: spec,
 		},
 	}
 

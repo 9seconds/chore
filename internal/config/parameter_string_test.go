@@ -40,12 +40,6 @@ func (suite *ParameterStringTestSuite) TestType() {
 	suite.Equal(config.ParameterString, param.Type())
 }
 
-func (suite *ParameterStringTestSuite) TestString() {
-	param, err := config.NewString("", false, nil)
-	suite.NoError(err)
-	suite.NotEmpty(param.String())
-}
-
 func (suite *ParameterStringTestSuite) TestIncorrectRegexp() {
 	_, err := config.NewString("", false, map[string]string{
 		"regexp": "[",

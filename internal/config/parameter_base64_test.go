@@ -40,12 +40,6 @@ func (suite *ParameterBase64TestSuite) TestType() {
 	suite.Equal(config.ParameterBase64, param.Type())
 }
 
-func (suite *ParameterBase64TestSuite) TestString() {
-	param, err := config.NewBase64("", false, nil)
-	suite.NoError(err)
-	suite.NotEmpty(param.String())
-}
-
 func (suite *ParameterBase64TestSuite) TestIncorrectLength() {
 	testNames := []string{
 		"min_length",

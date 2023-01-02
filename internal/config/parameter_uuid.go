@@ -29,10 +29,6 @@ func (p paramUUID) Type() string {
 	return ParameterUUID
 }
 
-func (p paramUUID) String() string {
-	return fmt.Sprintf("%q (required=%t, version=%d)", p.description, p.required, p.version)
-}
-
 func (p paramUUID) Validate(_ context.Context, value string) error {
 	parsed, err := uuid.FromString(value)
 	if err != nil {
@@ -51,8 +47,9 @@ func (p paramUUID) Validate(_ context.Context, value string) error {
 func NewUUID(description string, required bool, spec map[string]string) (Parameter, error) {
 	param := paramUUID{
 		baseParameter: baseParameter{
-			required:    required,
-			description: description,
+			required:      required,
+			description:   description,
+			specification: spec,
 		},
 	}
 

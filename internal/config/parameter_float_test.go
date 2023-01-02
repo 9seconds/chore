@@ -40,12 +40,6 @@ func (suite *ParameterFloatTestSuite) TestType() {
 	suite.Equal(config.ParameterFloat, param.Type())
 }
 
-func (suite *ParameterFloatTestSuite) TestString() {
-	param, err := config.NewFloat("", false, nil)
-	suite.NoError(err)
-	suite.NotEmpty(param.String())
-}
-
 func (suite *ParameterFloatTestSuite) TestIncorrectValues() {
 	param, err := config.NewFloat("", false, map[string]string{
 		"min": "10",

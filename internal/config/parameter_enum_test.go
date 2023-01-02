@@ -44,14 +44,6 @@ func (suite *ParameterEnumTestSuite) TestType() {
 	suite.Equal(config.ParameterEnum, param.Type())
 }
 
-func (suite *ParameterEnumTestSuite) TestString() {
-	param, err := config.NewEnum("", false, map[string]string{
-		"choices": "xxx",
-	})
-	suite.NoError(err)
-	suite.NotEmpty(param.String())
-}
-
 func (suite *ParameterEnumTestSuite) TestNoChoices() {
 	_, err := config.NewEnum("", false, map[string]string{
 		"choices": ",,,,",

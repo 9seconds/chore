@@ -16,10 +16,6 @@ func (p paramXML) Type() string {
 	return ParameterXML
 }
 
-func (p paramXML) String() string {
-	return fmt.Sprintf("%q (required=%t)", p.description, p.required)
-}
-
 func (p paramXML) Validate(_ context.Context, value string) error {
 	var doc interface{}
 
@@ -33,8 +29,9 @@ func (p paramXML) Validate(_ context.Context, value string) error {
 func NewXML(description string, required bool, spec map[string]string) (Parameter, error) {
 	return paramXML{
 		baseParameter: baseParameter{
-			required:    required,
-			description: description,
+			required:      required,
+			description:   description,
+			specification: spec,
 		},
 	}, nil
 }

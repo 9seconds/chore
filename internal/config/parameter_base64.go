@@ -35,14 +35,6 @@ func (p paramBase64) Type() string {
 	return ParameterBase64
 }
 
-func (p paramBase64) String() string {
-	return fmt.Sprintf(
-		"%q (required=%t, encoding=%s)",
-		p.description,
-		p.required,
-		p.encodingName)
-}
-
 func (p paramBase64) Validate(_ context.Context, value string) error {
 	if _, err := p.encoding.DecodeString(value); err != nil {
 		return fmt.Errorf("incorrectly encoded value: %w", err)
@@ -54,8 +46,9 @@ func (p paramBase64) Validate(_ context.Context, value string) error {
 func NewBase64(description string, required bool, spec map[string]string) (Parameter, error) {
 	param := paramBase64{
 		baseParameter: baseParameter{
-			required:    required,
-			description: description,
+			required:      required,
+			description:   description,
+			specification: spec,
 		},
 		encodingName: spec["encoding"],
 	}

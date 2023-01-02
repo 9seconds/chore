@@ -40,12 +40,6 @@ func (suite *ParameterSemverTestSuite) TestType() {
 	suite.Equal(config.ParameterSemver, param.Type())
 }
 
-func (suite *ParameterSemverTestSuite) TestString() {
-	param, err := config.NewSemver("", false, nil)
-	suite.NoError(err)
-	suite.NotEmpty(param.String())
-}
-
 func (suite *ParameterSemverTestSuite) TestIncorrectSemver() {
 	param, err := config.NewSemver("", false, nil)
 	suite.NoError(err)

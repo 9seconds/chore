@@ -40,12 +40,6 @@ func (suite *ParameterHexTestSuite) TestType() {
 	suite.Equal(config.ParameterHex, param.Type())
 }
 
-func (suite *ParameterHexTestSuite) TestString() {
-	param, err := config.NewHex("", false, nil)
-	suite.NoError(err)
-	suite.NotEmpty(param.String())
-}
-
 func (suite *ParameterHexTestSuite) TestIncorrectLength() {
 	testNames := []string{
 		"min_length",

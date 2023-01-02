@@ -19,14 +19,6 @@ func (p parameterSemver) Type() string {
 	return ParameterSemver
 }
 
-func (p parameterSemver) String() string {
-	return fmt.Sprintf(
-		"%q (required=%t, constraint=%s)",
-		p.description,
-		p.required,
-		p.constraint)
-}
-
 func (p parameterSemver) Validate(_ context.Context, value string) error {
 	ver, err := semver.NewVersion(value)
 	if err != nil {
@@ -47,8 +39,9 @@ func (p parameterSemver) Validate(_ context.Context, value string) error {
 func NewSemver(description string, required bool, spec map[string]string) (Parameter, error) {
 	param := parameterSemver{
 		baseParameter: baseParameter{
-			required:    required,
-			description: description,
+			required:      required,
+			description:   description,
+			specification: spec,
 		},
 	}
 

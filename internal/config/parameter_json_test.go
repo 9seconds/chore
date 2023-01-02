@@ -40,12 +40,6 @@ func (suite *ParameterJSONTestSuite) TestType() {
 	suite.Equal(config.ParameterJSON, param.Type())
 }
 
-func (suite *ParameterJSONTestSuite) TestString() {
-	param, err := config.NewJSON("", false, nil)
-	suite.NoError(err)
-	suite.NotEmpty(param.String())
-}
-
 func (suite *ParameterJSONTestSuite) TestValidaton() {
 	testTable := map[string]bool{
 		"":           false,

@@ -28,16 +28,6 @@ func (p paramIP) Type() string {
 	return ParameterIP
 }
 
-func (p paramIP) String() string {
-	return fmt.Sprintf(
-		"%q (required=%t, resolve=%t, allowedSubnets=%v, forbiddenSubnets=%v)",
-		p.description,
-		p.required,
-		p.resolve,
-		p.allowedSubnets,
-		p.forbiddenSubnets)
-}
-
 func (p paramIP) Validate(ctx context.Context, value string) error {
 	addr := net.ParseIP(value)
 	if addr == nil {
@@ -78,8 +68,9 @@ func (p paramIP) Validate(ctx context.Context, value string) error {
 func NewIP(description string, required bool, spec map[string]string) (Parameter, error) {
 	param := paramIP{
 		baseParameter: baseParameter{
-			required:    required,
-			description: description,
+			required:      required,
+			description:   description,
+			specification: spec,
 		},
 	}
 

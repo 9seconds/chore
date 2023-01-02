@@ -44,12 +44,6 @@ func (suite *ParameterURLTestSuite) TestType() {
 	suite.Equal(config.ParameterURL, param.Type())
 }
 
-func (suite *ParameterURLTestSuite) TestString() {
-	param, err := config.NewURL("", false, nil)
-	suite.NoError(err)
-	suite.NotEmpty(param.String())
-}
-
 func (suite *ParameterStringTestSuite) TestIncorrectParameter() {
 	testTable := map[string][]string{
 		"resolve":   {"xx", ""},

@@ -44,12 +44,6 @@ func (suite *ParameterIPTestSuite) TestType() {
 	suite.Equal(config.ParameterIP, param.Type())
 }
 
-func (suite *ParameterIPTestSuite) TestString() {
-	param, err := config.NewIP("", false, nil)
-	suite.NoError(err)
-	suite.NotEmpty(param.String())
-}
-
 func (suite *ParameterIPTestSuite) TestIncorrectParameter() {
 	testTable := map[string][]string{
 		"resolve":           {"xx", ""},

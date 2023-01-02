@@ -26,18 +26,6 @@ func (p paramURL) Type() string {
 	return ParameterURL
 }
 
-func (p paramURL) String() string {
-	return fmt.Sprintf(
-		"%q (required=%t, scheme=%s, domain_re=%v, path_re=%v, user_re=%v, resolve=%t)",
-		p.description,
-		p.required,
-		p.scheme,
-		p.domainRE,
-		p.pathRE,
-		p.userRE,
-		p.resolve)
-}
-
 func (p paramURL) Validate(ctx context.Context, value string) error { //nolint: cyclop
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -83,8 +71,9 @@ func (p paramURL) Validate(ctx context.Context, value string) error { //nolint: 
 func NewURL(description string, required bool, spec map[string]string) (Parameter, error) {
 	param := paramURL{
 		baseParameter: baseParameter{
-			required:    required,
-			description: description,
+			required:      required,
+			description:   description,
+			specification: spec,
 		},
 		scheme: spec["scheme"],
 	}

@@ -45,12 +45,6 @@ func (suite *ParameterDatetimeTestSuite) TestType() {
 	suite.Equal(config.ParameterDatetime, param.Type())
 }
 
-func (suite *ParameterDatetimeTestSuite) TestString() {
-	param, err := config.NewDatetime("", false, nil)
-	suite.NoError(err)
-	suite.NotEmpty(param.String())
-}
-
 func (suite *ParameterDatetimeTestSuite) TestIncorrectParameters() {
 	for _, testName := range []string{"future_delta", "past_delta", "rounded_to"} {
 		testName := testName
