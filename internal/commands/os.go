@@ -41,8 +41,15 @@ func (o *osCommand) Pid() int {
 }
 
 func (o *osCommand) Start() error {
+	var (
+		err  error
+		boot bool
+	)
+
 	o.startOnce.Do(func() {
+		err = o.cmd.Start()
 		o.startTime = time.Now()
+		boot = true
 
 		signal.Notify(o.sigChan, SignalsToRelay...)
 
@@ -73,6 +80,10 @@ func (o *osCommand) Start() error {
 			}
 		}()
 	})
+
+	if boot {
+		return err
+	}
 
 	return o.cmd.Start()
 }
