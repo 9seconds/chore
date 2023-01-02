@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -12,12 +13,24 @@ import (
 )
 
 type CliCmdRun struct {
+	Timeout cli.Timeout `short:"t" help:"Limit execution time."`
+
 	Namespace cli.Namespace `arg:"" help:"Prefix of the script namespace."`
 	Script    string        `arg:"" help:"Prefix of the script name."`
 	Args      []string      `arg:"" optional:"" passthrough:"" help:"Script arguments to use."`
 }
 
-func (c *CliCmdRun) Run(ctx cli.Context) error {
+func (c *CliCmdRun) Run(appCtx cli.Context) error {
+	var (
+		ctx    context.Context = appCtx
+		cancel context.CancelFunc
+	)
+
+	if c.Timeout.Value() != 0 {
+		ctx, cancel = context.WithTimeout(ctx, c.Timeout.Value())
+		defer cancel()
+	}
+
 	scr, err := script.FindScript(c.Namespace.Value(), c.Script)
 	if err != nil {
 		return fmt.Errorf("cannot find out script: %w", err)
