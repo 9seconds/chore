@@ -14,6 +14,7 @@ require (
 	github.com/denisbrodbeck/machineid v1.0.1
 	github.com/gabriel-vasile/mimetype v1.4.1
 	github.com/go-git/go-git/v5 v5.5.1
+	github.com/gofrs/flock v0.8.1
 	github.com/gofrs/uuid v4.3.1+incompatible
 	github.com/hjson/hjson-go/v4 v4.3.0
 	github.com/jarcoal/httpmock v1.2.0

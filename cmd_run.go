@@ -5,15 +5,20 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/9seconds/chore/internal/argparse"
 	"github.com/9seconds/chore/internal/cli"
 	"github.com/9seconds/chore/internal/commands"
 	"github.com/9seconds/chore/internal/script"
+	"github.com/gofrs/flock"
 )
+
+const fileLockPollPeriod = 100 * time.Millisecond
 
 type CliCmdRun struct {
 	Timeout cli.Timeout `short:"t" help:"Limit execution time."`
+	Lock    bool        `short:"l" help:"Acquire exclusive file lock on a script."`
 
 	Namespace cli.Namespace `arg:"" help:"Prefix of the script namespace."`
 	Script    string        `arg:"" help:"Prefix of the script name."`
@@ -67,6 +72,13 @@ func (c *CliCmdRun) Run(appCtx cli.Context) error {
 		os.Stdout,
 		os.Stderr)
 
+	lock, err := c.lockScript(ctx, scr.Path())
+	if err != nil {
+		return err
+	}
+
+	defer lock.Unlock() //nolint: errcheck
+
 	if err := cmd.Start(ctx); err != nil {
 		return fmt.Errorf("cannot start command: %w", err)
 	}
@@ -87,4 +99,28 @@ func (c *CliCmdRun) Run(appCtx cli.Context) error {
 		result.ElapsedTime)
 
 	return result
+}
+
+func (c *CliCmdRun) lockScript(ctx context.Context, path string) (*flock.Flock, error) {
+	var (
+		acquired bool
+		err      error
+	)
+
+	lock := flock.New(path)
+
+	if c.Lock {
+		acquired, err = lock.TryLockContext(ctx, fileLockPollPeriod)
+	} else {
+		acquired, err = lock.TryRLockContext(ctx, fileLockPollPeriod)
+	}
+
+	switch {
+	case err != nil:
+		return nil, fmt.Errorf("cannot acquire lock on %s: %w", path, err)
+	case !acquired:
+		return nil, fmt.Errorf("cannot acquire lock on %s", path)
+	}
+
+	return lock, nil
 }
