@@ -197,12 +197,6 @@ func (c *CliCmdShow) showPrettyDataGlobals(scr *script.Script) {
 	table.AddLine("Network:", strconv.FormatBool(conf.Network))
 	table.AddLine("Git:", conf.Git.String())
 
-	if conf.AsUser == "" {
-		table.AddLine("As user:", "<current>")
-	} else {
-		table.AddLine("As user:", conf.AsUser)
-	}
-
 	table.Print()
 }
 

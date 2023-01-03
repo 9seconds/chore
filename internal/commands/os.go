@@ -126,13 +126,7 @@ func NewOS(ctx context.Context, script *script.Script,
 ) Command {
 	ctx, cancel := context.WithCancel(ctx)
 
-	cmdLine := []string{}
-
-	if user := script.Config().AsUser; user != "" {
-		cmdLine = append(cmdLine, "sudo", "-SEH", "-u", user, "--")
-	}
-
-	cmdLine = append(cmdLine, script.Path())
+	cmdLine := []string{script.Path()}
 	cmdLine = append(cmdLine, args...)
 
 	cmd := exec.CommandContext(ctx, cmdLine[0], cmdLine[1:]...)
