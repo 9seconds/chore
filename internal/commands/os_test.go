@@ -2,6 +2,7 @@ package commands_test
 
 import (
 	"bytes"
+	"context"
 	"io"
 	"os"
 	"testing"
@@ -68,7 +69,6 @@ func (suite *OSTestSuite) SetupTest() {
 
 func (suite *OSTestSuite) TestExecuteCommand() {
 	cmd := commands.NewOS(
-		suite.Context(),
 		suite.s,
 		suite.environ,
 		suite.args,
@@ -78,11 +78,11 @@ func (suite *OSTestSuite) TestExecuteCommand() {
 
 	suite.Equal(0, cmd.Pid())
 
-	suite.NoError(cmd.Start())
+	suite.NoError(cmd.Start(suite.Context()))
 	suite.NotEqual(0, cmd.Pid())
 
-	result, err := cmd.Wait()
-	suite.NoError(err)
+	result := cmd.Wait()
+	suite.True(result.Ok())
 	suite.Equal(0, result.ExitCode)
 	suite.Less(result.UserTime, time.Second)
 	suite.Less(result.SystemTime, time.Second)
@@ -93,7 +93,6 @@ func (suite *OSTestSuite) TestExecuteCommand() {
 
 func (suite *OSTestSuite) TestExitCode() {
 	cmd := commands.NewOS(
-		suite.Context(),
 		suite.s,
 		suite.environ,
 		suite.args,
@@ -103,11 +102,31 @@ func (suite *OSTestSuite) TestExitCode() {
 
 	suite.EnsureScript("x", "y", "exit 3")
 
-	suite.NoError(cmd.Start())
-	result, err := cmd.Wait()
-	suite.NoError(err)
+	suite.NoError(cmd.Start(suite.Context()))
+	result := cmd.Wait()
+	suite.False(result.Ok())
 
 	suite.Equal(3, result.ExitCode)
+}
+
+func (suite *OSTestSuite) TestTimeout() {
+	ctx, cancel := context.WithTimeout(suite.Context(), time.Second)
+	defer cancel()
+
+	cmd := commands.NewOS(
+		suite.s,
+		suite.environ,
+		suite.args,
+		suite.stdin,
+		suite.stdout,
+		suite.stderr)
+
+	suite.EnsureScript("x", "y", "exec sleep 20")
+
+	suite.NoError(cmd.Start(ctx))
+	result := cmd.Wait()
+	suite.False(result.Ok())
+	suite.Equal(-1, result.ExitCode)
 }
 
 func TestOs(t *testing.T) {

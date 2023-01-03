@@ -60,7 +60,6 @@ func (c *CliCmdRun) Run(appCtx cli.Context) error {
 	}
 
 	cmd := commands.NewOS(
-		ctx,
 		scr,
 		environ,
 		args.Positional,
@@ -68,15 +67,15 @@ func (c *CliCmdRun) Run(appCtx cli.Context) error {
 		os.Stdout,
 		os.Stderr)
 
-	if err := cmd.Start(); err != nil {
+	if err := cmd.Start(ctx); err != nil {
 		return fmt.Errorf("cannot start command: %w", err)
 	}
 
 	log.Printf("command %s has started as %d", scr, cmd.Pid())
 
-	result, err := cmd.Wait()
-	if err != nil {
-		return fmt.Errorf("cannot correctly finish command: %w", err)
+	result := cmd.Wait()
+	if !result.Ok() {
+		return fmt.Errorf("cannot correctly finish command: %w", result)
 	}
 
 	log.Printf("command %d exit with exit code %d", cmd.Pid(), result.ExitCode)
@@ -87,7 +86,5 @@ func (c *CliCmdRun) Run(appCtx cli.Context) error {
 		result.SystemTime,
 		result.ElapsedTime)
 
-	return commands.ExitError{
-		Result: result,
-	}
+	return result
 }

@@ -1,14 +1,15 @@
 package commands
 
 import (
+	"context"
 	"fmt"
 	"time"
 )
 
 type Command interface {
 	Pid() int
-	Start() error
-	Wait() (ExecutionResult, error)
+	Start(context.Context) error
+	Wait() ExecutionResult
 }
 
 type ExecutionResult struct {
@@ -16,19 +17,25 @@ type ExecutionResult struct {
 	UserTime    time.Duration
 	SystemTime  time.Duration
 	ElapsedTime time.Duration
+
+	err error
 }
 
-type ExitError struct {
-	Result ExecutionResult
+func (e ExecutionResult) Ok() bool {
+	return e.Code() == 0
 }
 
-func (e ExitError) Error() string {
+func (e ExecutionResult) Code() int {
+	return e.ExitCode
+}
+
+func (e ExecutionResult) Error() string {
 	return fmt.Sprintf(
 		"command has finished with %d in %v",
-		e.Result.ExitCode,
-		e.Result.ElapsedTime)
+		e.ExitCode,
+		e.ElapsedTime)
 }
 
-func (e ExitError) Code() int {
-	return e.Result.ExitCode
+func (e ExecutionResult) Unwrap() error {
+	return e.err
 }

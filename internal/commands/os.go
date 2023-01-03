@@ -4,32 +4,19 @@ import (
 	"context"
 	"errors"
 	"io"
-	"log"
 	"os"
 	"os/exec"
-	"os/signal"
 	"sync"
 	"time"
 
 	"github.com/9seconds/chore/internal/script"
 )
 
-var ErrNotStarted = errors.New("process not started")
-
 type osCommand struct {
 	cmd       *exec.Cmd
-	ctx       context.Context
-	ctxCancel context.CancelFunc
-
-	finishErr error
-
-	startTime  time.Time
-	finishTime time.Time
-	startOnce  sync.Once
-	finishOnce sync.Once
-
-	sigChan chan os.Signal
-	sigDone chan struct{}
+	waiters   *sync.WaitGroup
+	startTime time.Time
+	cancel    context.CancelFunc
 }
 
 func (o *osCommand) Pid() int {
@@ -40,96 +27,56 @@ func (o *osCommand) Pid() int {
 	return 0
 }
 
-func (o *osCommand) Start() error {
-	var (
-		err  error
-		boot bool
-	)
+func (o *osCommand) Start(ctx context.Context) error {
+	ctx, cancel := context.WithCancel(ctx)
 
-	o.startOnce.Do(func() {
-		err = o.cmd.Start()
-		o.startTime = time.Now()
-		boot = true
+	o.cancel = cancel
 
-		signal.Notify(o.sigChan, SignalsToRelay...)
-
-		go func() {
-			defer func() {
-				signal.Stop(o.sigChan)
-				close(o.sigDone)
-			}()
-
-			for {
-				select {
-				case <-o.ctx.Done():
-					return
-				case sig := <-o.sigChan:
-					switch {
-					case o.cmd.Process == nil:
-						continue
-					case o.cmd.ProcessState != nil && o.cmd.ProcessState.Exited():
-						return
-					}
-
-					log.Printf("!end %s to %d", sig, o.cmd.Process.Pid)
-
-					if err := o.cmd.Process.Signal(sig); err != nil {
-						log.Printf("cannot send %v to process %d: %v", sig, o.Pid(), err)
-					}
-				}
-			}
-		}()
-	})
-
-	if boot {
+	if err := o.cmd.Start(); err != nil {
 		return err
 	}
 
-	return o.cmd.Start()
+	o.startTime = time.Now()
+
+	o.waiters.Add(2) //nolint: gomnd
+
+	go osSidecarSignals(ctx, o.waiters, o.cmd)
+
+	go osSidecarGracefulShutdown(ctx, o.waiters, o.cmd)
+
+	return nil
 }
 
-func (o *osCommand) Wait() (ExecutionResult, error) {
-	result := ExecutionResult{}
+func (o *osCommand) Wait() ExecutionResult {
+	err := o.cmd.Wait()
+	finishTime := time.Now()
 
-	if o.startTime.IsZero() {
-		return result, ErrNotStarted
-	}
+	o.cancel()
+	o.waiters.Wait()
 
-	o.finishOnce.Do(func() {
-		o.finishErr = o.cmd.Wait()
-		o.finishTime = time.Now()
-		o.ctxCancel()
-		<-o.sigDone
-	})
-
-	if o.cmd.ProcessState != nil {
-		result.ExitCode = o.cmd.ProcessState.ExitCode()
-		result.UserTime = o.cmd.ProcessState.UserTime()
-		result.SystemTime = o.cmd.ProcessState.SystemTime()
-		result.ElapsedTime = o.finishTime.Sub(o.startTime)
+	result := ExecutionResult{
+		ElapsedTime: finishTime.Sub(o.startTime),
 	}
 
 	var exitErr *exec.ExitError
 
-	if errors.As(o.finishErr, &exitErr) {
+	switch {
+	case o.cmd.ProcessState != nil:
+		result.ExitCode = o.cmd.ProcessState.ExitCode()
+		result.UserTime = o.cmd.ProcessState.UserTime()
+		result.SystemTime = o.cmd.ProcessState.SystemTime()
+	case errors.As(err, &exitErr):
 		result.ExitCode = exitErr.ExitCode()
-
-		return result, nil
 	}
 
-	return result, o.finishErr
+	return result
 }
 
-func NewOS(ctx context.Context, script *script.Script,
+func NewOS(script *script.Script,
 	environ, args []string,
 	stdin io.Reader, stdout, stderr io.Writer,
 ) Command {
-	ctx, cancel := context.WithCancel(ctx)
-
-	cmdLine := []string{script.Path()}
-	cmdLine = append(cmdLine, args...)
-
-	cmd := exec.CommandContext(ctx, cmdLine[0], cmdLine[1:]...)
+	cmd := exec.Command(script.Path(), args...)
 
 	cmd.Env = append(os.Environ(), environ...)
 	cmd.Stdin = stdin
@@ -137,10 +84,7 @@ func NewOS(ctx context.Context, script *script.Script,
 	cmd.Stderr = stderr
 
 	return &osCommand{
-		cmd:       cmd,
-		ctx:       ctx,
-		ctxCancel: cancel,
-		sigChan:   make(chan os.Signal, 1),
-		sigDone:   make(chan struct{}),
+		cmd:     cmd,
+		waiters: &sync.WaitGroup{},
 	}
 }

@@ -7,6 +7,11 @@ import (
 	"syscall"
 )
 
+const (
+	SignalInterrupt = syscall.SIGTERM
+	SignalKill      = syscall.SIGKILL
+)
+
 var SignalsToRelay = []os.Signal{
 	syscall.SIGABRT,
 	syscall.SIGALRM,

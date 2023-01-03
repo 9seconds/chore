@@ -54,10 +54,10 @@ func main() {
 
 	cancel()
 
-	var exitErr commands.ExitError
+	var executionResult commands.ExecutionResult
 
-	if errors.As(err, &exitErr) {
-		os.Exit(exitErr.Code())
+	if errors.As(err, &executionResult) {
+		os.Exit(executionResult.Code())
 	}
 
 	cliCtx.FatalIfErrorf(err)
