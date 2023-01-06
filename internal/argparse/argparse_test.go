@@ -18,7 +18,7 @@ func (suite *ParseTestSuite) TestInvalidArgument() {
 }
 
 func (suite *ParseTestSuite) TestUnexpectedFlag() {
-	for _, testName := range []string{"+c", "-c"} {
+	for _, testName := range []string{"+c", "!c"} {
 		testName := testName
 
 		suite.T().Run(testName, func(t *testing.T) {
@@ -29,7 +29,7 @@ func (suite *ParseTestSuite) TestUnexpectedFlag() {
 }
 
 func (suite *ParseTestSuite) TestIncorrectFlag() {
-	for _, testValue := range []string{"-", "+"} {
+	for _, testValue := range []string{"!", "+"} {
 		testValue := testValue
 
 		suite.T().Run(testValue, func(t *testing.T) {
@@ -54,14 +54,14 @@ func (suite *ParseTestSuite) TestMixed() {
 		"c=1",
 		"+x",
 		"+k",
-		"-k",
-		"-k",
-		"-j",
+		"!k",
+		"!k",
+		"!j",
 		"k=2",
 		"c=3",
 		"arg1",
 		"arg2",
-		":-j",
+		":!j",
 		":k=v",
 	})
 
@@ -75,7 +75,7 @@ func (suite *ParseTestSuite) TestMixed() {
 		"k": argparse.FlagFalse,
 		"j": argparse.FlagFalse,
 	}, parsed.Flags)
-	suite.Equal([]string{"arg1", "arg2", "-j", "k=v"}, parsed.Positional)
+	suite.Equal([]string{"arg1", "arg2", "!j", "k=v"}, parsed.Positional)
 }
 
 func (suite *ParseTestSuite) TestExplicitPositionals() {

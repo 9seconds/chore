@@ -31,7 +31,7 @@ func (s *Script) Config() *config.Config {
 }
 
 func (s *Script) NamespacePath() string {
-	return filepath.Join(env.RootPathConfig(), s.Namespace)
+	return env.PathConfigNamespace(s.Namespace)
 }
 
 func (s *Script) Path() string {

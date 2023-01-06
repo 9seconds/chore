@@ -7,13 +7,17 @@ import (
 
 	"github.com/9seconds/chore/internal/env"
 	"github.com/9seconds/chore/internal/gc"
+	"github.com/9seconds/chore/internal/script"
 	"github.com/9seconds/chore/internal/testlib"
+	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )
 
 type GCTestSuite struct {
 	suite.Suite
 	testlib.CustomRootTestSuite
+
+	validScripts []*script.Script
 }
 
 func (suite *GCTestSuite) EqualStrings(expected, actual []string) {
@@ -43,10 +47,29 @@ func (suite *GCTestSuite) SetupTest() {
 		filepath.Join(suite.StateScriptPath("x", "valid_script_without_config"), "a"),
 	)
 	suite.EnsureDir(suite.CacheScriptPath("x", "valid_script_with_config"))
+
+	namespaces, err := script.ListNamespaces()
+	require.NoError(suite.T(), err)
+
+	suite.validScripts = nil
+
+	for _, namespace := range namespaces {
+		scripts, err := script.ListScripts(namespace)
+		require.NoError(suite.T(), err)
+
+		for _, name := range scripts {
+			suite.validScripts = append(suite.validScripts, &script.Script{
+				Namespace:  namespace,
+				Executable: name,
+			})
+		}
+	}
+
+	require.NotEmpty(suite.T(), suite.validScripts)
 }
 
 func (suite *GCTestSuite) TestCollect() {
-	filenames, err := gc.Collect()
+	filenames, err := gc.Collect(suite.validScripts)
 	suite.NoError(err)
 
 	suite.EqualStrings([]string{
@@ -60,7 +83,7 @@ func (suite *GCTestSuite) TestCollect() {
 }
 
 func (suite *GCTestSuite) TestRemove() {
-	filenames, err := gc.Collect()
+	filenames, err := gc.Collect(suite.validScripts)
 	suite.NoError(err)
 
 	suite.NoError(gc.Remove(filenames))

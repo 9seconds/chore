@@ -2,39 +2,17 @@ package main
 
 import (
 	"context"
-	"errors"
-	"io"
 	"log"
-	"os"
 	"os/signal"
 	"syscall"
 
 	"github.com/9seconds/chore/internal/cli"
-	"github.com/9seconds/chore/internal/commands"
-	"github.com/alecthomas/kong"
 )
 
+var version = "dev"
+
 func main() {
-	cliCtx := kong.Parse(
-		&CLI,
-		kong.Name("chore"),
-		kong.Description("Execution environment for a small helper scripts."),
-		kong.UsageOnError(),
-		kong.ConfigureHelp(kong.HelpOptions{
-			Compact:   true,
-			Summary:   true,
-			Tree:      true,
-			FlagsLast: true,
-		}),
-		kong.Vars{
-			"version": version,
-		})
-
 	log.SetFlags(log.Lshortfile | log.LstdFlags)
-
-	if !CLI.Debug {
-		log.SetOutput(io.Discard)
-	}
 
 	ctx, cancel := signal.NotifyContext(
 		context.Background(),
@@ -48,17 +26,23 @@ func main() {
 		log.Println("application context is closed")
 	}()
 
-	err := cliCtx.Run(cli.Context{
-		Context: ctx,
-	})
+	root := cli.NewRoot(version)
 
-	cancel()
+	root.InitDefaultCompletionCmd()
+	root.InitDefaultHelpFlag()
+	root.InitDefaultVersionFlag()
+	root.InitDefaultHelpCmd()
 
-	var executionResult commands.ExecutionResult
+	root.AddCommand(
+		cli.NewRun(),
+		cli.NewShow(),
+		cli.NewEditConfig(),
+		cli.NewEditScript(),
+		cli.NewGC())
 
-	if errors.As(err, &executionResult) {
-		os.Exit(executionResult.Code())
+	if err := root.ExecuteContext(ctx); err != nil {
+		log.Fatal(err)
 	}
 
-	cliCtx.FatalIfErrorf(err)
+	cancel()
 }

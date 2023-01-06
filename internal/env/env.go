@@ -8,6 +8,8 @@ import (
 
 const (
 	ChoreDir = "chore"
+
+	DebugEnabled = "1"
 )
 
 const (
@@ -23,6 +25,8 @@ const (
 	EnvOSVersionPrefix = EnvOSPrefix + "VERSION_"
 	EnvGitPrefix       = Prefix + "GIT_"
 	EnvUserPrefix      = Prefix + "USER_"
+
+	Debug = Prefix + "DEBUG"
 
 	EnvNamespace = Prefix + "NAMESPACE"
 	EnvCaller    = Prefix + "CALLER"
@@ -112,4 +116,8 @@ func RootPathState() string {
 
 func RootPathRuntime() string {
 	return filepath.Join(xdg.RuntimeDir, ChoreDir)
+}
+
+func PathConfigNamespace(namespace string) string {
+	return filepath.Join(RootPathConfig(), namespace)
 }

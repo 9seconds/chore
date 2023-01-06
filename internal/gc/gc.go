@@ -15,12 +15,7 @@ import (
 	"github.com/tchap/go-patricia/v2/patricia"
 )
 
-func Collect() ([]string, error) { //nolint: cyclop
-	validScripts, err := script.SearchScripts("", "")
-	if err != nil {
-		return nil, fmt.Errorf("cannot detect valid scripts: %w", err)
-	}
-
+func Collect(validScripts []*script.Script) ([]string, error) { //nolint: cyclop
 	safeFiles := map[string]bool{}
 	safePaths := patricia.NewTrie()
 

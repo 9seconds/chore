@@ -24,93 +24,24 @@ func (suite *ListTestSuite) SetupTest() {
 	suite.EnsureDir(suite.ConfigScriptPath("nb", "b"))
 }
 
-type ListNamespacesTestSuite struct {
-	ListTestSuite
-}
-
-func (suite *ListNamespacesTestSuite) TestListAll() {
-	namespaces, err := script.ListNamespaces("")
+func (suite *ListTestSuite) TestListNamespaces() {
+	namespaces, err := script.ListNamespaces()
 	suite.NoError(err)
 	suite.Equal([]string{"nb", "ns"}, namespaces)
 }
 
-func (suite *ListNamespacesTestSuite) TestPrefixed() {
-	namespaces, err := script.ListNamespaces("ns")
-	suite.NoError(err)
-	suite.Equal([]string{"ns"}, namespaces)
-}
-
-func (suite *ListNamespacesTestSuite) TestEmpty() {
-	namespaces, err := script.ListNamespaces("f")
-	suite.NoError(err)
-	suite.Empty(namespaces)
-}
-
-type ListScriptsTestSuite struct {
-	ListTestSuite
-}
-
-func (suite *ListScriptsTestSuite) TestListAll() {
-	scripts, err := script.ListScripts("nb", "")
+func (suite *ListTestSuite) TestListScripts() {
+	scripts, err := script.ListScripts("nb")
 	suite.NoError(err)
 	suite.Equal([]string{"aa", "ab"}, scripts)
 }
 
-func (suite *ListScriptsTestSuite) TestPrefixed() {
-	scripts, err := script.ListScripts("nb", "aa")
-	suite.NoError(err)
-	suite.Equal([]string{"aa"}, scripts)
-}
-
-func (suite *ListScriptsTestSuite) TestNothing() {
-	scripts, err := script.ListScripts("nb", "b")
+func (suite *ListTestSuite) TestListScriptsNothing() {
+	scripts, err := script.ListScripts("ns")
 	suite.NoError(err)
 	suite.Empty(scripts)
 }
 
-func (suite *ListScriptsTestSuite) TestEmpty() {
-	scripts, err := script.ListScripts("ns", "")
-	suite.NoError(err)
-	suite.Empty(scripts)
-}
-
-type FindScriptTestSuite struct {
-	ListTestSuite
-}
-
-func (suite *FindScriptTestSuite) TestExactFound() {
-	scr, err := script.FindScript("nb", "aa")
-	suite.NoError(err)
-	suite.Equal("nb", scr.Namespace)
-	suite.Equal("aa", scr.Executable)
-}
-
-func (suite *FindScriptTestSuite) TestNotExactFound() {
-	scr, err := script.FindScript("n", "aa")
-	suite.NoError(err)
-	suite.Equal("nb", scr.Namespace)
-	suite.Equal("aa", scr.Executable)
-}
-
-func (suite *FindScriptTestSuite) TestAmbigous() {
-	_, err := script.FindScript("n", "a")
-	suite.ErrorContains(err, "aa")
-	suite.ErrorContains(err, "ab")
-}
-
-func (suite *FindScriptTestSuite) TestNotFound() {
-	_, err := script.FindScript("n", "b")
-	suite.ErrorContains(err, "cannot find such script")
-}
-
-func TestListNamespaces(t *testing.T) {
-	suite.Run(t, &ListNamespacesTestSuite{})
-}
-
-func TestListScripts(t *testing.T) {
-	suite.Run(t, &ListScriptsTestSuite{})
-}
-
-func TestFindScript(t *testing.T) {
-	suite.Run(t, &FindScriptTestSuite{})
+func TestList(t *testing.T) {
+	suite.Run(t, &ListTestSuite{})
 }
