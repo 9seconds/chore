@@ -53,12 +53,16 @@ func GetAccessMode(value string) (AccessMode, error) {
 }
 
 func GetRepo() (*git.Repository, error) {
-	currentDir, err := os.Getwd()
+	gitDir, err := os.Getwd()
 	if err != nil {
 		return nil, fmt.Errorf("cannot find out current working dir: %w", err)
 	}
 
-	repo, err := git.PlainOpenWithOptions(currentDir, &git.PlainOpenOptions{
+	if value, ok := os.LookupEnv("GIT_DIR"); ok {
+		gitDir = value
+	}
+
+	repo, err := git.PlainOpenWithOptions(gitDir, &git.PlainOpenOptions{
 		DetectDotGit:          true,
 		EnableDotGitCommonDir: true,
 	})
