@@ -82,7 +82,6 @@ func (suite *OSTestSuite) TestExecuteCommand() {
 	suite.NotEqual(0, cmd.Pid())
 
 	result := cmd.Wait()
-	suite.True(result.Ok())
 	suite.Equal(0, result.ExitCode)
 	suite.Less(result.UserTime, time.Second)
 	suite.Less(result.SystemTime, time.Second)
@@ -104,7 +103,6 @@ func (suite *OSTestSuite) TestExitCode() {
 
 	suite.NoError(cmd.Start(suite.Context()))
 	result := cmd.Wait()
-	suite.False(result.Ok())
 
 	suite.Equal(3, result.ExitCode)
 }
@@ -125,7 +123,6 @@ func (suite *OSTestSuite) TestTimeout() {
 
 	suite.NoError(cmd.Start(ctx))
 	result := cmd.Wait()
-	suite.False(result.Ok())
 	suite.Equal(-1, result.ExitCode)
 }
 

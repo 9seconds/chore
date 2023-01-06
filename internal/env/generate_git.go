@@ -7,16 +7,16 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/9seconds/chore/internal/vcs"
+	"github.com/9seconds/chore/internal/git"
 )
 
 const GitCommitHashShortLength = 12
 
-func GenerateGit(ctx context.Context, results chan<- string, waiters *sync.WaitGroup, mode vcs.GitAccessMode) { //nolint: cyclop
+func GenerateGit(ctx context.Context, results chan<- string, waiters *sync.WaitGroup, mode git.AccessMode) { //nolint: cyclop
 	switch mode {
-	case vcs.GitAccessNo:
+	case git.AccessNo:
 		return
-	case vcs.GitAccessIfUndefined:
+	case git.AccessIfUndefined:
 		if _, ok := os.LookupEnv(EnvGitReference); ok {
 			return
 		}
@@ -27,7 +27,7 @@ func GenerateGit(ctx context.Context, results chan<- string, waiters *sync.WaitG
 	go func() {
 		defer waiters.Done()
 
-		repo, err := vcs.GetGitRepo()
+		repo, err := git.GetRepo()
 		if err != nil {
 			log.Printf("cannot find out correct git repo: %v", err)
 
@@ -52,15 +52,15 @@ func GenerateGit(ctx context.Context, results chan<- string, waiters *sync.WaitG
 
 		switch {
 		case refName.IsBranch():
-			sendValue(ctx, results, EnvGitReferenceType, vcs.GitRefTypeBranch)
+			sendValue(ctx, results, EnvGitReferenceType, git.RefTypeBranch)
 		case refName.IsTag():
-			sendValue(ctx, results, EnvGitReferenceType, vcs.GitRefTypeTag)
+			sendValue(ctx, results, EnvGitReferenceType, git.RefTypeTag)
 		case refName.IsRemote():
-			sendValue(ctx, results, EnvGitReferenceType, vcs.GitRefTypeRemote)
+			sendValue(ctx, results, EnvGitReferenceType, git.RefTypeRemote)
 		case refName.IsNote():
-			sendValue(ctx, results, EnvGitReferenceType, vcs.GitRefTypeNote)
+			sendValue(ctx, results, EnvGitReferenceType, git.RefTypeNote)
 		default:
-			sendValue(ctx, results, EnvGitReferenceType, vcs.GitRefTypeCommit)
+			sendValue(ctx, results, EnvGitReferenceType, git.RefTypeCommit)
 		}
 
 		workTree, err := repo.Worktree()

@@ -11,8 +11,8 @@ import (
 
 	"github.com/9seconds/chore/internal/argparse"
 	"github.com/9seconds/chore/internal/env"
+	"github.com/9seconds/chore/internal/git"
 	"github.com/9seconds/chore/internal/testlib"
-	"github.com/9seconds/chore/internal/vcs"
 	"github.com/Showmax/go-fqdn"
 	"github.com/adrg/xdg"
 	"github.com/jarcoal/httpmock"
@@ -116,7 +116,7 @@ func (suite *ScriptTestSuite) TestEnviron() {
 
 	conf := scr.Config()
 	conf.Network = true
-	conf.Git = vcs.GitAccessIfUndefined
+	conf.Git = git.AccessIfUndefined
 
 	environ := scr.Environ(context.Background(), argparse.ParsedArgs{
 		Parameters: map[string]string{

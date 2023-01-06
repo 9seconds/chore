@@ -1,20 +1,20 @@
-package vcs_test
+package git_test
 
 import (
 	"os"
 	"testing"
 
-	"github.com/9seconds/chore/internal/vcs"
+	"github.com/9seconds/chore/internal/git"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )
 
-type GetGitRepoTestSuite struct {
+type GetRepoTestSuite struct {
 	suite.Suite
 }
 
-func (suite *GetGitRepoTestSuite) SetupTest() {
+func (suite *GetRepoTestSuite) SetupTest() {
 	wd, _ := os.Getwd()
 	t := suite.T()
 
@@ -23,25 +23,25 @@ func (suite *GetGitRepoTestSuite) SetupTest() {
 	})
 }
 
-func (suite *GetGitRepoTestSuite) TestInNonGit() {
+func (suite *GetRepoTestSuite) TestInNonGit() {
 	suite.NoError(os.Chdir(suite.T().TempDir()))
 
-	_, err := vcs.GetGitRepo()
+	_, err := git.GetRepo()
 	suite.ErrorContains(err, "cannot open git repository")
 }
 
-func (suite *GetGitRepoTestSuite) TestInvalidWorkingDir() {
+func (suite *GetRepoTestSuite) TestInvalidWorkingDir() {
 	dir := suite.T().TempDir()
 
 	suite.NoError(os.Chdir(dir))
 	suite.NoError(os.RemoveAll(dir))
 
-	_, err := vcs.GetGitRepo()
+	_, err := git.GetRepo()
 	suite.ErrorContains(err, "cannot find out current working dir")
 }
 
-func (suite *GetGitRepoTestSuite) TestOk() {
-	repo, err := vcs.GetGitRepo()
+func (suite *GetRepoTestSuite) TestOk() {
+	repo, err := git.GetRepo()
 	suite.NoError(err)
 
 	_, err = repo.Head()
@@ -49,10 +49,10 @@ func (suite *GetGitRepoTestSuite) TestOk() {
 }
 
 func TestGetGitRepo(t *testing.T) {
-	suite.Run(t, &GetGitRepoTestSuite{})
+	suite.Run(t, &GetRepoTestSuite{})
 }
 
-func TestGetGitAccessMode(t *testing.T) {
+func TestGetAccessMode(t *testing.T) {
 	testTable := map[string]bool{
 		"if_undef":     false,
 		"":             true,
@@ -72,18 +72,18 @@ func TestGetGitAccessMode(t *testing.T) {
 		t.Run(testName, func(t *testing.T) {
 			t.Parallel()
 
-			mode, err := vcs.GetGitAccessMode(testName)
+			mode, err := git.GetAccessMode(testName)
 
 			if isValid {
 				assert.NoError(t, err)
 
 				if testName == "" {
-					assert.Equal(t, vcs.GitAccessIfUndefined, mode)
+					assert.Equal(t, git.AccessIfUndefined, mode)
 				} else {
 					assert.Equal(t, testName, mode.String())
 				}
 			} else {
-				assert.ErrorIs(t, err, vcs.ErrGitAccessModeUnknown)
+				assert.ErrorIs(t, err, git.ErrAccessModeUnknown)
 			}
 		})
 	}

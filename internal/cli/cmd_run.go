@@ -33,7 +33,7 @@ func NewRun() *cobra.Command {
 func mainRun(cmd *cobra.Command, args []string) {
 	exitCode, err := mainRunWrapper(cmd, args)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "command has failed: %v", err)
+		fmt.Fprintf(os.Stderr, "command has failed: %v\n", err)
 
 		exitCode = 1
 	}
@@ -86,9 +86,6 @@ func mainRunWrapper(cmd *cobra.Command, args []string) (int, error) {
 	log.Printf("command %s has started as %d", scr, runCmd.Pid())
 
 	result := runCmd.Wait()
-	if !result.Ok() {
-		return 0, fmt.Errorf("cannot correctly finish command: %w", result)
-	}
 
 	log.Printf("command %d exit with exit code %d", runCmd.Pid(), result.ExitCode)
 	log.Printf(
