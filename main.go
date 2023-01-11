@@ -2,14 +2,14 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os/signal"
+	"runtime/debug"
 	"syscall"
 
 	"github.com/9seconds/chore/internal/cli"
 )
-
-var version = "dev"
 
 func main() {
 	log.SetFlags(log.Lshortfile | log.LstdFlags)
@@ -26,7 +26,7 @@ func main() {
 		log.Println("application context is closed")
 	}()
 
-	root := cli.NewRoot(version)
+	root := cli.NewRoot(getVersion())
 
 	root.InitDefaultCompletionCmd()
 	root.InitDefaultHelpFlag()
@@ -45,4 +45,32 @@ func main() {
 	}
 
 	cancel()
+}
+
+func getVersion() string {
+	info, ok := debug.ReadBuildInfo()
+	if !ok {
+		panic("cannot read build info")
+	}
+
+	commit := ""
+	date := ""
+	isDirty := ""
+
+	for _, setting := range info.Settings {
+		switch {
+		case setting.Key == "vcs.revision":
+			commit = setting.Value
+		case setting.Key == "vcs.time":
+			date = setting.Value
+		case setting.Key == "vcs.modified" && setting.Value == "true":
+			isDirty = "[!] "
+		}
+	}
+
+	if commit == "" {
+		return "dev"
+	}
+
+	return fmt.Sprintf("%s%s (%s, %s)", isDirty, commit, date, info.GoVersion)
 }
