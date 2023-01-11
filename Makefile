@@ -4,8 +4,7 @@ GOBIN    := .bin
 GOLANGCI_LINT_VERSION := v1.50.1
 GOFUMPT_VERSION       := v0.4.0
 
-VERSION      := $(shell git describe --exact-match HEAD 2>/dev/null || git describe --tags --always)
-STATIC_FLAGS := -trimpath -mod=readonly -ldflags="-s -w -X 'main.version=$(VERSION)'"
+STATIC_FLAGS := -buildmode=pie -modcacherw -trimpath -mod=readonly -ldflags=-linkmode=external -ldflags=-buildid='' -ldflags="-s -w"
 GOTOOL       := env "GOBIN=$(abspath $(GOBIN))" "PATH=$(abspath $(GOBIN)):$(PATH)"
 GO_FILES     := $(shell find . -name "*.go" -type f | grep -vE '_test\.go$$')
 
