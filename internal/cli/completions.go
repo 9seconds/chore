@@ -42,6 +42,13 @@ func completeNamespaceScript(_ *cobra.Command, args []string, _ string) ([]strin
 }
 
 func completeRun(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) { //nolint: cyclop
+	listDelimiter, err := cmd.Flags().GetString("list-delimiter")
+	if err != nil {
+		log.Printf("cannot get value of 'list-delimiter' flag: %v", err)
+
+		listDelimiter = argparse.DefaultListDelimiter
+	}
+
 	switch len(args) {
 	case 0:
 		return completeNamespaces()
@@ -49,7 +56,7 @@ func completeRun(cmd *cobra.Command, args []string, toComplete string) ([]string
 		return completeScripts(args[0])
 	}
 
-	parsed, err := argparse.Parse(args[2:])
+	parsed, err := argparse.Parse(args[2:], listDelimiter)
 
 	switch {
 	case err != nil:

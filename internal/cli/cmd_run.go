@@ -27,6 +27,14 @@ func NewRun() *cobra.Command {
 		ValidArgsFunction: completeRun,
 	}
 
+	flags := cmd.Flags()
+
+	flags.StringP(
+		"list-delimiter",
+		"l",
+		argparse.DefaultListDelimiter,
+		"List delimiter for a fused parameter values")
+
 	return cmd
 }
 
@@ -42,6 +50,11 @@ func mainRun(cmd *cobra.Command, args []string) {
 }
 
 func mainRunWrapper(cmd *cobra.Command, args []string) (int, error) {
+	listDelimiter, err := cmd.Flags().GetString("list-delimiter")
+	if err != nil {
+		return 0, fmt.Errorf("cannot get a value of 'list-delimiter' flag: %w", err)
+	}
+
 	ctx := cmd.Context()
 	scr := &script.Script{
 		Namespace:  args[0],
@@ -56,7 +69,7 @@ func mainRunWrapper(cmd *cobra.Command, args []string) (int, error) {
 
 	conf := scr.Config()
 
-	parsedArgs, err := argparse.Parse(args[2:])
+	parsedArgs, err := argparse.Parse(args[2:], listDelimiter)
 	if err != nil {
 		return 0, fmt.Errorf("cannot parse arguments: %w", err)
 	}

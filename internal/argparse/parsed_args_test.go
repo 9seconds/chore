@@ -194,6 +194,42 @@ func (suite *ParsedArgsTestSuite) TestAllParametersIncorrect() {
 		"invalid value for parameter")
 }
 
+func (suite *ParsedArgsTestSuite) TestValidateListOk() {
+	args := argparse.ParsedArgs{
+		Parameters: map[string]string{
+			"int1":  "1:2:3",
+			"json1": "{}",
+		},
+		Flags: map[string]argparse.FlagValue{
+			"flag1": argparse.FlagFalse,
+			"flag2": argparse.FlagTrue,
+		},
+		ListDelimiter: argparse.DefaultListDelimiter,
+	}
+
+	suite.NoError(args.Validate(suite.Context(), suite.flags, suite.params))
+}
+
+func (suite *ParsedArgsTestSuite) TestValidateListFail() {
+	args := argparse.ParsedArgs{
+		Parameters: map[string]string{
+			"int1":  "1:xxx:3",
+			"json1": "{}",
+		},
+		Flags: map[string]argparse.FlagValue{
+			"flag1": argparse.FlagFalse,
+			"flag2": argparse.FlagTrue,
+		},
+		ListDelimiter: argparse.DefaultListDelimiter,
+	}
+
+	err := args.Validate(suite.Context(), suite.flags, suite.params)
+
+	suite.ErrorContains(err, "invalid value for parameter")
+	suite.ErrorContains(err, "int1")
+	suite.ErrorContains(err, "xxx")
+}
+
 func TestParsedArgs(t *testing.T) {
 	suite.Run(t, &ParsedArgsTestSuite{})
 }

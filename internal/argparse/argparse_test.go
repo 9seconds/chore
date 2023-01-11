@@ -13,7 +13,7 @@ type ParseTestSuite struct {
 }
 
 func (suite *ParseTestSuite) TestInvalidArgument() {
-	_, err := argparse.Parse([]string{"a\xc5z"})
+	_, err := argparse.Parse([]string{"a\xc5z"}, argparse.DefaultListDelimiter)
 	suite.ErrorContains(err, "is not valid UTF-8 string")
 }
 
@@ -22,7 +22,9 @@ func (suite *ParseTestSuite) TestUnexpectedFlag() {
 		testName := testName
 
 		suite.T().Run(testName, func(t *testing.T) {
-			_, err := argparse.Parse([]string{"arg", testName})
+			_, err := argparse.Parse(
+				[]string{"arg", testName},
+				argparse.DefaultListDelimiter)
 			assert.ErrorContains(t, err, "unexpected flag")
 		})
 	}
@@ -33,19 +35,21 @@ func (suite *ParseTestSuite) TestIncorrectFlag() {
 		testValue := testValue
 
 		suite.T().Run(testValue, func(t *testing.T) {
-			_, err := argparse.Parse([]string{testValue})
+			_, err := argparse.Parse(
+				[]string{testValue},
+				argparse.DefaultListDelimiter)
 			assert.ErrorContains(t, err, "incorrect flag")
 		})
 	}
 }
 
 func (suite *ParseTestSuite) TestUnexpectedParameter() {
-	_, err := argparse.Parse([]string{"arg", "c=1"})
+	_, err := argparse.Parse([]string{"arg", "c=1"}, argparse.DefaultListDelimiter)
 	suite.ErrorContains(err, "unexpected parameter")
 }
 
 func (suite *ParseTestSuite) TestIncorrectParameter() {
-	_, err := argparse.Parse([]string{"=1"})
+	_, err := argparse.Parse([]string{"=1"}, argparse.DefaultListDelimiter)
 	suite.ErrorContains(err, "incorrect parameter")
 }
 
@@ -59,16 +63,18 @@ func (suite *ParseTestSuite) TestMixed() {
 		"!j",
 		"k=2",
 		"c=3",
+		"p=:v:d:e:",
 		"arg1",
 		"arg2",
 		":!j",
 		":k=v",
-	})
+	}, argparse.DefaultListDelimiter)
 
 	suite.NoError(err)
 	suite.Equal(map[string]string{
 		"c": "3",
 		"k": "2",
+		"p": "v:d:e:",
 	}, parsed.Parameters)
 	suite.Equal(map[string]argparse.FlagValue{
 		"x": argparse.FlagTrue,
@@ -80,13 +86,15 @@ func (suite *ParseTestSuite) TestMixed() {
 
 func (suite *ParseTestSuite) TestExplicitPositionals() {
 	suite.T().Run("empty", func(t *testing.T) {
-		parsed, err := argparse.Parse([]string{})
+		parsed, err := argparse.Parse([]string{}, argparse.DefaultListDelimiter)
 		assert.NoError(t, err)
 		assert.False(t, parsed.IsPositionalTime())
 	})
 
 	suite.T().Run("non-empty", func(t *testing.T) {
-		parsed, err := argparse.Parse([]string{"--", "a", ":--", "b"})
+		parsed, err := argparse.Parse(
+			[]string{"--", "a", ":--", "b"},
+			argparse.DefaultListDelimiter)
 		assert.NoError(t, err)
 		assert.True(t, parsed.IsPositionalTime())
 		assert.Equal(t, []string{"a", "--", "b"}, parsed.Positional)

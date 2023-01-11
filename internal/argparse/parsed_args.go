@@ -6,6 +6,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"sort"
+	"strings"
 	"sync"
 
 	"github.com/9seconds/chore/internal/config"
@@ -16,6 +17,7 @@ type ParsedArgs struct {
 	Flags              map[string]FlagValue
 	Positional         []string
 	ExplicitPositional bool
+	ListDelimiter      string
 }
 
 func (p ParsedArgs) Validate( //nolint: cyclop
@@ -53,25 +55,27 @@ func (p ParsedArgs) Validate( //nolint: cyclop
 	waiters := &sync.WaitGroup{}
 	errChan := make(chan error)
 
-	waiters.Add(len(p.Parameters))
+	for name, listValues := range p.Parameters {
+		for _, value := range strings.Split(listValues, p.ListDelimiter) {
+			waiters.Add(1)
+
+			go func(name, value string) {
+				defer waiters.Done()
+
+				if err := parameters[name].Validate(ctx, value); err != nil {
+					select {
+					case <-ctx.Done():
+					case errChan <- fmt.Errorf("invalid value for parameter %s: %w", name, err):
+					}
+				}
+			}(name, value)
+		}
+	}
 
 	go func() {
 		waiters.Wait()
 		close(errChan)
 	}()
-
-	for name, value := range p.Parameters {
-		go func(name, value string) {
-			defer waiters.Done()
-
-			if err := parameters[name].Validate(ctx, value); err != nil {
-				select {
-				case <-ctx.Done():
-				case errChan <- fmt.Errorf("invalid value for parameter %s: %w", name, err):
-				}
-			}
-		}(name, value)
-	}
 
 	return <-errChan
 }

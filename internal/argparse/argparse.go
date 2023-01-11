@@ -14,6 +14,8 @@ const (
 	PrefixLiteral      = ':'
 	SeparatorKeyword   = '='
 
+	DefaultListDelimiter = ":"
+
 	PositionalDelimiter = "--"
 )
 
@@ -24,11 +26,12 @@ const (
 	FlagFalse FlagValue = 'f'
 )
 
-func Parse(args []string) (ParsedArgs, error) { //nolint: cyclop
+func Parse(args []string, listDelimiter string) (ParsedArgs, error) { //nolint: cyclop
 	parsed := ParsedArgs{
-		Parameters: make(map[string]string),
-		Flags:      make(map[string]FlagValue),
-		Positional: []string{},
+		Parameters:    make(map[string]string),
+		Flags:         make(map[string]FlagValue),
+		Positional:    []string{},
+		ListDelimiter: listDelimiter,
 	}
 
 	for idx, arg := range args {
@@ -74,7 +77,7 @@ func Parse(args []string) (ParsedArgs, error) { //nolint: cyclop
 				return parsed, fmt.Errorf("incorrect parameter %s", arg)
 			}
 
-			parsed.Parameters[name] = value
+			parsed.Parameters[name] = strings.TrimPrefix(value, listDelimiter)
 		default:
 			parsed.Positional = append(parsed.Positional, arg)
 		}
