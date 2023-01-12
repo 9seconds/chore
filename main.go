@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"os/signal"
 	"runtime/debug"
 	"syscall"
@@ -41,7 +42,8 @@ func main() {
 		cli.NewGC())
 
 	if err := root.ExecuteContext(ctx); err != nil {
-		log.Fatal(err)
+		fmt.Fprintln(os.Stderr, err.Error())
+		os.Exit(1)
 	}
 
 	cancel()
