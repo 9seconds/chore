@@ -50,6 +50,7 @@ func (suite *GenerateRecursionTestSuite) TestEnv() {
 	suite.NotContains(data[env.EnvRecursion], "pos1")
 	suite.NotContains(data[env.EnvRecursion], "pos2")
 	suite.NotContains(data[env.EnvRecursion], "pos3")
+	suite.NotContains(data[env.EnvRecursion], "--")
 }
 
 func TestGenerateRecursion(t *testing.T) {
