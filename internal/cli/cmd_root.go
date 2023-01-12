@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/9seconds/chore/internal/argparse"
 	"github.com/9seconds/chore/internal/env"
 	"github.com/spf13/cobra"
 )
@@ -38,6 +39,11 @@ func NewRoot(version string) *cobra.Command {
 	flags := root.Flags()
 
 	flags.BoolVarP(&isDebug, "debug", "d", false, "run in debug mode")
+	flags.StringP(
+		"list-delimiter",
+		"l",
+		argparse.DefaultListDelimiter,
+		"List delimiter for a fused parameter values")
 
 	return root
 }

@@ -90,7 +90,7 @@ func (suite *ParsedArgsTestSuite) TestOptionsAsCli() {
 
 	sort.Strings(options)
 
-	suite.Equal([]string{"+cleanup", "@welcome", "k=kk", "v=k"}, options)
+	suite.Equal([]string{"+cleanup", "-welcome", "k=kk", "v=k"}, options)
 }
 
 func (suite *ParsedArgsTestSuite) TestCannotFindRequiredParameter() {

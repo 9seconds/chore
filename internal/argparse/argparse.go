@@ -10,7 +10,7 @@ import (
 
 const (
 	PrefixFlagPositive = '+'
-	PrefixFlagNegative = '@'
+	PrefixFlagNegative = '-'
 	PrefixLiteral      = ':'
 	SeparatorKeyword   = '='
 

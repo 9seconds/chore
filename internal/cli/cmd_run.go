@@ -26,15 +26,15 @@ func NewRun() *cobra.Command {
 		Run:                   mainRun,
 		ValidArgsFunction:     completeRun,
 		DisableFlagsInUseLine: true,
+		DisableFlagParsing:    true,
 	}
 
-	flags := cmd.Flags()
+	// workaround to get rid of -h/--help flag
+	cmd.InitDefaultHelpFlag()
 
-	flags.StringP(
-		"list-delimiter",
-		"l",
-		argparse.DefaultListDelimiter,
-		"List delimiter for a fused parameter values")
+	if err := cmd.Flags().MarkHidden("help"); err != nil {
+		panic(err)
+	}
 
 	return cmd
 }
@@ -51,7 +51,7 @@ func mainRun(cmd *cobra.Command, args []string) {
 }
 
 func mainRunWrapper(cmd *cobra.Command, args []string) (int, error) {
-	listDelimiter, err := cmd.Flags().GetString("list-delimiter")
+	listDelimiter, err := cmd.Root().Flags().GetString("list-delimiter")
 	if err != nil {
 		return 0, fmt.Errorf("cannot get a value of 'list-delimiter' flag: %w", err)
 	}

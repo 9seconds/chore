@@ -24,6 +24,8 @@ const (
 
 	RequiredTrue  = "✔"
 	RequiredFalse = "✖"
+
+	TabSize = 8
 )
 
 var byteUnits = [6]string{
@@ -407,5 +409,5 @@ func mainShowParameterSpec(spec map[string]string) string {
 }
 
 func mainTabwriter(cmd *cobra.Command) *tabwriter.Writer {
-	return tabwriter.NewWriter(cmd.OutOrStdout(), 0, 8, 1, '\t', 0)
+	return tabwriter.NewWriter(cmd.OutOrStdout(), 0, TabSize, 1, '\t', 0)
 }
