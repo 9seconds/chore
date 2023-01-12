@@ -61,7 +61,7 @@ func mainGC(cmd *cobra.Command, _ []string) error {
 	}
 
 	for _, path := range paths {
-		fmt.Println(path)
+		cmd.Println(path)
 	}
 
 	return nil
