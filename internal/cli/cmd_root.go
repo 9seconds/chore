@@ -32,9 +32,10 @@ func NewRoot(version string) *cobra.Command {
 
 			return nil
 		},
+		TraverseChildren: true,
 	}
 
-	flags := root.PersistentFlags()
+	flags := root.Flags()
 
 	flags.BoolVarP(&isDebug, "debug", "d", false, "run in debug mode")
 

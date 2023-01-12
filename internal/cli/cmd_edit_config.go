@@ -10,9 +10,10 @@ import (
 
 func NewEditConfig() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "edit-config [flags] namespace script",
-		Aliases: []string{"c", "ec"},
-		Short:   "Edit chore script configuration HJSON",
+		Use:        "edit-config [flags] namespace script",
+		Aliases:    []string{"c", "ec"},
+		SuggestFor: []string{"edit-script", "es", "e"},
+		Short:      "Edit chore script configuration HJSON",
 		Args: cobra.MatchAll(
 			cobra.ExactArgs(2), //nolint: gomnd
 			validScriptName(0, ErrNamespaceInvalid),

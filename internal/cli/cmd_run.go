@@ -13,7 +13,7 @@ import (
 
 func NewRun() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "run [flags] namespace script [options] [--] [args]",
+		Use:     "run namespace script [options] [--] [args]",
 		Aliases: []string{"r"},
 		Short:   "Run chore script",
 		Args: cobra.MatchAll(
@@ -23,8 +23,9 @@ func NewRun() *cobra.Command {
 			validNamespace(0),
 			validScript(0, 1),
 		),
-		Run:               mainRun,
-		ValidArgsFunction: completeRun,
+		Run:                   mainRun,
+		ValidArgsFunction:     completeRun,
+		DisableFlagsInUseLine: true,
 	}
 
 	flags := cmd.Flags()

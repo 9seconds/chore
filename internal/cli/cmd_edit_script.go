@@ -13,9 +13,10 @@ import (
 
 func NewEditScript() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "edit-script [flags] namespace script",
-		Aliases: []string{"e", "es"},
-		Short:   "Edit chore script",
+		Use:        "edit-script [flags] namespace script",
+		Aliases:    []string{"e", "es"},
+		SuggestFor: []string{"edit-config", "ec"},
+		Short:      "Edit chore script",
 		Args: cobra.MatchAll(
 			cobra.ExactArgs(2), //nolint: gomnd
 			validScriptName(0, ErrNamespaceInvalid),
