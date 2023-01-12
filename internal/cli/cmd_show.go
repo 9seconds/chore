@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"context"
 	"fmt"
 	"io/fs"
 	"log"
@@ -11,9 +10,9 @@ import (
 	"strings"
 	"sync"
 	"sync/atomic"
+	"text/tabwriter"
 
 	"github.com/9seconds/chore/internal/script"
-	"github.com/cheynewallace/tabby"
 	"github.com/spf13/cobra"
 )
 
@@ -67,9 +66,9 @@ func NewShow() *cobra.Command {
 func mainShow(cmd *cobra.Command, args []string) error { //nolint: cyclop
 	switch len(args) {
 	case 0:
-		return mainShowListNamespaces()
+		return mainShowListNamespaces(cmd)
 	case 1:
-		return mainShowListScripts(args[0])
+		return mainShowListScripts(cmd, args[0])
 	}
 
 	scr := &script.Script{
@@ -114,67 +113,68 @@ func mainShow(cmd *cobra.Command, args []string) error { //nolint: cyclop
 	}
 
 	if showPaths || showConfig || showData || showCache || showState || showRuntime {
-		mainShowFlags(scr, showPaths, showConfig, showData, showCache, showState, showRuntime)
+		mainShowFlags(cmd, scr, showPaths, showConfig, showData, showCache, showState, showRuntime)
 	} else {
-		mainShowTables(cmd.Context(), scr)
+		mainShowTables(cmd, scr)
 	}
 
 	return nil
 }
 
-func mainShowListNamespaces() error {
+func mainShowListNamespaces(cmd *cobra.Command) error {
 	names, err := script.ListNamespaces()
 	if err != nil {
 		return fmt.Errorf("cannot list namespaces: %w", err)
 	}
 
 	for _, name := range names {
-		fmt.Println(name)
+		cmd.Println(name)
 	}
 
 	return nil
 }
 
-func mainShowListScripts(namespace string) error {
+func mainShowListScripts(cmd *cobra.Command, namespace string) error {
 	names, err := script.ListScripts(namespace)
 	if err != nil {
 		return fmt.Errorf("cannot list scripts: %w", err)
 	}
 
 	for _, name := range names {
-		fmt.Println(name)
+		cmd.Println(name)
 	}
 
 	return nil
 }
 
-func mainShowFlags(scr *script.Script, paths, config, data, cache, state, runtime bool) {
+func mainShowFlags(cmd *cobra.Command, scr *script.Script, paths, config, data, cache, state, runtime bool) {
 	if paths {
-		fmt.Println(scr.Path())
+		cmd.Println(scr.Path())
 	}
 
 	if config {
-		fmt.Println(scr.ConfigPath())
+		cmd.Println(scr.ConfigPath())
 	}
 
 	if data {
-		fmt.Println(scr.DataPath())
+		cmd.Println(scr.DataPath())
 	}
 
 	if cache {
-		fmt.Println(scr.CachePath())
+		cmd.Println(scr.CachePath())
 	}
 
 	if state {
-		fmt.Println(scr.StatePath())
+		cmd.Println(scr.StatePath())
 	}
 
 	if runtime {
-		fmt.Println(scr.RuntimePath())
+		cmd.Println(scr.RuntimePath())
 	}
 }
 
-func mainShowTables(ctx context.Context, scr *script.Script) {
+func mainShowTables(cmd *cobra.Command, scr *script.Script) {
+	ctx := cmd.Context()
 	dirSizes := map[string]*atomic.Int64{
 		scr.DataPath():    {},
 		scr.StatePath():   {},
@@ -210,45 +210,56 @@ func mainShowTables(ctx context.Context, scr *script.Script) {
 
 	waiters.Wait()
 
-	mainShowTablePaths(scr, dirSizes)
-	fmt.Println()
+	if mainShowDescription(cmd, scr) {
+		cmd.Println()
+	}
 
-	mainShowTableGlobals(scr)
-	mainShowTableParameters(scr)
-	mainShowTableFlags(scr)
+	mainShowMainTable(cmd, scr, dirSizes)
+
+	if mainShowTableParameters(cmd, scr) {
+		cmd.Println()
+	}
+
+	mainShowTableFlags(cmd, scr)
 }
 
-func mainShowTablePaths(scr *script.Script, dirSizes map[string]*atomic.Int64) {
-	table := tabby.New()
-
-	table.AddLine("Path:", scr.Path(), "")
-	table.AddLine("Config path:", scr.ConfigPath(), "")
-	table.AddLine("Data path:", scr.DataPath(), mainShowDirSize(dirSizes[scr.DataPath()]))
-	table.AddLine("Cache path:", scr.CachePath(), mainShowDirSize(dirSizes[scr.CachePath()]))
-	table.AddLine("State path:", scr.StatePath(), mainShowDirSize(dirSizes[scr.StatePath()]))
-	table.AddLine("Runtime path:", scr.RuntimePath(), mainShowDirSize(dirSizes[scr.RuntimePath()]))
-	table.Print()
-}
-
-func mainShowTableGlobals(scr *script.Script) {
-	table := tabby.New()
+func mainShowDescription(cmd *cobra.Command, scr *script.Script) bool {
 	conf := scr.Config()
 
-	table.AddLine("Network:", strconv.FormatBool(conf.Network))
-	table.AddLine("Git:", conf.Git.String())
+	if conf.Description == "" {
+		return false
+	}
 
-	table.Print()
+	cmd.Println(conf.Description)
+
+	return true
 }
 
-func mainShowTableParameters(scr *script.Script) {
-	table := tabby.New()
+func mainShowMainTable(cmd *cobra.Command, scr *script.Script, dirSizes map[string]*atomic.Int64) {
+	writer := mainTabwriter(cmd)
+	conf := scr.Config()
+
+	fmt.Fprintf(writer, "Path:\t%s\n", scr.Path())
+	fmt.Fprintf(writer, "Config path:\t%s\n", scr.ConfigPath())
+	fmt.Fprintf(writer, "Data path:\t%s\t%s\n", scr.DataPath(), mainShowDirSize(dirSizes[scr.DataPath()]))
+	fmt.Fprintf(writer, "Cache path:\t%s\t%s\n", scr.CachePath(), mainShowDirSize(dirSizes[scr.CachePath()]))
+	fmt.Fprintf(writer, "State path:\t%s\t%s\n", scr.StatePath(), mainShowDirSize(dirSizes[scr.StatePath()]))
+	fmt.Fprintf(writer, "Runtime path:\t%s\t%s\n\n", scr.RuntimePath(), mainShowDirSize(dirSizes[scr.RuntimePath()]))
+
+	fmt.Fprintf(writer, "Network:\t%s\n", strconv.FormatBool(conf.Network))
+	fmt.Fprintf(writer, "Git:\t%s\n", conf.Git.String())
+
+	writer.Flush()
+}
+
+func mainShowTableParameters(cmd *cobra.Command, scr *script.Script) bool {
 	conf := scr.Config()
 
 	if len(conf.Parameters) == 0 {
-		return
+		return false
 	}
 
-	fmt.Println()
+	cmd.Println()
 
 	names := make([]string, 0, len(conf.Parameters))
 
@@ -272,12 +283,17 @@ func mainShowTableParameters(scr *script.Script) {
 		return valueI > valueJ
 	})
 
-	table.AddHeader("Parameter", "Description", "Required?", "Type", "Specification")
+	writer := mainTabwriter(cmd)
+
+	fmt.Fprintln(writer, "Parameter\tDescription\tRequired?\tType\tSpecification")
+	fmt.Fprintln(writer, "╴╴╴╴╴╴╴╴╴\t╴╴╴╴╴╴╴╴╴╴╴\t╴╴╴╴╴╴╴╴╴\t╴╴╴╴\t╴╴╴╴╴╴╴╴╴╴╴╴╴")
 
 	for _, name := range names {
 		param := conf.Parameters[name]
 
-		table.AddLine(
+		fmt.Fprintf(
+			writer,
+			"%s\t%s\t%s\t%s\t%s\n",
 			name,
 			param.Description(),
 			mainShowRequired(param.Required()),
@@ -285,18 +301,17 @@ func mainShowTableParameters(scr *script.Script) {
 			mainShowParameterSpec(param.Specification()))
 	}
 
-	table.Print()
+	writer.Flush()
+
+	return true
 }
 
-func mainShowTableFlags(scr *script.Script) {
-	table := tabby.New()
+func mainShowTableFlags(cmd *cobra.Command, scr *script.Script) {
 	conf := scr.Config()
 
 	if len(conf.Flags) == 0 {
 		return
 	}
-
-	fmt.Println()
 
 	names := make([]string, 0, len(conf.Flags))
 
@@ -320,18 +335,23 @@ func mainShowTableFlags(scr *script.Script) {
 		return valueI > valueJ
 	})
 
-	table.AddHeader("Flag", "Description", "Required?")
+	writer := mainTabwriter(cmd)
+
+	fmt.Fprintln(writer, "Flag\tDescription\tRequired?")
+	fmt.Fprintln(writer, "╴╴╴╴\t╴╴╴╴╴╴╴╴╴╴╴\t╴╴╴╴╴╴╴╴╴")
 
 	for _, name := range names {
 		flag := conf.Flags[name]
 
-		table.AddLine(
+		fmt.Fprintf(
+			writer,
+			"%s\t%s\t%s\n",
 			name,
 			flag.Description(),
 			mainShowRequired(flag.Required()))
 	}
 
-	table.Print()
+	writer.Flush()
 }
 
 func mainShowDirSize(atomicValue *atomic.Int64) string {
@@ -349,7 +369,7 @@ func mainShowDirSize(atomicValue *atomic.Int64) string {
 		unit++
 	}
 
-	return strconv.FormatFloat(size, 'f', 2, 64) + byteUnits[unit]
+	return strconv.FormatFloat(size, 'g', 2, 64) + byteUnits[unit]
 }
 
 func mainShowBoolToInt(value bool) int {
@@ -384,4 +404,8 @@ func mainShowParameterSpec(spec map[string]string) string {
 	}
 
 	return strings.Join(kvs, " ")
+}
+
+func mainTabwriter(cmd *cobra.Command) *tabwriter.Writer {
+	return tabwriter.NewWriter(cmd.OutOrStdout(), 0, 8, 1, '\t', 0)
 }
