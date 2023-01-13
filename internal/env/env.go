@@ -2,6 +2,7 @@ package env
 
 import (
 	"path/filepath"
+	"strings"
 
 	"github.com/adrg/xdg"
 )
@@ -120,4 +121,12 @@ func RootPathRuntime() string {
 
 func PathConfigNamespace(namespace string) string {
 	return filepath.Join(RootPathConfig(), namespace)
+}
+
+func ParameterName(name string) string {
+	return EnvParameterPrefix + strings.ToUpper(name)
+}
+
+func FlagName(name string) string {
+	return EnvFlagPrefix + strings.ToUpper(name)
 }

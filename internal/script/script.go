@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 	"sync"
 
 	"github.com/9seconds/chore/internal/argparse"
@@ -78,15 +77,11 @@ func (s *Script) Environ(ctx context.Context, args argparse.ParsedArgs) []string
 	}
 
 	for k, v := range args.Parameters {
-		environ = append(
-			environ,
-			env.MakeValue(env.EnvParameterPrefix+strings.ToUpper(k), v))
+		environ = append(environ, env.MakeValue(env.ParameterName(k), v))
 	}
 
 	for k, v := range args.Flags {
-		environ = append(
-			environ,
-			env.MakeValue(env.EnvFlagPrefix+strings.ToUpper(k), string(v)))
+		environ = append(environ, env.MakeValue(env.FlagName(k), string(v)))
 	}
 
 	waiterGroup := &sync.WaitGroup{}
