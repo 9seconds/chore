@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+	"io"
 	"io/fs"
 	"log"
 	"path/filepath"
@@ -11,6 +12,7 @@ import (
 	"sync"
 	"sync/atomic"
 	"text/tabwriter"
+	"unicode"
 
 	"github.com/9seconds/chore/internal/script"
 	"github.com/spf13/cobra"
@@ -212,34 +214,33 @@ func mainShowTables(cmd *cobra.Command, scr *script.Script) {
 
 	waiters.Wait()
 
-	if mainShowDescription(cmd, scr) {
-		cmd.Println()
-	}
+	buf := &strings.Builder{}
 
-	mainShowMainTable(cmd, scr, dirSizes)
+	mainShowDescription(buf, scr)
+	mainShowMainTable(buf, scr, dirSizes)
+	mainShowTableParameters(buf, scr)
+	mainShowTableFlags(buf, scr)
 
-	if mainShowTableParameters(cmd, scr) {
-		cmd.Println()
-	}
-
-	mainShowTableFlags(cmd, scr)
+	cmd.Println(strings.TrimRightFunc(buf.String(), unicode.IsSpace))
 }
 
-func mainShowDescription(cmd *cobra.Command, scr *script.Script) bool {
+func mainShowDescription(buf io.Writer, scr *script.Script) {
 	conf := scr.Config()
 
-	if conf.Description == "" {
-		return false
+	if conf.Description != "" {
+		io.WriteString(buf, strings.TrimSpace(conf.Description)) //nolint: errcheck
+		io.WriteString(buf, "\n\n")                              //nolint: errcheck
 	}
-
-	cmd.Println(conf.Description)
-
-	return true
 }
 
-func mainShowMainTable(cmd *cobra.Command, scr *script.Script, dirSizes map[string]*atomic.Int64) {
-	writer := mainTabwriter(cmd)
+func mainShowMainTable(buf io.Writer, scr *script.Script, dirSizes map[string]*atomic.Int64) {
+	defer io.WriteString(buf, "\n") //nolint: errcheck
+
 	conf := scr.Config()
+
+	writer := mainTabwriter(buf)
+
+	defer writer.Flush()
 
 	fmt.Fprintf(writer, "Path:\t%s\n", scr.Path())
 	fmt.Fprintf(writer, "Config path:\t%s\n", scr.ConfigPath())
@@ -250,18 +251,16 @@ func mainShowMainTable(cmd *cobra.Command, scr *script.Script, dirSizes map[stri
 
 	fmt.Fprintf(writer, "Network:\t%s\n", strconv.FormatBool(conf.Network))
 	fmt.Fprintf(writer, "Git:\t%s\n", conf.Git.String())
-
-	writer.Flush()
 }
 
-func mainShowTableParameters(cmd *cobra.Command, scr *script.Script) bool {
+func mainShowTableParameters(buf io.Writer, scr *script.Script) {
 	conf := scr.Config()
 
 	if len(conf.Parameters) == 0 {
-		return false
+		return
 	}
 
-	cmd.Println()
+	defer io.WriteString(buf, "\n") //nolint: errcheck
 
 	names := make([]string, 0, len(conf.Parameters))
 
@@ -285,7 +284,9 @@ func mainShowTableParameters(cmd *cobra.Command, scr *script.Script) bool {
 		return valueI > valueJ
 	})
 
-	writer := mainTabwriter(cmd)
+	writer := mainTabwriter(buf)
+
+	defer writer.Flush()
 
 	fmt.Fprintln(writer, "Parameter\tDescription\tRequired?\tType\tSpecification")
 	fmt.Fprintln(writer, "╴╴╴╴╴╴╴╴╴\t╴╴╴╴╴╴╴╴╴╴╴\t╴╴╴╴╴╴╴╴╴\t╴╴╴╴\t╴╴╴╴╴╴╴╴╴╴╴╴╴")
@@ -302,13 +303,9 @@ func mainShowTableParameters(cmd *cobra.Command, scr *script.Script) bool {
 			param.Type(),
 			mainShowParameterSpec(param.Specification()))
 	}
-
-	writer.Flush()
-
-	return true
 }
 
-func mainShowTableFlags(cmd *cobra.Command, scr *script.Script) {
+func mainShowTableFlags(buf io.Writer, scr *script.Script) {
 	conf := scr.Config()
 
 	if len(conf.Flags) == 0 {
@@ -337,7 +334,9 @@ func mainShowTableFlags(cmd *cobra.Command, scr *script.Script) {
 		return valueI > valueJ
 	})
 
-	writer := mainTabwriter(cmd)
+	writer := mainTabwriter(buf)
+
+	defer writer.Flush()
 
 	fmt.Fprintln(writer, "Flag\tDescription\tRequired?")
 	fmt.Fprintln(writer, "╴╴╴╴\t╴╴╴╴╴╴╴╴╴╴╴\t╴╴╴╴╴╴╴╴╴")
@@ -352,8 +351,6 @@ func mainShowTableFlags(cmd *cobra.Command, scr *script.Script) {
 			flag.Description(),
 			mainShowRequired(flag.Required()))
 	}
-
-	writer.Flush()
 }
 
 func mainShowDirSize(atomicValue *atomic.Int64) string {
@@ -408,6 +405,6 @@ func mainShowParameterSpec(spec map[string]string) string {
 	return strings.Join(kvs, " ")
 }
 
-func mainTabwriter(cmd *cobra.Command) *tabwriter.Writer {
-	return tabwriter.NewWriter(cmd.OutOrStdout(), 0, TabSize, 1, '\t', 0)
+func mainTabwriter(writer io.Writer) *tabwriter.Writer {
+	return tabwriter.NewWriter(writer, 0, TabSize, 1, '\t', 0)
 }

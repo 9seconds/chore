@@ -120,7 +120,7 @@ func ValidateConfig(path string) (config.Config, error) {
 
 	conf, err = config.Parse(file)
 	if err != nil {
-		err = fmt.Errorf("cannot parse config file %script: %w", path, err)
+		err = fmt.Errorf("cannot parse config file %s: %w", path, err)
 	}
 
 	return conf, err
