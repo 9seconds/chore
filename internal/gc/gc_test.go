@@ -30,7 +30,7 @@ func (suite *GCTestSuite) SetupTest() {
 	suite.CustomRootTestSuite.Setup(suite.T())
 
 	suite.EnsureScript("x", "valid_script_with_config", "echo 1")
-	suite.EnsureScriptConfig("x", "valid_script_with_config", "{}")
+	suite.EnsureScriptConfig("x", "valid_script_with_config", "description = '1'")
 
 	suite.EnsureScript("x", "valid_script_without_config", "echo 2")
 

@@ -78,7 +78,7 @@ func (suite *CustomRootTestSuite) ConfigScriptPath(namespace, executable string)
 }
 
 func (suite *CustomRootTestSuite) ConfigScriptConfigPath(namespace, executable string) string {
-	return suite.ConfigScriptPath(namespace, executable) + ".hjson"
+	return suite.ConfigScriptPath(namespace, executable) + ".toml"
 }
 
 func (suite *CustomRootTestSuite) DataNamespacePath(namespace string) string {

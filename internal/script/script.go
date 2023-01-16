@@ -38,7 +38,7 @@ func (s *Script) Path() string {
 }
 
 func (s *Script) ConfigPath() string {
-	return s.Path() + ".hjson"
+	return s.Path() + ".toml"
 }
 
 func (s *Script) DataPath() string {

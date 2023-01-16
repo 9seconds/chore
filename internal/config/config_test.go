@@ -2,9 +2,10 @@ package config_test
 
 import (
 	"bytes"
-	"encoding/json"
+	"fmt"
 	"io"
 	"strconv"
+	"strings"
 	"testing"
 	"testing/iotest"
 
@@ -24,11 +25,7 @@ func (suite *ConfigTestSuite) TestParseNetwork() {
 		testValue := testValue
 
 		suite.T().Run(strconv.FormatBool(testValue), func(t *testing.T) {
-			configRaw := map[string]bool{
-				"network": testValue,
-			}
-			data, _ := json.Marshal(configRaw)
-			buf := bytes.NewBuffer(data)
+			buf := strings.NewReader(fmt.Sprintf("network = %t", testValue))
 
 			conf, err := config.Parse(buf)
 			assert.NoError(t, err)
@@ -38,11 +35,7 @@ func (suite *ConfigTestSuite) TestParseNetwork() {
 }
 
 func (suite *ConfigTestSuite) TestParseDescription() {
-	configRaw := map[string]string{
-		"description": "xxy",
-	}
-	data, _ := json.Marshal(configRaw) //nolint: errchkjson
-	buf := bytes.NewBuffer(data)
+	buf := strings.NewReader("description = 'xxy'")
 
 	conf, err := config.Parse(buf)
 	suite.NoError(err)
@@ -74,25 +67,18 @@ func (suite *ConfigTestSuite) TestParameter() {
 		testValue := testValue
 
 		suite.T().Run(testValue, func(t *testing.T) {
-			spec := map[string]interface{}{}
+			specRaw := `
+[parameters.param]
+type = "%s"
+required = true
+spec = %s`
+			spec := "{}"
 
 			if testValue == config.ParameterEnum {
-				spec = map[string]interface{}{
-					"choices": "xx",
-				}
+				spec = `{ choices = "xx" }`
 			}
 
-			configRaw := map[string]interface{}{
-				"parameters": map[string]interface{}{
-					"param": map[string]interface{}{
-						"type":     testValue,
-						"required": true,
-						"spec":     spec,
-					},
-				},
-			}
-			data, _ := json.Marshal(configRaw)
-			buf := bytes.NewBuffer(data)
+			buf := strings.NewReader(fmt.Sprintf(specRaw, testValue, spec))
 
 			conf, err := config.Parse(buf)
 			suite.NoError(err)
@@ -104,36 +90,22 @@ func (suite *ConfigTestSuite) TestParameter() {
 }
 
 func (suite *ConfigTestSuite) TestUnknownParameterType() {
-	configRaw := map[string]interface{}{
-		"parameters": map[string]interface{}{
-			"param": map[string]interface{}{
-				"type":     "xxx",
-				"required": true,
-				"spec":     map[string]interface{}{},
-			},
-		},
-	}
-	data, _ := json.Marshal(configRaw) //nolint: errchkjson
-	buf := bytes.NewBuffer(data)
+	configRaw := `
+[parameters.param]
+type = "xxx"`
+	buf := strings.NewReader(configRaw)
 
 	_, err := config.Parse(buf)
 	suite.ErrorContains(err, "unknown parameter type")
 }
 
 func (suite *ConfigTestSuite) TestCannotInitializeParameter() {
-	configRaw := map[string]interface{}{
-		"parameters": map[string]interface{}{
-			"param": map[string]interface{}{
-				"type":     "integer",
-				"required": true,
-				"spec": map[string]interface{}{
-					"max": "x",
-				},
-			},
-		},
-	}
-	data, _ := json.Marshal(configRaw) //nolint: errchkjson
-	buf := bytes.NewBuffer(data)
+	configRaw := `
+[parameters.param]
+type = "integer"
+required = true
+spec = { max = "x" }`
+	buf := strings.NewReader(configRaw)
 
 	_, err := config.Parse(buf)
 	suite.ErrorContains(err, "cannot initialize parameter")
@@ -143,7 +115,7 @@ func (suite *ConfigTestSuite) TestIncorrectJSON() {
 	buf := bytes.NewBuffer([]byte("x"))
 
 	_, err := config.Parse(buf)
-	suite.ErrorContains(err, "cannot parse JSON config")
+	suite.ErrorContains(err, "cannot parse TOML config")
 }
 
 func (suite *ConfigTestSuite) TestBrokenReader() {

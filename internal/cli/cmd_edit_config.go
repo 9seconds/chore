@@ -13,7 +13,7 @@ func NewEditConfig() *cobra.Command {
 		Use:        "edit-config [flags] namespace script",
 		Aliases:    []string{"c", "ec"},
 		SuggestFor: []string{"edit-script", "es", "e"},
-		Short:      "Edit chore script configuration HJSON",
+		Short:      "Edit chore script configuration TOML",
 		Args: cobra.MatchAll(
 			cobra.ExactArgs(2), //nolint: gomnd
 			validScriptName(0, ErrNamespaceInvalid),
@@ -50,7 +50,7 @@ func mainEditConfig(cmd *cobra.Command, args []string) error {
 	}
 
 	defaultContent := bytes.Buffer{}
-	tpl := getTemplate("static/edit-config-template.hjson")
+	tpl := getTemplate("static/edit-config-template.toml")
 
 	if err := tpl.Execute(&defaultContent, scr); err != nil {
 		return fmt.Errorf("cannot render default template: %w", err)

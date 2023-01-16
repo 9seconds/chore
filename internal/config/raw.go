@@ -4,42 +4,37 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/hjson/hjson-go/v4"
+	"github.com/pelletier/go-toml/v2"
 )
 
 type RawConfig struct {
-	Description string                  `json:"description"`
-	Git         string                  `json:"git"`
-	Network     bool                    `json:"network"`
-	Parameters  map[string]RawParameter `json:"parameters"`
-	Flags       map[string]RawFlag      `json:"flags"`
+	Description string                  `toml:"description"`
+	Git         string                  `toml:"git"`
+	Network     bool                    `toml:"network"`
+	Parameters  map[string]RawParameter `toml:"parameters"`
+	Flags       map[string]RawFlag      `toml:"flags"`
 }
 
 type RawParameter struct {
-	Type        string            `json:"type"`
-	Required    bool              `json:"required"`
-	Description string            `json:"description"`
-	Spec        map[string]string `json:"spec"`
+	Type        string            `toml:"type"`
+	Required    bool              `toml:"required"`
+	Description string            `toml:"description"`
+	Spec        map[string]string `toml:"spec"`
 }
 
 type RawFlag struct {
-	Required    bool   `json:"required"`
-	Description string `json:"description"`
+	Required    bool   `toml:"required"`
+	Description string `toml:"description"`
 }
 
 func parseRaw(reader io.Reader) (RawConfig, error) {
 	raw := RawConfig{}
 
-	data, err := io.ReadAll(reader)
-	if err != nil {
-		return raw, fmt.Errorf("cannot read config: %w", err)
-	}
+	decoder := toml.NewDecoder(reader)
+	decoder = decoder.DisallowUnknownFields()
 
-	decoderOptions := hjson.DefaultDecoderOptions()
-	decoderOptions.DisallowUnknownFields = true
-
-	if err := hjson.UnmarshalWithOptions(data, &raw, decoderOptions); err != nil {
-		return raw, fmt.Errorf("cannot parse JSON config: %w", err)
+	if err := decoder.Decode(&raw); err != nil {
+		return raw, fmt.Errorf("cannot parse TOML config: %w", err)
 	}
 
 	return raw, nil
