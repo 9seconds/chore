@@ -3,6 +3,7 @@ module github.com/9seconds/chore
 go 1.19
 
 require (
+	github.com/BurntSushi/toml v1.2.1
 	github.com/Masterminds/semver v1.5.0
 	github.com/Masterminds/semver/v3 v3.2.0
 	github.com/Showmax/go-fqdn v1.0.0
@@ -14,7 +15,6 @@ require (
 	github.com/go-git/go-git/v5 v5.5.2
 	github.com/gofrs/uuid v4.3.1+incompatible
 	github.com/jarcoal/httpmock v1.2.0
-	github.com/pelletier/go-toml/v2 v2.0.6
 	github.com/spf13/cobra v1.6.1
 	github.com/stretchr/testify v1.8.1
 	github.com/tchap/go-patricia/v2 v2.3.1
