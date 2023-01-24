@@ -41,6 +41,7 @@ func Collect(validScripts []*script.Script) ([]string, error) { //nolint: cyclop
 	queue := list.New()
 
 	for _, v := range getRootPaths() {
+		safePaths.Set(patricia.Prefix(filepath.Join(v, "\x00")), true)
 		queue.PushBack(v)
 	}
 
