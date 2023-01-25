@@ -6,7 +6,8 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
-	"os/exec"
+
+	"github.com/9seconds/chore/internal/commands"
 )
 
 const (
@@ -14,6 +15,9 @@ const (
 )
 
 func openEditor(ctx context.Context, editor, path string, templateContent []byte) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	_, err := os.Stat(path)
 
 	switch {
@@ -25,10 +29,17 @@ func openEditor(ctx context.Context, editor, path string, templateContent []byte
 		return fmt.Errorf("cannot stat file: %w", err)
 	}
 
-	cmd := exec.CommandContext(ctx, editor, path)
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	cmd := commands.New(editor, []string{path}, nil, os.Stdin, os.Stdout, os.Stderr)
 
-	return cmd.Run()
+	if err := cmd.Start(ctx); err != nil {
+		return fmt.Errorf("cannot start editor: %w", err)
+	}
+
+	result := cmd.Wait()
+
+	if result.ExitCode != 0 {
+		return fmt.Errorf("command exited with %d", result.ExitCode)
+	}
+
+	return nil
 }

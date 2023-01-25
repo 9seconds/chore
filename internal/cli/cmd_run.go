@@ -85,10 +85,10 @@ func mainRunWrapper(cmd *cobra.Command, args []string) (int, error) {
 		log.Printf("env: %s", v)
 	}
 
-	runCmd := commands.NewOS(
-		scr,
-		environ,
+	runCmd := commands.New(
+		scr.Path(),
 		parsedArgs.Positional,
+		environ,
 		os.Stdin,
 		os.Stdout,
 		os.Stderr)

@@ -8,8 +8,6 @@ import (
 	"os/exec"
 	"sync"
 	"time"
-
-	"github.com/9seconds/chore/internal/script"
 )
 
 type osCommand struct {
@@ -72,11 +70,13 @@ func (o *osCommand) Wait() ExecutionResult {
 	return result
 }
 
-func NewOS(script *script.Script,
-	environ, args []string,
-	stdin io.Reader, stdout, stderr io.Writer,
+func New(
+	command string,
+	args, environ []string,
+	stdin io.Reader,
+	stdout, stderr io.Writer,
 ) Command {
-	cmd := exec.Command(script.Path(), args...)
+	cmd := exec.Command(command, args...)
 
 	cmd.Env = append(os.Environ(), environ...)
 	cmd.Stdin = stdin

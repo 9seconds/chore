@@ -68,10 +68,10 @@ func (suite *OSTestSuite) SetupTest() {
 }
 
 func (suite *OSTestSuite) TestExecuteCommand() {
-	cmd := commands.NewOS(
-		suite.s,
-		suite.environ,
+	cmd := commands.New(
+		suite.s.Path(),
 		suite.args,
+		suite.environ,
 		suite.stdin,
 		suite.stdout,
 		suite.stderr)
@@ -91,10 +91,10 @@ func (suite *OSTestSuite) TestExecuteCommand() {
 }
 
 func (suite *OSTestSuite) TestExitCode() {
-	cmd := commands.NewOS(
-		suite.s,
-		suite.environ,
+	cmd := commands.New(
+		suite.s.Path(),
 		suite.args,
+		suite.environ,
 		suite.stdin,
 		suite.stdout,
 		suite.stderr)
@@ -111,10 +111,10 @@ func (suite *OSTestSuite) TestTimeout() {
 	ctx, cancel := context.WithTimeout(suite.Context(), time.Second)
 	defer cancel()
 
-	cmd := commands.NewOS(
-		suite.s,
-		suite.environ,
+	cmd := commands.New(
+		suite.s.Path(),
 		suite.args,
+		suite.environ,
 		suite.stdin,
 		suite.stdout,
 		suite.stderr)
