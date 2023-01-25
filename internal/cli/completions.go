@@ -2,6 +2,8 @@ package cli
 
 import (
 	"log"
+	"sort"
+	"strings"
 
 	"github.com/9seconds/chore/internal/argparse"
 	"github.com/9seconds/chore/internal/script"
@@ -82,6 +84,7 @@ func completeRun(cmd *cobra.Command, args []string, toComplete string) ([]string
 
 	conf := scr.Config()
 	completions := []string{}
+	directive := cobra.ShellCompDirectiveNoFileComp
 
 	for name, param := range conf.Parameters {
 		if _, ok := parsed.Parameters[name]; ok {
@@ -89,6 +92,14 @@ func completeRun(cmd *cobra.Command, args []string, toComplete string) ([]string
 		}
 
 		completion := name + string(argparse.SeparatorKeyword)
+
+		if toComplete != "" {
+			if !strings.HasPrefix(completion, toComplete) {
+				continue
+			}
+
+			directive = cobra.ShellCompDirectiveNoSpace
+		}
 
 		if descr := param.Description(); descr != "" {
 			completion += "\t" + descr
@@ -110,11 +121,19 @@ func completeRun(cmd *cobra.Command, args []string, toComplete string) ([]string
 			positive += "\t" + descr + " (yes)"
 		}
 
-		completions = append(completions, negative, positive)
+		if toComplete == "" || strings.HasPrefix(negative, toComplete) {
+			completions = append(completions, negative)
+		}
+
+		if toComplete == "" || strings.HasPrefix(positive, toComplete) {
+			completions = append(completions, positive)
+		}
 	}
 
+	sort.Strings(completions)
+
 	if len(completions) > 0 {
-		return completions, cobra.ShellCompDirectiveNoFileComp
+		return completions, directive
 	}
 
 	return nil, cobra.ShellCompDirectiveDefault
