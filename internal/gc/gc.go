@@ -1,7 +1,6 @@
 package gc
 
 import (
-	"container/list"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -38,15 +37,17 @@ func Collect(validScripts []*script.Script) ([]string, error) { //nolint: cyclop
 	}
 
 	collected := []string{}
-	queue := list.New()
+	queue := NewListset()
 
 	for _, v := range getRootPaths() {
 		safePaths.Set(patricia.Prefix(filepath.Join(v, "\x00")), true)
-		queue.PushBack(v)
+		queue.Add(v)
 	}
 
-	for element := queue.Front(); element != nil; element = queue.Front() {
-		path := queue.Remove(element).(string)
+	queueIter := queue.Iter()
+
+	for queueIter.Scan() {
+		path := queueIter.Next()
 		prefix := patricia.Prefix(path)
 
 		switch {
@@ -69,7 +70,7 @@ func Collect(validScripts []*script.Script) ([]string, error) { //nolint: cyclop
 			}
 
 			for _, info := range files {
-				queue.PushBack(filepath.Join(path, info.Name()))
+				queueIter.Add(filepath.Join(path, info.Name()))
 			}
 
 		// some directory that is not a prefix of a safe subdirectory
@@ -92,17 +93,16 @@ func Remove(paths []string) error {
 		safePaths.Set(patricia.Prefix(rootPath), true)
 	}
 
-	queue := list.New()
-	seenPaths := map[string]bool{}
+	queue := NewListset()
 
 	for _, seed := range paths {
-		queue.PushBack(seed)
-
-		seenPaths[seed] = true
+		queue.Add(seed)
 	}
 
-	for element := queue.Front(); element != nil; element = queue.Front() {
-		path := queue.Remove(element).(string)
+	queueIter := queue.Iter()
+
+	for queueIter.Scan() {
+		path := queueIter.Next()
 
 		if safePaths.MatchSubtree(patricia.Prefix(path)) {
 			continue
@@ -118,10 +118,8 @@ func Remove(paths []string) error {
 		switch {
 		case err != nil:
 			return fmt.Errorf("cannot read directory %s: %w", path, err)
-		case len(content) == 0 && !seenPaths[rootPath]:
-			seenPaths[rootPath] = true
-
-			queue.PushBack(rootPath)
+		case len(content) == 0:
+			queueIter.Add(rootPath)
 		}
 	}
 
