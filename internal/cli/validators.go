@@ -29,7 +29,7 @@ func argumentOptional(index int, callback cobra.PositionalArgs) cobra.Positional
 	}
 }
 
-func validAsciiName(index int, err error) cobra.PositionalArgs {
+func validASCIIName(index int, err error) cobra.PositionalArgs {
 	return func(_ *cobra.Command, args []string) error {
 		if !asciiNameRegexp.MatchString(args[index]) {
 			return err

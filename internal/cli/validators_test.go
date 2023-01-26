@@ -92,9 +92,9 @@ func TestArgumentOptional(t *testing.T) {
 	})
 }
 
-func TestValidAsciiName(t *testing.T) {
-	err := errors.New("error!")
-	testable := validAsciiName(0, err)
+func TestValidASCIIName(t *testing.T) {
+	err := errors.New("error")
+	testable := validASCIIName(0, err)
 
 	testTable := map[string]bool{
 		"":       false,

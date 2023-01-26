@@ -19,8 +19,8 @@ func NewEditScript() *cobra.Command {
 		Short:      "Edit chore script",
 		Args: cobra.MatchAll(
 			cobra.ExactArgs(2), //nolint: gomnd
-			validAsciiName(0, ErrNamespaceInvalid),
-			validAsciiName(1, ErrScriptInvalid),
+			validASCIIName(0, ErrNamespaceInvalid),
+			validASCIIName(1, ErrScriptInvalid),
 		),
 		RunE:              mainEditScript,
 		ValidArgsFunction: completeNamespaceScript,

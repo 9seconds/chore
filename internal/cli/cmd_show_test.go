@@ -59,7 +59,7 @@ func (suite *CmdShowTestSuite) TestListNamespace() {
 	suite.Equal([]string{"s", "s2"}, ctx.StdoutLines())
 }
 
-func (suite *CmdShowTestSuite) TestShow() {
+func (suite *CmdShowTestSuite) TestShow() { //nolint: cyclop
 	ctx, err := suite.ExecuteCommand([]string{"ns", "s"})
 
 	scr := &script.Script{

@@ -18,8 +18,8 @@ func NewRun() *cobra.Command {
 		Short:   "Run chore script",
 		Args: cobra.MatchAll(
 			cobra.MinimumNArgs(2), //nolint: gomnd
-			validAsciiName(0, ErrNamespaceInvalid),
-			validAsciiName(1, ErrScriptInvalid),
+			validASCIIName(0, ErrNamespaceInvalid),
+			validASCIIName(1, ErrScriptInvalid),
 			validNamespace(0),
 			validScript(0, 1),
 		),

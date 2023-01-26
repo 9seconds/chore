@@ -46,8 +46,8 @@ func NewShow() *cobra.Command {
 		Short:   "Show details on scripts and namespaces.",
 		Args: cobra.MatchAll(
 			cobra.MaximumNArgs(2), //nolint: gomnd
-			argumentOptional(0, validAsciiName(0, ErrNamespaceInvalid)),
-			argumentOptional(1, validAsciiName(1, ErrScriptInvalid)),
+			argumentOptional(0, validASCIIName(0, ErrNamespaceInvalid)),
+			argumentOptional(1, validASCIIName(1, ErrScriptInvalid)),
 			argumentOptional(0, validNamespace(0)),
 			argumentOptional(1, validScript(0, 1)),
 		),

@@ -14,9 +14,7 @@ const (
 	fileDefaultPermission = 0o600
 )
 
-var (
-	ErrExpectedFile = errors.New("file is expected")
-)
+var ErrExpectedFile = errors.New("file is expected")
 
 func openEditor(ctx context.Context, editor, path string, templateContent []byte) error {
 	ctx, cancel := context.WithCancel(ctx)
