@@ -14,17 +14,23 @@ const (
 	fileDefaultPermission = 0o600
 )
 
+var (
+	ErrExpectedFile = errors.New("file is expected")
+)
+
 func openEditor(ctx context.Context, editor, path string, templateContent []byte) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	_, err := os.Stat(path)
+	stat, err := os.Stat(path)
 
 	switch {
 	case errors.Is(err, fs.ErrNotExist):
 		if err := os.WriteFile(path, templateContent, fileDefaultPermission); err != nil {
 			return fmt.Errorf("cannot populate file with a template content: %w", err)
 		}
+	case stat.IsDir():
+		return ErrExpectedFile
 	case err != nil:
 		return fmt.Errorf("cannot stat file: %w", err)
 	}
