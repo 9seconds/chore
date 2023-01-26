@@ -4,19 +4,16 @@ import (
 	"testing"
 
 	"github.com/9seconds/chore/internal/cli"
-	"github.com/9seconds/chore/internal/testlib"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
 
 type CmdGCTestSuite struct {
-	suite.Suite
-
-	testlib.CobraTestSuite
+	CmdTestSuite
 }
 
 func (suite *CmdGCTestSuite) SetupTest() {
-	suite.CobraTestSuite.Setup(suite.T(), cli.NewGC)
+	suite.CmdTestSuite.Setup("gc", cli.NewGC)
 
 	suite.EnsureDir(suite.ConfigNamespacePath("xx"))
 	suite.EnsureFile(suite.ConfigScriptPath("xy", "y"), "11", 0o600)
