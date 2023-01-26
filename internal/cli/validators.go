@@ -16,7 +16,7 @@ var (
 	ErrNamespaceInvalid        = errors.New("namespace is invalid")
 	ErrScriptInvalid           = errors.New("script is invalid")
 
-	ValidNameRegexp = regexp.MustCompile(`^[a-zA-Z0-9]+$`)
+	asciiNameRegexp = regexp.MustCompile(`^[a-zA-Z0-9_-]+$`)
 )
 
 func argumentOptional(index int, callback cobra.PositionalArgs) cobra.PositionalArgs {
@@ -29,9 +29,9 @@ func argumentOptional(index int, callback cobra.PositionalArgs) cobra.Positional
 	}
 }
 
-func validScriptName(index int, err error) cobra.PositionalArgs {
+func validAsciiName(index int, err error) cobra.PositionalArgs {
 	return func(_ *cobra.Command, args []string) error {
-		if !ValidNameRegexp.MatchString(args[index]) {
+		if !asciiNameRegexp.MatchString(args[index]) {
 			return err
 		}
 
