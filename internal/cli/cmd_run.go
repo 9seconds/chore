@@ -44,10 +44,12 @@ func mainRun(cmd *cobra.Command, args []string) {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "command has failed: %v\n", err)
 
-		exitCode = 1
+		os.Exit(1)
 	}
 
-	os.Exit(exitCode)
+	if exitCode != 0 {
+		os.Exit(exitCode)
+	}
 }
 
 func mainRunWrapper(cmd *cobra.Command, args []string) (int, error) {
