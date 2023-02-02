@@ -1,4 +1,4 @@
-package git2
+package git
 
 import (
 	"errors"
@@ -7,12 +7,12 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/go-git/go-git/v5"
+	gogit "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 )
 
 type Repo struct {
-	repo *git.Repository
+	repo *gogit.Repository
 
 	head    *plumbing.Reference
 	isDirty bool
@@ -59,31 +59,58 @@ func (r *Repo) HasTag(name string) (bool, error) {
 	return r.tags[name], nil
 }
 
-func (r *Repo) HasRevision(rev string) (ok bool, err error) {
+func (r *Repo) HasRevision(rev string) (bool, error) {
+	// go-git is horrible here: https://github.com/go-git/go-git/issues/674
+	// seems very little tested
+	_, err := r.resolveRevision(rev)
+
+	switch {
+	case errors.Is(err, plumbing.ErrReferenceNotFound):
+		return false, nil
+	case err != nil:
+		return false, err
+	}
+
+	return true, nil
+}
+
+func (r *Repo) HasCommit(rev string) (bool, error) {
+	hash, err := r.resolveRevision(rev)
+
+	switch {
+	case errors.Is(err, plumbing.ErrReferenceNotFound):
+		return false, nil
+	case err != nil:
+		return false, fmt.Errorf("cannot resolve revision: %w", err)
+	}
+
+	return strings.HasPrefix(hash.String(), rev), nil
+}
+
+func (r *Repo) resolveRevision(rev string) (hash *plumbing.Hash, err error) {
 	// go-git is horrible here: https://github.com/go-git/go-git/issues/674
 	// seems very little tested
 	defer func() {
 		if rec := recover(); rec != nil {
 			err = fmt.Errorf("panic: %v", rec)
-			ok = false
 		}
 	}()
 
-	hash, err := r.repo.ResolveRevision(plumbing.Revision(rev))
+	hash, err = r.repo.ResolveRevision(plumbing.Revision(rev))
 
 	switch {
 	case errors.Is(err, plumbing.ErrReferenceNotFound):
-		return false, nil
+		return nil, err
 	// https://github.com/go-git/go-git/issues/673
 	case err != nil && strings.Contains(err.Error(), "Revision invalid"):
-		return false, nil
+		return nil, plumbing.ErrReferenceNotFound
 	case err != nil:
-		return false, fmt.Errorf("cannot resolve revision: %w", err)
-	case hash != &plumbing.ZeroHash, hash != nil && *hash != plumbing.ZeroHash:
-		return true, nil
+		return nil, fmt.Errorf("cannot resolve revision: %w", err)
+	case hash == &plumbing.ZeroHash, hash != nil && *hash == plumbing.ZeroHash:
+		return nil, plumbing.ErrReferenceNotFound
 	}
 
-	return r.HasBranch(rev)
+	return hash, nil
 }
 
 func (r *Repo) Head() (*plumbing.Reference, error) {
@@ -104,7 +131,7 @@ func New() (*Repo, error) {
 		gitDir = value
 	}
 
-	repo, err := git.PlainOpenWithOptions(gitDir, &git.PlainOpenOptions{
+	repo, err := gogit.PlainOpenWithOptions(gitDir, &gogit.PlainOpenOptions{
 		DetectDotGit:          true,
 		EnableDotGitCommonDir: true,
 	})

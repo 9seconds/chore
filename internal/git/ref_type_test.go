@@ -1,9 +1,9 @@
-package git2_test
+package git_test
 
 import (
 	"testing"
 
-	"github.com/9seconds/chore/internal/git2"
+	"github.com/9seconds/chore/internal/git"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -23,8 +23,8 @@ func TestRefType(t *testing.T) {
 		isValid := isValid
 
 		t.Run(testValue, func(t *testing.T) {
-			value := git2.RefType(testValue)
-			ref, err := git2.GetRefType(testValue)
+			value := git.RefType(testValue)
+			ref, err := git.GetRefType(testValue)
 
 			assert.Equal(t, testValue, value.String())
 
@@ -40,9 +40,9 @@ func TestRefType(t *testing.T) {
 	}
 
 	t.Run("default", func(t *testing.T) {
-		ref, err := git2.GetRefType("")
+		ref, err := git.GetRefType("")
 
 		assert.NoError(t, err)
-		assert.Equal(t, git2.RefTypeRevision, ref)
+		assert.Equal(t, git.RefTypeRevision, ref)
 	})
 }

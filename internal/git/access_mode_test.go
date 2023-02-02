@@ -1,9 +1,9 @@
-package git2_test
+package git_test
 
 import (
 	"testing"
 
-	"github.com/9seconds/chore/internal/git2"
+	"github.com/9seconds/chore/internal/git"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -20,8 +20,8 @@ func TestAccessMode(t *testing.T) {
 		isValid := isValid
 
 		t.Run(testValue, func(t *testing.T) {
-			value := git2.AccessMode(testValue)
-			mode, err := git2.GetAccessMode(testValue)
+			value := git.AccessMode(testValue)
+			mode, err := git.GetAccessMode(testValue)
 
 			assert.Equal(t, testValue, value.String())
 
@@ -37,9 +37,9 @@ func TestAccessMode(t *testing.T) {
 	}
 
 	t.Run("default", func(t *testing.T) {
-		mode, err := git2.GetAccessMode("")
+		mode, err := git.GetAccessMode("")
 
 		assert.NoError(t, err)
-		assert.Equal(t, git2.AccessModeNo, mode)
+		assert.Equal(t, git.AccessModeNo, mode)
 	})
 }

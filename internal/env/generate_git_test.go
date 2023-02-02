@@ -13,18 +13,18 @@ type GenerateGitTestSuite struct {
 }
 
 func (suite *GenerateGitTestSuite) TestGitAccessNo() {
-	env.GenerateGit(suite.Context(), suite.values, suite.wg, git.AccessNo)
+	env.GenerateGit(suite.Context(), suite.values, suite.wg, git.AccessModeNo)
 	suite.Empty(suite.Collect())
 }
 
 func (suite *GenerateGitTestSuite) TestGitAccessIfPresent() {
 	suite.Setenv(env.EnvGitReference, "xx")
-	env.GenerateGit(suite.Context(), suite.values, suite.wg, git.AccessIfUndefined)
+	env.GenerateGit(suite.Context(), suite.values, suite.wg, git.AccessModeIfUndefined)
 	suite.Empty(suite.Collect())
 }
 
 func (suite *GenerateGitTestSuite) TestGitAccess() {
-	env.GenerateGit(suite.Context(), suite.values, suite.wg, git.AccessAlways)
+	env.GenerateGit(suite.Context(), suite.values, suite.wg, git.AccessModeAlways)
 	data := suite.Collect()
 
 	suite.Len(data, 6)

@@ -1,10 +1,10 @@
-package git2_test
+package git_test
 
 import (
 	"path/filepath"
 	"testing"
 
-	"github.com/9seconds/chore/internal/git2"
+	"github.com/9seconds/chore/internal/git"
 	"github.com/9seconds/chore/internal/testlib"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -17,7 +17,7 @@ type RepoTestSuite struct {
 	testlib.CustomRootTestSuite
 	testlib.GitTestSuite
 
-	repo *git2.Repo
+	repo *git.Repo
 }
 
 func (suite *RepoTestSuite) SetupTest() {
@@ -41,7 +41,7 @@ func (suite *RepoTestSuite) SetupTest() {
 	suite.GitCreateTag("light", headHash)
 	suite.GitCreateAnnotatedTag("annotated", "Hello", headHash)
 
-	gitRepo, err := git2.New()
+	gitRepo, err := git.New()
 	require.NoError(suite.T(), err)
 
 	suite.repo = gitRepo
@@ -199,6 +199,26 @@ func (suite *RepoTestSuite) TestUntracked() {
 
 	suite.NoError(err)
 	suite.True(ok)
+}
+
+func (suite *RepoTestSuite) TestCommit() {
+	head := suite.GitHead().Hash().String()
+
+	ok, err := suite.repo.HasCommit(head)
+	suite.True(ok)
+	suite.NoError(err)
+
+	ok, err = suite.repo.HasCommit(head[:8])
+	suite.True(ok)
+	suite.NoError(err)
+
+	ok, err = suite.repo.HasCommit("xxx")
+	suite.False(ok)
+	suite.NoError(err)
+
+	ok, err = suite.repo.HasCommit("br1")
+	suite.False(ok)
+	suite.NoError(err)
 }
 
 func TestRepo(t *testing.T) {

@@ -14,9 +14,11 @@ const GitCommitHashShortLength = 12
 
 func GenerateGit(ctx context.Context, results chan<- string, waiters *sync.WaitGroup, mode git.AccessMode) { //nolint: cyclop
 	switch mode {
-	case git.AccessNo:
+	case git.AccessModeNo:
+
 		return
-	case git.AccessIfUndefined:
+
+	case git.AccessModeIfUndefined:
 		if _, ok := os.LookupEnv(EnvGitReference); ok {
 			return
 		}
@@ -27,7 +29,7 @@ func GenerateGit(ctx context.Context, results chan<- string, waiters *sync.WaitG
 	go func() {
 		defer waiters.Done()
 
-		repo, err := git.GetRepo()
+		repo, err := git.Get()
 		if err != nil {
 			log.Printf("cannot find out correct git repo: %v", err)
 
@@ -52,31 +54,21 @@ func GenerateGit(ctx context.Context, results chan<- string, waiters *sync.WaitG
 
 		switch {
 		case refName.IsBranch():
-			sendValue(ctx, results, EnvGitReferenceType, git.RefTypeBranch)
+			sendValue(ctx, results, EnvGitReferenceType, git.RefTypeBranch.String())
 		case refName.IsTag():
-			sendValue(ctx, results, EnvGitReferenceType, git.RefTypeTag)
+			sendValue(ctx, results, EnvGitReferenceType, git.RefTypeTag.String())
 		case refName.IsRemote():
-			sendValue(ctx, results, EnvGitReferenceType, git.RefTypeRemote)
+			sendValue(ctx, results, EnvGitReferenceType, git.RefTypeRemote.String())
 		case refName.IsNote():
-			sendValue(ctx, results, EnvGitReferenceType, git.RefTypeNote)
+			sendValue(ctx, results, EnvGitReferenceType, git.RefTypeNote.String())
 		default:
-			sendValue(ctx, results, EnvGitReferenceType, git.RefTypeCommit)
+			sendValue(ctx, results, EnvGitReferenceType, git.RefTypeCommit.String())
 		}
 
-		workTree, err := repo.Worktree()
-		if err != nil {
-			log.Printf("cannot get work tree: %v", err)
-
-			return
+		if isDirty, err := repo.IsDirty(); err != nil {
+			log.Printf("cannot detect if repository is dirty: %v", err)
+		} else {
+			sendValue(ctx, results, EnvGitIsDirty, strconv.FormatBool(isDirty))
 		}
-
-		status, err := workTree.Status()
-		if err != nil {
-			log.Printf("cannot get work tree status: %v", err)
-
-			return
-		}
-
-		sendValue(ctx, results, EnvGitIsDirty, strconv.FormatBool(!status.IsClean()))
 	}()
 }
