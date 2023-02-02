@@ -13,7 +13,7 @@ require (
 	github.com/denisbrodbeck/machineid v1.0.1
 	github.com/gabriel-vasile/mimetype v1.4.1
 	github.com/go-git/go-git/v5 v5.5.2
-	github.com/gofrs/uuid v4.3.1+incompatible
+	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/jarcoal/httpmock v1.2.0
 	github.com/spf13/cobra v1.6.1
 	github.com/stretchr/testify v1.8.1
@@ -26,10 +26,10 @@ require (
 
 require (
 	github.com/Microsoft/go-winio v0.6.0 // indirect
-	github.com/ProtonMail/go-crypto v0.0.0-20230113180642-068501e20d67 // indirect
+	github.com/ProtonMail/go-crypto v0.0.0-20230201104953-d1d05f4e2bfb // indirect
 	github.com/acomagu/bufpipe v1.0.3 // indirect
 	github.com/alecthomas/repr v0.1.0 // indirect
-	github.com/cloudflare/circl v1.3.1 // indirect
+	github.com/cloudflare/circl v1.3.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/go-git/gcfg v1.5.0 // indirect

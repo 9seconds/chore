@@ -41,14 +41,20 @@ func (suite *NetworkTestSuite) Setup(t *testing.T) {
 }
 
 func (suite *NetworkTestSuite) Dialer() *DialerMock {
+	suite.t.Helper()
+
 	return suite.dialer
 }
 
 func (suite *NetworkTestSuite) DNS() *DNSResolverMock {
+	suite.t.Helper()
+
 	return suite.dns
 }
 
 func (suite *NetworkTestSuite) MakeNetConn() *NetConnMock {
+	suite.t.Helper()
+
 	connMock := &NetConnMock{}
 
 	suite.t.Cleanup(func() {

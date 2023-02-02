@@ -18,6 +18,8 @@ func (suite *FixturesTestSuite) Setup(t *testing.T) {
 }
 
 func (suite *FixturesTestSuite) FixturePath(path string) string {
+	suite.t.Helper()
+
 	path = filepath.Join("testdata", path)
 
 	require.FileExists(suite.t, path)

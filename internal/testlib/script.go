@@ -17,6 +17,8 @@ func (suite *ScriptTestSuite) Setup(t *testing.T) {
 }
 
 func (suite *ScriptTestSuite) NewScript(namespace, executable string) *script.Script {
+	suite.t.Helper()
+
 	scr := &script.Script{
 		Namespace:  namespace,
 		Executable: executable,

@@ -56,6 +56,8 @@ func (suite *CobraTestSuite) Setup(t *testing.T, makeCommand func() *cobra.Comma
 }
 
 func (suite *CobraTestSuite) ExecuteCommand(args []string) (*CobraCommandContext, error) {
+	suite.t.Helper()
+
 	cmd := suite.makeCommand()
 	ctx := &CobraCommandContext{
 		Context: suite.Context(),
