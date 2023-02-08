@@ -15,9 +15,7 @@ const GitCommitHashShortLength = 12
 func GenerateGit(ctx context.Context, results chan<- string, waiters *sync.WaitGroup, mode git.AccessMode) { //nolint: cyclop
 	switch mode {
 	case git.AccessModeNo:
-
 		return
-
 	case git.AccessModeIfUndefined:
 		if _, ok := os.LookupEnv(EnvGitReference); ok {
 			return

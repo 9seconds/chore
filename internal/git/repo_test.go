@@ -204,20 +204,20 @@ func (suite *RepoTestSuite) TestUntracked() {
 func (suite *RepoTestSuite) TestCommit() {
 	head := suite.GitHead().Hash().String()
 
-	ok, err := suite.repo.HasCommit(head)
-	suite.True(ok)
+	okay, err := suite.repo.HasCommit(head)
+	suite.True(okay)
 	suite.NoError(err)
 
-	ok, err = suite.repo.HasCommit(head[:8])
-	suite.True(ok)
+	okay, err = suite.repo.HasCommit(head[:8])
+	suite.True(okay)
 	suite.NoError(err)
 
-	ok, err = suite.repo.HasCommit("xxx")
-	suite.False(ok)
+	okay, err = suite.repo.HasCommit("xxx")
+	suite.False(okay)
 	suite.NoError(err)
 
-	ok, err = suite.repo.HasCommit("br1")
-	suite.False(ok)
+	okay, err = suite.repo.HasCommit("br1")
+	suite.False(okay)
 	suite.NoError(err)
 }
 

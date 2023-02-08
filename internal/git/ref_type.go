@@ -5,17 +5,14 @@ import "errors"
 type RefType string
 
 const (
-	RefTypeRevision RefType = "revision"
-	RefTypeTag      RefType = "tag"
-	RefTypeBranch   RefType = "branch"
-	RefTypeRemote   RefType = "remote"
-	RefTypeNote     RefType = "note"
-	RefTypeCommit   RefType = "commit"
+	RefTypeTag    RefType = "tag"
+	RefTypeBranch RefType = "branch"
+	RefTypeRemote RefType = "remote"
+	RefTypeNote   RefType = "note"
+	RefTypeCommit RefType = "commit"
 )
 
-var (
-	ErrInvalidRefType = errors.New("invalid reftype")
-)
+var ErrInvalidRefType = errors.New("invalid reftype")
 
 func (r RefType) String() string {
 	return string(r)
@@ -23,7 +20,7 @@ func (r RefType) String() string {
 
 func (r RefType) Valid() bool {
 	switch string(r) {
-	case "tag", "branch", "remote", "note", "commit", "revision":
+	case "tag", "branch", "remote", "note", "commit":
 		return true
 	}
 
@@ -31,10 +28,6 @@ func (r RefType) Valid() bool {
 }
 
 func GetRefType(value string) (RefType, error) {
-	if value == "" {
-		value = RefTypeRevision.String()
-	}
-
 	ref := RefType(value)
 
 	if !ref.Valid() {

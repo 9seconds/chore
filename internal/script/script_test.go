@@ -116,7 +116,7 @@ func (suite *ScriptTestSuite) TestEnviron() {
 
 	conf := scr.Config()
 	conf.Network = true
-	conf.Git = git.AccessIfUndefined
+	conf.Git = git.AccessModeIfUndefined
 
 	environ := scr.Environ(context.Background(), argparse.ParsedArgs{
 		Parameters: map[string]string{

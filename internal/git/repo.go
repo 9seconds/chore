@@ -14,9 +14,6 @@ import (
 type Repo struct {
 	repo *gogit.Repository
 
-	head    *plumbing.Reference
-	isDirty bool
-
 	branches map[string]bool
 	remotes  map[string]bool
 	notes    map[string]bool
@@ -121,7 +118,7 @@ func (r *Repo) IsDirty() (bool, error) {
 	return r.collectIsDirty()
 }
 
-func New() (*Repo, error) {
+func New() (*Repo, error) { //nolint: cyclop
 	gitDir, err := os.Getwd()
 	if err != nil {
 		return nil, fmt.Errorf("cannot find out current working dir: %w", err)

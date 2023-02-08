@@ -2,7 +2,7 @@ package git
 
 import "sync"
 
-func memoize[T any](fn func() (T, error)) func() (T, error) {
+func memoize[T any](callback func() (T, error)) func() (T, error) {
 	var (
 		result T
 		err    error
@@ -12,7 +12,7 @@ func memoize[T any](fn func() (T, error)) func() (T, error) {
 
 	return func() (T, error) {
 		once.Do(func() {
-			result, err = fn()
+			result, err = callback()
 		})
 
 		return result, err

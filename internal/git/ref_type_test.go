@@ -9,13 +9,12 @@ import (
 
 func TestRefType(t *testing.T) {
 	testTable := map[string]bool{
-		"revision": true,
-		"tag":      true,
-		"branch":   true,
-		"remote":   true,
-		"note":     true,
-		"commit":   true,
-		"xx":       false,
+		"tag":    true,
+		"branch": true,
+		"remote": true,
+		"note":   true,
+		"commit": true,
+		"xx":     false,
 	}
 
 	for testValue, isValid := range testTable {
@@ -38,11 +37,4 @@ func TestRefType(t *testing.T) {
 			}
 		})
 	}
-
-	t.Run("default", func(t *testing.T) {
-		ref, err := git.GetRefType("")
-
-		assert.NoError(t, err)
-		assert.Equal(t, git.RefTypeRevision, ref)
-	})
 }

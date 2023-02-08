@@ -90,7 +90,8 @@ func (suite *GitTestSuite) GitCreateRemoteBranch(name, remote string, hash plumb
 		suite.repo.CreateBranch(&config.Branch{
 			Name:   name,
 			Remote: remote,
-			Merge:  branchName}))
+			Merge:  branchName,
+		}))
 	require.NoError(
 		suite.t,
 		suite.repo.Storer.SetReference(

@@ -10,9 +10,7 @@ const (
 	AccessModeAlways      AccessMode = "always"
 )
 
-var (
-	ErrInvalidAccessMode = errors.New("invalid mode")
-)
+var ErrInvalidAccessMode = errors.New("invalid mode")
 
 func (a AccessMode) String() string {
 	return string(a)
