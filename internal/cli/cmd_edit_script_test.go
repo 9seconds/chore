@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/9seconds/chore/internal/cli"
+	"github.com/9seconds/chore/internal/paths"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -26,14 +27,14 @@ func (suite *CmdEditScriptTestSuite) TestNewFile() {
 	suite.Empty(ctx.StdoutLines())
 	suite.Empty(ctx.StderrLines())
 
-	stat, err := os.Stat(suite.ConfigScriptPath("xx", "x"))
+	stat, err := os.Stat(paths.ConfigNamespaceScript("xx", "x"))
 
 	suite.NoError(err)
 	suite.Greater(stat.Size(), int64(0))
 }
 
 func (suite *CmdEditScriptTestSuite) TestExistingFile() {
-	before, err := os.ReadFile(suite.ConfigScriptPath("ns", "s"))
+	before, err := os.ReadFile(paths.ConfigNamespaceScript("ns", "s"))
 	suite.NoError(err)
 
 	ctx, err := suite.ExecuteCommand([]string{"-e", "true", "ns", "s"})
@@ -42,7 +43,7 @@ func (suite *CmdEditScriptTestSuite) TestExistingFile() {
 	suite.Empty(ctx.StdoutLines())
 	suite.Empty(ctx.StderrLines())
 
-	after, err := os.ReadFile(suite.ConfigScriptPath("ns", "s"))
+	after, err := os.ReadFile(paths.ConfigNamespaceScript("ns", "s"))
 	suite.NoError(err)
 
 	suite.NoError(err)
@@ -50,7 +51,7 @@ func (suite *CmdEditScriptTestSuite) TestExistingFile() {
 }
 
 func (suite *CmdEditScriptTestSuite) TestEditorFailed() {
-	before, err := os.ReadFile(suite.ConfigScriptPath("ns", "s"))
+	before, err := os.ReadFile(paths.ConfigNamespaceScript("ns", "s"))
 	suite.NoError(err)
 
 	ctx, err := suite.ExecuteCommand([]string{"-e", "false", "ns", "s"})
@@ -59,7 +60,7 @@ func (suite *CmdEditScriptTestSuite) TestEditorFailed() {
 	suite.NotEmpty(ctx.StdoutLines())
 	suite.NotEmpty(ctx.StderrLines())
 
-	after, err := os.ReadFile(suite.ConfigScriptPath("ns", "s"))
+	after, err := os.ReadFile(paths.ConfigNamespaceScript("ns", "s"))
 	suite.NoError(err)
 
 	suite.NoError(err)

@@ -5,8 +5,8 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/9seconds/chore/internal/env"
 	"github.com/9seconds/chore/internal/gc"
+	"github.com/9seconds/chore/internal/paths"
 	"github.com/9seconds/chore/internal/script"
 	"github.com/9seconds/chore/internal/testlib"
 	"github.com/stretchr/testify/require"
@@ -37,16 +37,16 @@ func (suite *GCTestSuite) SetupTest() {
 	suite.EnsureScript("x", "valid_script_with_incorrect_config", "echo 2")
 	suite.EnsureScriptConfig("x", "valid_script_with_incorrect_config", "{")
 
-	suite.EnsureDir(suite.ConfigScriptConfigPath("y", "script_config_dir"))
-	suite.EnsureDir(suite.ConfigScriptPath("y", "script_dir"))
-	suite.EnsureDir(suite.DataNamespacePath("y1"))
-	suite.EnsureFile(suite.DataNamespacePath("y2"), "", 0o600)
-	suite.EnsureFile(suite.CacheNamespacePath("y2"), "", 0o600)
-	suite.EnsureDir(suite.CacheScriptPath("y", "script_dir"))
+	suite.EnsureDir(paths.ConfigNamespaceScriptConfig("y", "script_config_dir"))
+	suite.EnsureDir(paths.ConfigNamespaceScript("y", "script_dir"))
+	suite.EnsureDir(paths.DataNamespace("y1"))
+	suite.EnsureFile(paths.DataNamespace("y2"), "", 0o600)
+	suite.EnsureFile(paths.CacheNamespace("y2"), "", 0o600)
+	suite.EnsureDir(paths.CacheNamespaceScript("y", "script_dir"))
 	suite.EnsureDir(
-		filepath.Join(suite.StateScriptPath("x", "valid_script_without_config"), "a"),
+		filepath.Join(paths.StateNamespaceScript("x", "valid_script_without_config"), "a"),
 	)
-	suite.EnsureDir(suite.CacheScriptPath("x", "valid_script_with_config"))
+	suite.EnsureDir(paths.CacheNamespaceScript("x", "valid_script_with_config"))
 
 	namespaces, err := script.ListNamespaces()
 	require.NoError(suite.T(), err)
@@ -73,12 +73,12 @@ func (suite *GCTestSuite) TestCollect() {
 	suite.NoError(err)
 
 	suite.EqualStrings([]string{
-		suite.CacheNamespacePath("y"),
-		suite.CacheNamespacePath("y2"),
-		suite.ConfigScriptConfigPath("x", "valid_script_with_incorrect_config"),
-		suite.ConfigNamespacePath("y"),
-		suite.DataNamespacePath("y1"),
-		suite.DataNamespacePath("y2"),
+		paths.CacheNamespace("y"),
+		paths.CacheNamespace("y2"),
+		paths.ConfigNamespaceScriptConfig("x", "valid_script_with_incorrect_config"),
+		paths.ConfigNamespace("y"),
+		paths.DataNamespace("y1"),
+		paths.DataNamespace("y2"),
 	}, filenames)
 }
 
@@ -87,16 +87,16 @@ func (suite *GCTestSuite) TestRemove() {
 	suite.NoError(err)
 
 	suite.NoError(gc.Remove(filenames))
-	suite.DirExists(env.RootPathConfig())
-	suite.DirExists(env.RootPathState())
-	suite.DirExists(env.RootPathCache())
-	suite.DirExists(env.RootPathData())
-	suite.NoDirExists(suite.DataNamespacePath("y1"))
-	suite.NoDirExists(suite.DataNamespacePath("y2"))
-	suite.NoDirExists(suite.CacheNamespacePath("y1"))
-	suite.NoDirExists(suite.CacheNamespacePath("y2"))
-	suite.NoDirExists(suite.ConfigNamespacePath("y"))
-	suite.NoFileExists(suite.ConfigScriptConfigPath("x", "valid_script_without_config"))
+	suite.DirExists(paths.ConfigRoot())
+	suite.DirExists(paths.StateRoot())
+	suite.DirExists(paths.CacheRoot())
+	suite.DirExists(paths.DataRoot())
+	suite.NoDirExists(paths.DataNamespace("y1"))
+	suite.NoDirExists(paths.DataNamespace("y2"))
+	suite.NoDirExists(paths.CacheNamespace("y1"))
+	suite.NoDirExists(paths.CacheNamespace("y2"))
+	suite.NoDirExists(paths.ConfigNamespace("y"))
+	suite.NoFileExists(paths.ConfigNamespaceScriptConfig("x", "valid_script_without_config"))
 }
 
 func TestGC(t *testing.T) {

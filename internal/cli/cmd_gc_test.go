@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/9seconds/chore/internal/cli"
+	"github.com/9seconds/chore/internal/paths"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
@@ -15,9 +16,9 @@ type CmdGCTestSuite struct {
 func (suite *CmdGCTestSuite) SetupTest() {
 	suite.CmdTestSuite.Setup("gc", cli.NewGC)
 
-	suite.EnsureDir(suite.ConfigNamespacePath("xx"))
-	suite.EnsureFile(suite.ConfigScriptPath("xy", "y"), "11", 0o600)
-	suite.EnsureFile(suite.ConfigScriptPath("xx", "z"), "11", 0o600)
+	suite.EnsureDir(paths.ConfigNamespace("xx"))
+	suite.EnsureFile(paths.ConfigNamespaceScript("xy", "y"), "11", 0o600)
+	suite.EnsureFile(paths.ConfigNamespaceScript("xx", "z"), "11", 0o600)
 }
 
 func (suite *CmdGCTestSuite) TestDryRun() {
@@ -28,17 +29,17 @@ func (suite *CmdGCTestSuite) TestDryRun() {
 			ctx, err := suite.ExecuteCommand([]string{testValue})
 
 			assert.NoError(t, err)
-			assert.DirExists(t, suite.ConfigNamespacePath("xx"))
-			assert.FileExists(t, suite.ConfigScriptPath("xy", "y"))
-			assert.FileExists(t, suite.ConfigScriptPath("xx", "z"))
+			assert.DirExists(t, paths.ConfigNamespace("xx"))
+			assert.FileExists(t, paths.ConfigNamespaceScript("xy", "y"))
+			assert.FileExists(t, paths.ConfigNamespaceScript("xx", "z"))
 			assert.Empty(t, ctx.StderrLines())
 
 			lines := ctx.StdoutLines()
 
 			assert.NotEmpty(t, lines)
 			assert.Len(t, lines, 2)
-			assert.Contains(t, lines, suite.ConfigNamespacePath("xx"))
-			assert.Contains(t, lines, suite.ConfigNamespacePath("xy"))
+			assert.Contains(t, lines, paths.ConfigNamespace("xx"))
+			assert.Contains(t, lines, paths.ConfigNamespace("xy"))
 		})
 	}
 }
@@ -47,8 +48,8 @@ func (suite *CmdGCTestSuite) TestRun() {
 	ctx, err := suite.ExecuteCommand([]string{})
 
 	suite.NoError(err)
-	suite.NoDirExists(suite.ConfigNamespacePath("xx"))
-	suite.NoDirExists(suite.ConfigNamespacePath("xy"))
+	suite.NoDirExists(paths.ConfigNamespace("xx"))
+	suite.NoDirExists(paths.ConfigNamespace("xy"))
 	suite.Empty(ctx.StderrLines())
 	suite.Empty(ctx.StdoutLines())
 }

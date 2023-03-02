@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/9seconds/chore/internal/paths"
 	"github.com/9seconds/chore/internal/testlib"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
@@ -23,7 +24,7 @@ func (suite *ValidNamespaceTestSuite) SetupTest() {
 
 	suite.fn = validNamespace(0)
 
-	suite.EnsureFile(suite.ConfigNamespacePath("xx"), "", 0o600)
+	suite.EnsureFile(paths.ConfigNamespace("xx"), "", 0o600)
 }
 
 func (suite *ValidNamespaceTestSuite) TestUnknownPath() {
@@ -46,9 +47,9 @@ func (suite *ValidScriptTestSuite) SetupTest() {
 
 	suite.fn = validScript(0, 1)
 
-	suite.EnsureFile(suite.ConfigNamespacePath("xx"), "", 0o600)
-	suite.EnsureDir(suite.ConfigNamespacePath("yy"))
-	suite.EnsureDir(suite.ConfigScriptConfigPath("zz", "a"))
+	suite.EnsureFile(paths.ConfigNamespace("xx"), "", 0o600)
+	suite.EnsureDir(paths.ConfigNamespace("yy"))
+	suite.EnsureDir(paths.ConfigNamespaceScriptConfig("zz", "a"))
 	suite.EnsureScript("aa", "a", "")
 }
 

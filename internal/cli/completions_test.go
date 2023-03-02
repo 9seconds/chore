@@ -3,7 +3,7 @@ package cli
 import (
 	"testing"
 
-	"github.com/9seconds/chore/internal/env"
+	"github.com/9seconds/chore/internal/paths"
 	"github.com/9seconds/chore/internal/testlib"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/suite"
@@ -37,7 +37,7 @@ func (suite *CompleteNamespacesTestSuite) TestError() {
 }
 
 func (suite *CompleteNamespacesTestSuite) TestEmpty() {
-	suite.EnsureDir(env.RootPathConfig())
+	suite.EnsureDir(paths.ConfigRoot())
 
 	namespaces, directive := completeNamespaces()
 
@@ -46,9 +46,9 @@ func (suite *CompleteNamespacesTestSuite) TestEmpty() {
 }
 
 func (suite *CompleteNamespacesTestSuite) TestSomething() {
-	suite.EnsureDir(suite.ConfigNamespacePath("xx"))
-	suite.EnsureDir(suite.ConfigNamespacePath("yy"))
-	suite.EnsureDir(suite.ConfigNamespacePath("__"))
+	suite.EnsureDir(paths.ConfigNamespace("xx"))
+	suite.EnsureDir(paths.ConfigNamespace("yy"))
+	suite.EnsureDir(paths.ConfigNamespace("__"))
 
 	namespaces, directive := completeNamespaces()
 
@@ -68,7 +68,7 @@ func (suite *CompleteScriptsTestSuite) TestError() {
 }
 
 func (suite *CompleteScriptsTestSuite) TestEmpty() {
-	suite.EnsureDir(suite.ConfigNamespacePath("xx"))
+	suite.EnsureDir(paths.ConfigNamespace("xx"))
 
 	scripts, directive := completeScripts("xx")
 
@@ -81,7 +81,7 @@ func (suite *CompleteScriptsTestSuite) TestList() {
 	suite.EnsureScript("xx", "y2", "")
 	suite.EnsureScript("xx", "_y2", "")
 	suite.EnsureScript("xz", "y2", "")
-	suite.EnsureDir(suite.ConfigNamespacePath("xx"))
+	suite.EnsureDir(paths.ConfigNamespace("xx"))
 
 	scripts, directive := completeScripts("xx")
 
@@ -101,8 +101,8 @@ func (suite *CompleteNamespaceScriptTestSuite) TestNamespaceError() {
 }
 
 func (suite *CompleteNamespaceScriptTestSuite) TestNamespaces() {
-	suite.EnsureDir(suite.ConfigNamespacePath("xx"))
-	suite.EnsureDir(suite.ConfigNamespacePath("_"))
+	suite.EnsureDir(paths.ConfigNamespace("xx"))
+	suite.EnsureDir(paths.ConfigNamespace("_"))
 
 	values, directive := completeNamespaceScript(suite.cmd, nil, "")
 
@@ -111,8 +111,8 @@ func (suite *CompleteNamespaceScriptTestSuite) TestNamespaces() {
 }
 
 func (suite *CompleteNamespaceScriptTestSuite) TestEmptyNamespace() {
-	suite.EnsureDir(suite.ConfigNamespacePath("xx"))
-	suite.EnsureDir(suite.ConfigNamespacePath("_"))
+	suite.EnsureDir(paths.ConfigNamespace("xx"))
+	suite.EnsureDir(paths.ConfigNamespace("_"))
 
 	values, directive := completeNamespaceScript(suite.cmd, []string{"xx"}, "")
 
@@ -121,8 +121,8 @@ func (suite *CompleteNamespaceScriptTestSuite) TestEmptyNamespace() {
 }
 
 func (suite *CompleteNamespaceScriptTestSuite) TestUnknownNamespace() {
-	suite.EnsureDir(suite.ConfigNamespacePath("xx"))
-	suite.EnsureDir(suite.ConfigNamespacePath("_"))
+	suite.EnsureDir(paths.ConfigNamespace("xx"))
+	suite.EnsureDir(paths.ConfigNamespace("_"))
 
 	values, directive := completeNamespaceScript(suite.cmd, []string{"a"}, "")
 
@@ -162,8 +162,8 @@ func (suite *CompleteRunTestSuite) TestNamespaceError() {
 }
 
 func (suite *CompleteRunTestSuite) TestNamespaces() {
-	suite.EnsureDir(suite.ConfigNamespacePath("xx"))
-	suite.EnsureDir(suite.ConfigNamespacePath("_"))
+	suite.EnsureDir(paths.ConfigNamespace("xx"))
+	suite.EnsureDir(paths.ConfigNamespace("_"))
 
 	values, directive := completeRun(suite.cmd, nil, "")
 
@@ -172,8 +172,8 @@ func (suite *CompleteRunTestSuite) TestNamespaces() {
 }
 
 func (suite *CompleteRunTestSuite) TestEmptyNamespace() {
-	suite.EnsureDir(suite.ConfigNamespacePath("xx"))
-	suite.EnsureDir(suite.ConfigNamespacePath("_"))
+	suite.EnsureDir(paths.ConfigNamespace("xx"))
+	suite.EnsureDir(paths.ConfigNamespace("_"))
 
 	values, directive := completeRun(suite.cmd, []string{"xx"}, "")
 
@@ -182,8 +182,8 @@ func (suite *CompleteRunTestSuite) TestEmptyNamespace() {
 }
 
 func (suite *CompleteRunTestSuite) TestUnknownNamespace() {
-	suite.EnsureDir(suite.ConfigNamespacePath("xx"))
-	suite.EnsureDir(suite.ConfigNamespacePath("_"))
+	suite.EnsureDir(paths.ConfigNamespace("xx"))
+	suite.EnsureDir(paths.ConfigNamespace("_"))
 
 	values, directive := completeRun(suite.cmd, []string{"a"}, "")
 

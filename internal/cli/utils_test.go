@@ -5,6 +5,7 @@ import (
 	"os/exec"
 	"testing"
 
+	"github.com/9seconds/chore/internal/paths"
 	"github.com/9seconds/chore/internal/testlib"
 	"github.com/stretchr/testify/suite"
 )
@@ -20,7 +21,7 @@ func (suite *OpenEditorTestSuite) SetupTest() {
 	suite.CustomRootTestSuite.Setup(suite.T())
 	suite.CtxTestSuite.Setup(suite.T())
 
-	suite.EnsureDir(suite.ConfigNamespacePath("xx"))
+	suite.EnsureDir(paths.ConfigNamespace("xx"))
 }
 
 func (suite *OpenEditorTestSuite) TestCannotWriteDirectory() {
@@ -28,13 +29,13 @@ func (suite *OpenEditorTestSuite) TestCannotWriteDirectory() {
 		openEditor(
 			suite.Context(),
 			"true",
-			suite.ConfigNamespacePath("xx"),
+			paths.ConfigNamespace("xx"),
 			[]byte{1, 2, 3}),
 		ErrExpectedFile)
 }
 
 func (suite *OpenEditorTestSuite) TestEditedOk() {
-	path := suite.ConfigNamespacePath("aa")
+	path := paths.ConfigNamespace("aa")
 
 	suite.NoError(openEditor(suite.Context(), "true", path, []byte{1, 2, 3}))
 
@@ -45,7 +46,7 @@ func (suite *OpenEditorTestSuite) TestEditedOk() {
 }
 
 func (suite *OpenEditorTestSuite) TestEditedFailed() {
-	path := suite.ConfigNamespacePath("aa")
+	path := paths.ConfigNamespace("aa")
 
 	suite.ErrorContains(
 		openEditor(suite.Context(), "false", path, []byte{1, 2, 3}),

@@ -7,6 +7,7 @@ import (
 
 	"github.com/9seconds/chore/internal/cli"
 	"github.com/9seconds/chore/internal/config"
+	"github.com/9seconds/chore/internal/paths"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -27,7 +28,7 @@ func (suite *CmdEditConfigTestSuite) TestNewFile() {
 	suite.Empty(ctx.StdoutLines())
 	suite.Empty(ctx.StderrLines())
 
-	reader, err := os.Open(suite.ConfigScriptConfigPath("xx", "x"))
+	reader, err := os.Open(paths.ConfigNamespaceScriptConfig("xx", "x"))
 	suite.NoError(err)
 
 	defer reader.Close()
@@ -48,7 +49,7 @@ func (suite *CmdEditConfigTestSuite) TestExistingFile() {
 	suite.Empty(ctx.StdoutLines())
 	suite.Empty(ctx.StderrLines())
 
-	data, err := os.ReadFile(suite.ConfigScriptConfigPath("ns", "s"))
+	data, err := os.ReadFile(paths.ConfigNamespaceScriptConfig("ns", "s"))
 
 	suite.NoError(err)
 	suite.Equal(`description = "aaa"`, string(data))
@@ -61,7 +62,7 @@ func (suite *CmdEditConfigTestSuite) TestEditorFailed() {
 	suite.NotEmpty(ctx.StdoutLines())
 	suite.NotEmpty(ctx.StderrLines())
 
-	data, err := os.ReadFile(suite.ConfigScriptConfigPath("ns", "s"))
+	data, err := os.ReadFile(paths.ConfigNamespaceScriptConfig("ns", "s"))
 
 	suite.NoError(err)
 	suite.Equal(`description = "aaa"`, string(data))

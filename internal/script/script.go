@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"path/filepath"
 	"sync"
 
 	"github.com/9seconds/chore/internal/argparse"
 	"github.com/9seconds/chore/internal/config"
 	"github.com/9seconds/chore/internal/env"
+	"github.com/9seconds/chore/internal/paths"
 )
 
 type Script struct {
@@ -29,32 +29,24 @@ func (s *Script) Config() *config.Config {
 	return &s.config
 }
 
-func (s *Script) NamespacePath() string {
-	return env.PathConfigNamespace(s.Namespace)
-}
-
 func (s *Script) Path() string {
-	return filepath.Join(s.NamespacePath(), s.Executable)
+	return paths.ConfigNamespaceScript(s.Namespace, s.Executable)
 }
 
 func (s *Script) ConfigPath() string {
-	return s.Path() + ".toml"
+	return paths.ConfigNamespaceScriptConfig(s.Namespace, s.Executable)
 }
 
 func (s *Script) DataPath() string {
-	return filepath.Join(env.RootPathData(), s.Namespace, s.Executable)
+	return paths.DataNamespaceScript(s.Namespace, s.Executable)
 }
 
 func (s *Script) CachePath() string {
-	return filepath.Join(env.RootPathCache(), s.Namespace, s.Executable)
+	return paths.CacheNamespaceScript(s.Namespace, s.Executable)
 }
 
 func (s *Script) StatePath() string {
-	return filepath.Join(env.RootPathState(), s.Namespace, s.Executable)
-}
-
-func (s *Script) RuntimePath() string {
-	return filepath.Join(env.RootPathRuntime(), s.Namespace, s.Executable)
+	return paths.StateNamespaceScript(s.Namespace, s.Executable)
 }
 
 func (s *Script) TempPath() string {
@@ -72,7 +64,6 @@ func (s *Script) Environ(ctx context.Context, args argparse.ParsedArgs) []string
 		env.MakeValue(env.EnvPathData, s.DataPath()),
 		env.MakeValue(env.EnvPathCache, s.CachePath()),
 		env.MakeValue(env.EnvPathState, s.StatePath()),
-		env.MakeValue(env.EnvPathRuntime, s.RuntimePath()),
 		env.MakeValue(env.EnvPathTemp, s.TempPath()),
 	}
 
@@ -115,23 +106,11 @@ func (s *Script) Init() error {
 		return fmt.Errorf("invalid script: %w", err)
 	}
 
-	if err := EnsureDir(s.DataPath()); err != nil {
-		return fmt.Errorf("cannot create data path %s: %w", s.DataPath(), err)
+	if err := paths.EnsureRoots(s.Namespace, s.Executable); err != nil {
+		return fmt.Errorf("cannot ensure script roots: %w", err)
 	}
 
-	if err := EnsureDir(s.CachePath()); err != nil {
-		return fmt.Errorf("cannot create cache path %s: %w", s.CachePath(), err)
-	}
-
-	if err := EnsureDir(s.StatePath()); err != nil {
-		return fmt.Errorf("cannot create state path %s: %w", s.StatePath(), err)
-	}
-
-	if err := EnsureDir(s.RuntimePath()); err != nil {
-		return fmt.Errorf("cannot create runtime path %s: %w", s.RuntimePath(), err)
-	}
-
-	dir, err := os.MkdirTemp("", env.ChoreDir+"-")
+	dir, err := os.MkdirTemp("", paths.ChoreDir+"-")
 	if err != nil {
 		return fmt.Errorf("cannot initialize tmp dir: %w", err)
 	}

@@ -6,7 +6,7 @@ import (
 	"os"
 	"regexp"
 
-	"github.com/9seconds/chore/internal/env"
+	"github.com/9seconds/chore/internal/paths"
 	"github.com/9seconds/chore/internal/script"
 	"github.com/spf13/cobra"
 )
@@ -41,7 +41,7 @@ func validASCIIName(index int, err error) cobra.PositionalArgs {
 
 func validNamespace(index int) cobra.PositionalArgs {
 	return func(_ *cobra.Command, args []string) error {
-		stat, err := os.Stat(env.PathConfigNamespace(args[index]))
+		stat, err := os.Stat(paths.ConfigNamespace(args[index]))
 		if err != nil {
 			return fmt.Errorf("invalid namespace: %w", err)
 		}

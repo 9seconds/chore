@@ -1,15 +1,10 @@
 package env
 
 import (
-	"path/filepath"
 	"strings"
-
-	"github.com/adrg/xdg"
 )
 
 const (
-	ChoreDir = "chore"
-
 	DebugEnabled = "1"
 )
 
@@ -33,12 +28,11 @@ const (
 	EnvCaller    = Prefix + "CALLER"
 	EnvRecursion = Prefix + "RECURSION"
 
-	EnvPathCaller  = EnvPathPrefix + "CALLER"
-	EnvPathData    = EnvPathPrefix + "DATA"
-	EnvPathCache   = EnvPathPrefix + "CACHE"
-	EnvPathState   = EnvPathPrefix + "STATE"
-	EnvPathRuntime = EnvPathPrefix + "RUNTIME"
-	EnvPathTemp    = EnvPathPrefix + "TEMP"
+	EnvPathCaller = EnvPathPrefix + "CALLER"
+	EnvPathData   = EnvPathPrefix + "DATA"
+	EnvPathCache  = EnvPathPrefix + "CACHE"
+	EnvPathState  = EnvPathPrefix + "STATE"
+	EnvPathTemp   = EnvPathPrefix + "TEMP"
 
 	EnvIDUnique        = EnvIDPrefix + "UNIQUE"
 	EnvIDChainUnique   = EnvIDChainPrefix + "UNIQUE"
@@ -98,30 +92,6 @@ const (
 	EnvUserGID  = EnvUserPrefix + "GID"
 	EnvUserName = EnvUserPrefix + "NAME"
 )
-
-func RootPathConfig() string {
-	return filepath.Join(xdg.ConfigHome, ChoreDir)
-}
-
-func RootPathData() string {
-	return filepath.Join(xdg.DataHome, ChoreDir)
-}
-
-func RootPathCache() string {
-	return filepath.Join(xdg.CacheHome, ChoreDir)
-}
-
-func RootPathState() string {
-	return filepath.Join(xdg.StateHome, ChoreDir)
-}
-
-func RootPathRuntime() string {
-	return filepath.Join(xdg.RuntimeDir, ChoreDir)
-}
-
-func PathConfigNamespace(namespace string) string {
-	return filepath.Join(RootPathConfig(), namespace)
-}
 
 func ParameterName(name string) string {
 	return EnvParameterPrefix + strings.ToUpper(name)

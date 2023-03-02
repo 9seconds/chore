@@ -3,6 +3,7 @@ package script_test
 import (
 	"testing"
 
+	"github.com/9seconds/chore/internal/paths"
 	"github.com/9seconds/chore/internal/script"
 	"github.com/9seconds/chore/internal/testlib"
 	"github.com/stretchr/testify/suite"
@@ -17,11 +18,11 @@ type ListTestSuite struct {
 func (suite *ListTestSuite) SetupTest() {
 	suite.CustomRootTestSuite.Setup(suite.T())
 
-	suite.EnsureDir(suite.ConfigNamespacePath("ns"))
+	suite.EnsureDir(paths.ConfigNamespace("ns"))
 	suite.EnsureScript("nb", "aa", "echo 1")
 	suite.EnsureScript("nb", "ab", "echo 1")
-	suite.EnsureFile(suite.ConfigScriptPath("nb", "a"), "1", 0o400)
-	suite.EnsureDir(suite.ConfigScriptPath("nb", "b"))
+	suite.EnsureFile(paths.ConfigNamespaceScript("nb", "a"), "1", 0o400)
+	suite.EnsureDir(paths.ConfigNamespaceScript("nb", "b"))
 }
 
 func (suite *ListTestSuite) TestListNamespaces() {

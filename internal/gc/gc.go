@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"sort"
 
-	"github.com/9seconds/chore/internal/env"
+	"github.com/9seconds/chore/internal/paths"
 	"github.com/9seconds/chore/internal/script"
 	"github.com/tchap/go-patricia/v2/patricia"
 )
@@ -27,7 +27,6 @@ func Collect(validScripts []*script.Script) ([]string, error) { //nolint: cyclop
 		safePaths.Set(patricia.Prefix(scr.DataPath()), true)
 		safePaths.Set(patricia.Prefix(scr.CachePath()), true)
 		safePaths.Set(patricia.Prefix(scr.StatePath()), true)
-		safePaths.Set(patricia.Prefix(scr.RuntimePath()), true)
 
 		if _, err := script.ValidateConfig(scr.ConfigPath()); err == nil {
 			safeFiles[scr.ConfigPath()] = true
@@ -128,10 +127,9 @@ func Remove(paths []string) error {
 
 func getRootPaths() []string {
 	return []string{
-		env.RootPathConfig(),
-		env.RootPathData(),
-		env.RootPathCache(),
-		env.RootPathState(),
-		env.RootPathRuntime(),
+		paths.ConfigRoot(),
+		paths.DataRoot(),
+		paths.CacheRoot(),
+		paths.StateRoot(),
 	}
 }

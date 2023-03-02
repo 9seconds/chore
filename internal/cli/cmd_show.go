@@ -62,7 +62,6 @@ func NewShow() *cobra.Command {
 	flags.BoolP("show-data", "t", false, "show path to the script data directory")
 	flags.BoolP("show-cache", "a", false, "show path to the script config directory")
 	flags.BoolP("show-state", "s", false, "show path to the script state directory")
-	flags.BoolP("show-runtime", "r", false, "show path to the script runtime directory")
 
 	return cmd
 }
@@ -111,13 +110,8 @@ func mainShow(cmd *cobra.Command, args []string) error { //nolint: cyclop
 		return err
 	}
 
-	showRuntime, err := cmd.Flags().GetBool("show-runtime")
-	if err != nil {
-		return err
-	}
-
-	if showPaths || showConfig || showData || showCache || showState || showRuntime {
-		mainShowFlags(cmd, scr, showPaths, showConfig, showData, showCache, showState, showRuntime)
+	if showPaths || showConfig || showData || showCache || showState {
+		mainShowFlags(cmd, scr, showPaths, showConfig, showData, showCache, showState)
 	} else {
 		mainShowTables(cmd, scr)
 	}
@@ -151,7 +145,7 @@ func mainShowListScripts(cmd *cobra.Command, namespace string) error {
 	return nil
 }
 
-func mainShowFlags(cmd *cobra.Command, scr *script.Script, paths, config, data, cache, state, runtime bool) {
+func mainShowFlags(cmd *cobra.Command, scr *script.Script, paths, config, data, cache, state bool) {
 	if paths {
 		cmd.Println(scr.Path())
 	}
@@ -171,19 +165,14 @@ func mainShowFlags(cmd *cobra.Command, scr *script.Script, paths, config, data, 
 	if state {
 		cmd.Println(scr.StatePath())
 	}
-
-	if runtime {
-		cmd.Println(scr.RuntimePath())
-	}
 }
 
 func mainShowTables(cmd *cobra.Command, scr *script.Script) {
 	ctx := cmd.Context()
 	dirSizes := map[string]*atomic.Int64{
-		scr.DataPath():    {},
-		scr.StatePath():   {},
-		scr.CachePath():   {},
-		scr.RuntimePath(): {},
+		scr.DataPath():  {},
+		scr.StatePath(): {},
+		scr.CachePath(): {},
 	}
 
 	waiters := &sync.WaitGroup{}
@@ -247,7 +236,6 @@ func mainShowMainTable(buf io.Writer, scr *script.Script, dirSizes map[string]*a
 	fmt.Fprintf(writer, "Data path:\t%s\t%s\n", scr.DataPath(), mainShowDirSize(dirSizes[scr.DataPath()]))
 	fmt.Fprintf(writer, "Cache path:\t%s\t%s\n", scr.CachePath(), mainShowDirSize(dirSizes[scr.CachePath()]))
 	fmt.Fprintf(writer, "State path:\t%s\t%s\n", scr.StatePath(), mainShowDirSize(dirSizes[scr.StatePath()]))
-	fmt.Fprintf(writer, "Runtime path:\t%s\t%s\n\n", scr.RuntimePath(), mainShowDirSize(dirSizes[scr.RuntimePath()]))
 
 	fmt.Fprintf(writer, "Network:\t%s\n", strconv.FormatBool(conf.Network))
 	fmt.Fprintf(writer, "Git:\t%s\n", conf.Git.String())

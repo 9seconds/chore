@@ -12,7 +12,7 @@ import (
 
 	"github.com/9seconds/chore/internal/access"
 	"github.com/9seconds/chore/internal/config"
-	"github.com/9seconds/chore/internal/env"
+	"github.com/9seconds/chore/internal/paths"
 )
 
 const dirPermission = 0o700
@@ -22,7 +22,7 @@ func EnsureDir(path string) error {
 }
 
 func ListNamespaces() ([]string, error) {
-	dir := env.RootPathConfig()
+	dir := paths.ConfigRoot()
 
 	entries, err := os.ReadDir(dir)
 	if err != nil {
@@ -45,7 +45,7 @@ func ListNamespaces() ([]string, error) {
 }
 
 func ListScripts(namespace string) ([]string, error) {
-	entries, err := os.ReadDir(env.PathConfigNamespace(namespace))
+	entries, err := os.ReadDir(paths.ConfigNamespace(namespace))
 	if err != nil {
 		return nil, fmt.Errorf("cannot list scripts in namespace %s: %w", namespace, err)
 	}

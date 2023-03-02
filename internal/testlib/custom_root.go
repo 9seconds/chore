@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/9seconds/chore/internal/env"
+	"github.com/9seconds/chore/internal/paths"
 	"github.com/adrg/xdg"
 	"github.com/stretchr/testify/require"
 )
@@ -57,103 +57,32 @@ func (suite *CustomRootTestSuite) RootPath() string {
 func (suite *CustomRootTestSuite) EnsureDir(path string) string {
 	suite.t.Helper()
 
-	require.NoError(suite.t, os.MkdirAll(path, defaultDirPermission))
+	require.NoError(suite.t, paths.EnsureDir(path))
 
 	return path
 }
 
-func (suite *CustomRootTestSuite) EnsureFile(
-	path, content string, mode os.FileMode,
-) string {
+func (suite *CustomRootTestSuite) EnsureFile(path, content string, mode os.FileMode) string {
 	suite.t.Helper()
 
-	suite.EnsureDir(filepath.Dir(path))
-	require.NoError(suite.t, os.WriteFile(path, []byte(content), mode))
+	require.NoError(suite.t, paths.EnsureFile(path, content))
+	require.NoError(suite.t, os.Chmod(path, mode))
 
 	return path
-}
-
-func (suite *CustomRootTestSuite) ConfigNamespacePath(namespace string) string {
-	suite.t.Helper()
-
-	return filepath.Join(env.RootPathConfig(), namespace)
-}
-
-func (suite *CustomRootTestSuite) ConfigScriptPath(namespace, executable string) string {
-	suite.t.Helper()
-
-	return filepath.Join(suite.ConfigNamespacePath(namespace), executable)
-}
-
-func (suite *CustomRootTestSuite) ConfigScriptConfigPath(namespace, executable string) string {
-	suite.t.Helper()
-
-	return suite.ConfigScriptPath(namespace, executable) + ".toml"
-}
-
-func (suite *CustomRootTestSuite) DataNamespacePath(namespace string) string {
-	suite.t.Helper()
-
-	return filepath.Join(env.RootPathData(), namespace)
-}
-
-func (suite *CustomRootTestSuite) DataScriptPath(namespace, executable string) string {
-	suite.t.Helper()
-
-	return filepath.Join(suite.DataNamespacePath(namespace), executable)
-}
-
-func (suite *CustomRootTestSuite) CacheNamespacePath(namespace string) string {
-	suite.t.Helper()
-
-	return filepath.Join(env.RootPathCache(), namespace)
-}
-
-func (suite *CustomRootTestSuite) CacheScriptPath(namespace, executable string) string {
-	suite.t.Helper()
-
-	return filepath.Join(suite.CacheNamespacePath(namespace), executable)
-}
-
-func (suite *CustomRootTestSuite) StateNamespacePath(namespace string) string {
-	suite.t.Helper()
-
-	return filepath.Join(env.RootPathState(), namespace)
-}
-
-func (suite *CustomRootTestSuite) StateScriptPath(namespace, executable string) string {
-	suite.t.Helper()
-
-	return filepath.Join(suite.StateNamespacePath(namespace), executable)
-}
-
-func (suite *CustomRootTestSuite) RuntimeNamespacePath(namespace string) string {
-	suite.t.Helper()
-
-	return filepath.Join(env.RootPathRuntime(), namespace)
-}
-
-func (suite *CustomRootTestSuite) RuntimeScriptPath(namespace, executable string) string {
-	suite.t.Helper()
-
-	return filepath.Join(suite.RuntimeNamespacePath(namespace), executable)
 }
 
 func (suite *CustomRootTestSuite) EnsureScript(namespace, executable, content string) string {
 	suite.t.Helper()
 
 	content = "#!/usr/bin/env bash\nset -eu -o pipefail\n" + content
-	path := suite.ConfigScriptPath(namespace, executable)
+	path := paths.ConfigNamespaceScript(namespace, executable)
 
-	suite.EnsureFile(
-		suite.ConfigScriptPath(namespace, executable),
-		content,
-		defaultScriptPermission)
+	suite.EnsureFile(path, content, defaultScriptPermission)
 
 	return path
 }
 
-func (suite *CustomRootTestSuite) EnsureScriptConfig(namespace, executable string, content interface{}) {
+func (suite *CustomRootTestSuite) EnsureScriptConfig(namespace, executable string, content interface{}) string {
 	suite.t.Helper()
 
 	strContent := ""
@@ -170,8 +99,9 @@ func (suite *CustomRootTestSuite) EnsureScriptConfig(namespace, executable strin
 		require.NoError(suite.t, err)
 	}
 
-	suite.EnsureFile(
-		suite.ConfigScriptConfigPath(namespace, executable),
-		strContent,
-		defaultConfigPermission)
+	path := paths.ConfigNamespaceScriptConfig(namespace, executable)
+
+	suite.EnsureFile(path, strContent, defaultConfigPermission)
+
+	return path
 }

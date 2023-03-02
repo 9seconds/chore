@@ -12,6 +12,7 @@ import (
 	"github.com/9seconds/chore/internal/argparse"
 	"github.com/9seconds/chore/internal/env"
 	"github.com/9seconds/chore/internal/git"
+	"github.com/9seconds/chore/internal/paths"
 	"github.com/9seconds/chore/internal/testlib"
 	"github.com/Showmax/go-fqdn"
 	"github.com/adrg/xdg"
@@ -72,7 +73,7 @@ func (suite *ScriptTestSuite) TestCannotReadConfig() {
 
 func (suite *ScriptTestSuite) TestEmptyScript() {
 	suite.EnsureFile(
-		suite.ConfigScriptPath("xx", "1"),
+		paths.ConfigNamespaceScript("xx", "1"),
 		"\t \r\n",
 		0o700)
 
@@ -89,9 +90,7 @@ func (suite *ScriptTestSuite) TestDirsAreAvailable() {
 	suite.DirExists(scr.DataPath())
 	suite.DirExists(scr.CachePath())
 	suite.DirExists(scr.StatePath())
-	suite.DirExists(scr.RuntimePath())
 	suite.DirExists(scr.TempPath())
-	suite.DirExists(scr.NamespacePath())
 	suite.NoFileExists(scr.ConfigPath())
 }
 
@@ -139,7 +138,7 @@ func (suite *ScriptTestSuite) TestEnviron() {
 		require.True(suite.T(), found)
 	}
 
-	count := 46
+	count := 45
 
 	suite.Equal(scr.Namespace, data[env.EnvNamespace])
 	suite.Equal(scr.Executable, data[env.EnvCaller])
@@ -147,7 +146,6 @@ func (suite *ScriptTestSuite) TestEnviron() {
 	suite.Equal(scr.DataPath(), data[env.EnvPathData])
 	suite.Equal(scr.CachePath(), data[env.EnvPathCache])
 	suite.Equal(scr.StatePath(), data[env.EnvPathState])
-	suite.Equal(scr.RuntimePath(), data[env.EnvPathRuntime])
 	suite.Equal(scr.TempPath(), data[env.EnvPathTemp])
 	suite.Equal("v", data[env.ParameterName("k")])
 	suite.Equal("y", data[env.ParameterName("XX")])

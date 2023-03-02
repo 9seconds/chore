@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/9seconds/chore/internal/cli"
+	"github.com/9seconds/chore/internal/paths"
 	"github.com/9seconds/chore/internal/script"
 	"github.com/stretchr/testify/suite"
 )
@@ -38,7 +39,7 @@ regexp = '^\d\w+$'`)
 	suite.EnsureScript("ns", "s2", "")
 	suite.EnsureScript("xx", "s3", "")
 	suite.EnsureFile(
-		filepath.Join(suite.CacheScriptPath("ns", "s"), "c"),
+		filepath.Join(paths.CacheNamespaceScript("ns", "s"), "c"),
 		strings.Repeat("a", 50*1024*1024),
 		0o600)
 }
@@ -68,16 +69,15 @@ func (suite *CmdShowTestSuite) TestShow() { //nolint: cyclop
 	}
 
 	seen := map[string]bool{
-		scr.Path():        true,
-		scr.ConfigPath():  true,
-		scr.DataPath():    true,
-		scr.CachePath():   true,
-		scr.StatePath():   true,
-		scr.RuntimePath(): true,
-		"network":         true,
-		"git":             true,
-		"param":           true,
-		"flag1":           true,
+		scr.Path():       true,
+		scr.ConfigPath(): true,
+		scr.DataPath():   true,
+		scr.CachePath():  true,
+		scr.StatePath():  true,
+		"network":        true,
+		"git":            true,
+		"param":          true,
+		"flag1":          true,
 	}
 
 	suite.NoError(err)
@@ -103,10 +103,6 @@ func (suite *CmdShowTestSuite) TestShow() { //nolint: cyclop
 		case strings.Contains(line, scr.StatePath()):
 			suite.Contains(seen, scr.StatePath())
 			delete(seen, scr.StatePath())
-			suite.Contains(line, "4KB")
-		case strings.Contains(line, scr.RuntimePath()):
-			suite.Contains(seen, scr.RuntimePath())
-			delete(seen, scr.RuntimePath())
 			suite.Contains(line, "4KB")
 		case strings.Contains(strings.ToLower(line), "network"):
 			suite.Contains(seen, "network")

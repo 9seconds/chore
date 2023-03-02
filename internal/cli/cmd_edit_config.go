@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 
+	"github.com/9seconds/chore/internal/paths"
 	"github.com/9seconds/chore/internal/script"
 	"github.com/spf13/cobra"
 )
@@ -45,7 +46,7 @@ func mainEditConfig(cmd *cobra.Command, args []string) error {
 
 	defer scr.Cleanup()
 
-	if err := script.EnsureDir(scr.NamespacePath()); err != nil {
+	if err := script.EnsureDir(paths.ConfigNamespace(scr.Namespace)); err != nil {
 		return fmt.Errorf("cannot ensure namespace dir: %w", err)
 	}
 
