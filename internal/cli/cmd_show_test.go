@@ -95,7 +95,7 @@ func (suite *CmdShowTestSuite) TestShow() { //nolint: cyclop
 		case strings.Contains(line, scr.DataPath()):
 			suite.Contains(seen, scr.DataPath())
 			delete(seen, scr.DataPath())
-			suite.Contains(line, "4KB")
+			suite.Contains(line, "0B")
 		case strings.Contains(line, scr.CachePath()):
 			suite.Contains(seen, scr.CachePath())
 			delete(seen, scr.CachePath())
@@ -103,7 +103,7 @@ func (suite *CmdShowTestSuite) TestShow() { //nolint: cyclop
 		case strings.Contains(line, scr.StatePath()):
 			suite.Contains(seen, scr.StatePath())
 			delete(seen, scr.StatePath())
-			suite.Contains(line, "4KB")
+			suite.Contains(line, "0B")
 		case strings.Contains(strings.ToLower(line), "network"):
 			suite.Contains(seen, "network")
 			delete(seen, "network")

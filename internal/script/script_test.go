@@ -13,6 +13,7 @@ import (
 	"github.com/9seconds/chore/internal/env"
 	"github.com/9seconds/chore/internal/git"
 	"github.com/9seconds/chore/internal/paths"
+	"github.com/9seconds/chore/internal/script"
 	"github.com/9seconds/chore/internal/testlib"
 	"github.com/Showmax/go-fqdn"
 	"github.com/adrg/xdg"
@@ -26,7 +27,6 @@ type ScriptTestSuite struct {
 	suite.Suite
 
 	testlib.CustomRootTestSuite
-	testlib.ScriptTestSuite
 	testlib.NetworkTestSuite
 }
 
@@ -34,21 +34,19 @@ func (suite *ScriptTestSuite) SetupTest() {
 	t := suite.T()
 
 	suite.CustomRootTestSuite.Setup(t)
-	suite.ScriptTestSuite.Setup(t)
 	suite.NetworkTestSuite.Setup(t)
 }
 
 func (suite *ScriptTestSuite) TestAbsentScript() {
-	scr := suite.NewScript("xx", "1")
-	suite.Error(scr.Init())
+	_, err := script.New("xx", "1")
+	suite.Error(err)
 }
 
 func (suite *ScriptTestSuite) TestCannotCreatePath() {
 	testTable := map[string]string{
-		xdg.DataHome:   "data",
-		xdg.CacheHome:  "cache",
-		xdg.StateHome:  "state",
-		xdg.RuntimeDir: "runtime",
+		xdg.DataHome:  "data",
+		xdg.CacheHome: "cache",
+		xdg.StateHome: "state",
 	}
 
 	suite.EnsureScript("xx", "1", "echo 1")
@@ -57,8 +55,10 @@ func (suite *ScriptTestSuite) TestCannotCreatePath() {
 		suite.NoError(os.MkdirAll(testValue, 0o500))
 
 		suite.T().Run(testName, func(t *testing.T) {
-			scr := suite.NewScript("xx", "1")
-			assert.ErrorContains(t, scr.Init(), "permission denied")
+			scr, err := script.New("xx", "1")
+			assert.NoError(t, err)
+
+			assert.ErrorContains(t, scr.EnsureDirs(), "permission denied")
 		})
 	}
 }
@@ -67,8 +67,8 @@ func (suite *ScriptTestSuite) TestCannotReadConfig() {
 	suite.EnsureScript("xx", "1", "echo 1")
 	suite.EnsureScriptConfig("xx", "1", "x")
 
-	scr := suite.NewScript("xx", "1")
-	suite.ErrorContains(scr.Init(), "cannot parse config file")
+	_, err := script.New("xx", "1")
+	suite.ErrorContains(err, "cannot parse config file")
 }
 
 func (suite *ScriptTestSuite) TestEmptyScript() {
@@ -77,16 +77,23 @@ func (suite *ScriptTestSuite) TestEmptyScript() {
 		"\t \r\n",
 		0o700)
 
-	scr := suite.NewScript("xx", "1")
-	suite.ErrorContains(scr.Init(), "script is empty")
+	_, err := script.New("xx", "1")
+	suite.ErrorContains(err, "script is empty")
 }
 
 func (suite *ScriptTestSuite) TestDirsAreAvailable() {
 	suite.EnsureScript("xx", "1", "echo 1")
 
-	scr := suite.NewScript("xx", "1")
-	suite.NoError(scr.Init())
+	scr, err := script.New("xx", "1")
+	suite.NoError(err)
 
+	suite.NoDirExists(scr.DataPath())
+	suite.NoDirExists(scr.CachePath())
+	suite.NoDirExists(scr.StatePath())
+	suite.NoDirExists(scr.TempPath())
+	suite.NoFileExists(scr.ConfigPath())
+
+	suite.NoError(scr.EnsureDirs())
 	suite.DirExists(scr.DataPath())
 	suite.DirExists(scr.CachePath())
 	suite.DirExists(scr.StatePath())
@@ -94,11 +101,25 @@ func (suite *ScriptTestSuite) TestDirsAreAvailable() {
 	suite.NoFileExists(scr.ConfigPath())
 }
 
+func (suite *ScriptTestSuite) TestDoNotRecreateTempPath() {
+	suite.EnsureScript("xx", "1", "echo 1")
+
+	scr, err := script.New("xx", "1")
+	suite.NoError(err)
+
+	suite.NoError(scr.EnsureDirs())
+
+	tmpPath1 := scr.TempPath()
+
+	suite.NoError(scr.EnsureDirs())
+	suite.Equal(tmpPath1, scr.TempPath())
+}
+
 func (suite *ScriptTestSuite) TestString() {
 	suite.EnsureScript("xx", "1", "echo 1")
 
-	scr := suite.NewScript("xx", "1")
-	suite.NoError(scr.Init())
+	scr, err := script.New("xx", "1")
+	suite.NoError(err)
 	suite.NotEmpty(scr.String())
 }
 
@@ -110,12 +131,11 @@ func (suite *ScriptTestSuite) TestEnviron() {
 
 	suite.EnsureScript("xx", "1", "echo 1")
 
-	scr := suite.NewScript("xx", "1")
-	suite.NoError(scr.Init())
+	scr, err := script.New("xx", "1")
+	suite.NoError(err)
 
-	conf := scr.Config()
-	conf.Network = true
-	conf.Git = git.AccessModeIfUndefined
+	scr.Config.Network = true
+	scr.Config.Git = git.AccessModeIfUndefined
 
 	environ := scr.Environ(context.Background(), argparse.ParsedArgs{
 		Parameters: map[string]string{

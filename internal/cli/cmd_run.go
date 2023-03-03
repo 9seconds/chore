@@ -62,23 +62,22 @@ func mainRunWrapper(cmd *cobra.Command, args []string) (int, error) {
 	}
 
 	ctx := cmd.Context()
-	scr := &script.Script{
-		Namespace:  args[0],
-		Executable: args[1],
-	}
 
-	if err := scr.Init(); err != nil {
+	scr, err := script.New(args[0], args[1])
+	if err != nil {
 		return 0, fmt.Errorf("cannot initialize script: %w", err)
 	}
 
-	conf := scr.Config()
+	if err := scr.EnsureDirs(); err != nil {
+		return 0, fmt.Errorf("cannot initialize script directories: %w", err)
+	}
 
 	parsedArgs, err := argparse.Parse(args[2:], listDelimiter)
 	if err != nil {
 		return 0, fmt.Errorf("cannot parse arguments: %w", err)
 	}
 
-	if err := parsedArgs.Validate(ctx, conf.Flags, conf.Parameters); err != nil {
+	if err := parsedArgs.Validate(ctx, scr.Config.Flags, scr.Config.Parameters); err != nil {
 		return 0, fmt.Errorf("cannot validate arguments: %w", err)
 	}
 

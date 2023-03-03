@@ -14,17 +14,14 @@ import (
 type Script struct {
 	Namespace  string
 	Executable string
+	Config     config.Config
 
-	config config.Config
-	tmpDir string
+	tmpDir         string
+	ensureDirMutex sync.Mutex
 }
 
 func (s *Script) String() string {
 	return s.Namespace + "/" + s.Executable
-}
-
-func (s *Script) Config() *config.Config {
-	return &s.config
 }
 
 func (s *Script) Path() string {
@@ -83,9 +80,9 @@ func (s *Script) Environ(ctx context.Context, args argparse.ParsedArgs) []string
 	env.GenerateOS(ctx, values, waiterGroup)
 	env.GenerateUser(ctx, values, waiterGroup)
 	env.GenerateHostname(ctx, values, waiterGroup)
-	env.GenerateGit(ctx, values, waiterGroup, s.config.Git)
-	env.GenerateNetwork(ctx, values, waiterGroup, s.config.Network)
-	env.GenerateNetworkIPv6(ctx, values, waiterGroup, s.config.Network)
+	env.GenerateGit(ctx, values, waiterGroup, s.Config.Git)
+	env.GenerateNetwork(ctx, values, waiterGroup, s.Config.Network)
+	env.GenerateNetworkIPv6(ctx, values, waiterGroup, s.Config.Network)
 
 	go func() {
 		waiterGroup.Wait()
@@ -99,28 +96,39 @@ func (s *Script) Environ(ctx context.Context, args argparse.ParsedArgs) []string
 	return environ
 }
 
-func (s *Script) Init() error {
-	if err := ValidateScript(s.Path()); err != nil {
-		return fmt.Errorf("invalid script: %w", err)
+func (s *Script) EnsureDirs() error {
+	s.ensureDirMutex.Lock()
+
+	if s.tmpDir == "" {
+		tmpdir, err := paths.TempDir()
+		if err != nil {
+			return fmt.Errorf("cannot create temp directory: %w", err)
+		}
+
+		s.tmpDir = tmpdir
 	}
 
-	if err := paths.EnsureRoots(s.Namespace, s.Executable); err != nil {
-		return fmt.Errorf("cannot ensure script roots: %w", err)
+	s.ensureDirMutex.Unlock()
+
+	return paths.EnsureRoots(s.Namespace, s.Executable)
+}
+
+func New(namespace, executable string) (*Script, error) {
+	scr := &Script{
+		Namespace:  namespace,
+		Executable: executable,
 	}
 
-	dir, err := paths.TempDir()
+	if err := ValidateScript(scr.Path()); err != nil {
+		return nil, fmt.Errorf("invalid script: %w", err)
+	}
+
+	conf, err := ValidateConfig(scr.ConfigPath())
 	if err != nil {
-		return fmt.Errorf("cannot initialize tmp dir: %w", err)
+		return nil, fmt.Errorf("invalid config: %w", err)
 	}
 
-	s.tmpDir = dir
+	scr.Config = conf
 
-	conf, err := ValidateConfig(s.ConfigPath())
-	if err != nil {
-		return fmt.Errorf("invalid config: %w", err)
-	}
-
-	s.config = conf
-
-	return nil
+	return scr, nil
 }

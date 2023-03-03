@@ -20,7 +20,6 @@ type OSTestSuite struct {
 	suite.Suite
 
 	testlib.CtxTestSuite
-	testlib.ScriptTestSuite
 	testlib.CustomRootTestSuite
 
 	s       *script.Script
@@ -36,13 +35,13 @@ func (suite *OSTestSuite) SetupTest() {
 	t := suite.T()
 
 	suite.CtxTestSuite.Setup(t)
-	suite.ScriptTestSuite.Setup(t)
 	suite.CustomRootTestSuite.Setup(t)
 
 	suite.EnsureScript("x", "y", "echo $CHORE_CALLER $1")
 
-	scr := suite.NewScript("x", "y")
-	require.NoError(t, scr.Init())
+	scr, err := script.New("x", "y")
+	require.NoError(t, err)
+	require.NoError(t, scr.EnsureDirs())
 
 	parsedArgs := argparse.ParsedArgs{
 		Parameters: map[string]string{

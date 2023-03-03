@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/9seconds/chore/internal/paths"
+	"github.com/9seconds/chore/internal/script"
 )
 
 func (suite *ScriptTestSuite) TestScriptNoExecutableBit() {
@@ -14,6 +15,6 @@ func (suite *ScriptTestSuite) TestScriptNoExecutableBit() {
 	path := paths.ConfigNamespaceScript("xx", "1")
 	suite.NoError(os.Chmod(path, 0o600))
 
-	scr := suite.NewScript("xx", "1")
-	suite.ErrorContains(scr.Init(), "permission denied")
+	_, err := script.New("xx", "1")
+	suite.ErrorContains(err, "permission denied")
 }

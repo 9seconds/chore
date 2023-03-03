@@ -69,22 +69,17 @@ func completeRun(cmd *cobra.Command, args []string, toComplete string) ([]string
 		return nil, cobra.ShellCompDirectiveDefault
 	}
 
-	scr := &script.Script{
-		Namespace:  args[0],
-		Executable: args[1],
-	}
-
-	if err := scr.Init(); err != nil {
+	scr, err := script.New(args[0], args[1])
+	if err != nil {
 		log.Printf("cannot initalize script: %v", err)
 
 		return nil, cobra.ShellCompDirectiveError
 	}
 
-	conf := scr.Config()
 	completions := []string{}
 	directive := cobra.ShellCompDirectiveNoFileComp
 
-	for name, param := range conf.Parameters {
+	for name, param := range scr.Config.Parameters {
 		if _, ok := parsed.Parameters[name]; ok {
 			continue
 		}
@@ -106,7 +101,7 @@ func completeRun(cmd *cobra.Command, args []string, toComplete string) ([]string
 		completions = append(completions, completion)
 	}
 
-	for name, flag := range conf.Flags {
+	for name, flag := range scr.Config.Flags {
 		if _, ok := parsed.Flags[name]; ok {
 			continue
 		}

@@ -74,12 +74,8 @@ func mainShow(cmd *cobra.Command, args []string) error { //nolint: cyclop
 		return mainShowListScripts(cmd, args[0])
 	}
 
-	scr := &script.Script{
-		Namespace:  args[0],
-		Executable: args[1],
-	}
-
-	if err := scr.Init(); err != nil {
+	scr, err := script.New(args[0], args[1])
+	if err != nil {
 		return fmt.Errorf("cannot initialize script: %w", err)
 	}
 
@@ -182,7 +178,9 @@ func mainShowTables(cmd *cobra.Command, scr *script.Script) {
 			defer waiters.Done()
 
 			err := filepath.Walk(seedPath, func(_ string, info fs.FileInfo, _ error) error {
-				accumulator.Add(info.Size())
+				if info != nil { // directory does not exists -> info == nil
+					accumulator.Add(info.Size())
+				}
 
 				select {
 				case <-ctx.Done():
@@ -212,18 +210,14 @@ func mainShowTables(cmd *cobra.Command, scr *script.Script) {
 }
 
 func mainShowDescription(buf io.Writer, scr *script.Script) {
-	conf := scr.Config()
-
-	if conf.Description != "" {
-		io.WriteString(buf, strings.TrimSpace(conf.Description)) //nolint: errcheck
-		io.WriteString(buf, "\n\n")                              //nolint: errcheck
+	if scr.Config.Description != "" {
+		io.WriteString(buf, strings.TrimSpace(scr.Config.Description)) //nolint: errcheck
+		io.WriteString(buf, "\n\n")                                    //nolint: errcheck
 	}
 }
 
 func mainShowMainTable(buf io.Writer, scr *script.Script, dirSizes map[string]*atomic.Int64) {
 	defer io.WriteString(buf, "\n") //nolint: errcheck
-
-	conf := scr.Config()
 
 	writer := mainTabwriter(buf)
 
@@ -235,22 +229,20 @@ func mainShowMainTable(buf io.Writer, scr *script.Script, dirSizes map[string]*a
 	fmt.Fprintf(writer, "Cache path:\t%s\t%s\n", scr.CachePath(), mainShowDirSize(dirSizes[scr.CachePath()]))
 	fmt.Fprintf(writer, "State path:\t%s\t%s\n", scr.StatePath(), mainShowDirSize(dirSizes[scr.StatePath()]))
 
-	fmt.Fprintf(writer, "Network:\t%s\n", strconv.FormatBool(conf.Network))
-	fmt.Fprintf(writer, "Git:\t%s\n", conf.Git.String())
+	fmt.Fprintf(writer, "Network:\t%s\n", strconv.FormatBool(scr.Config.Network))
+	fmt.Fprintf(writer, "Git:\t%s\n", scr.Config.Git.String())
 }
 
 func mainShowTableParameters(buf io.Writer, scr *script.Script) {
-	conf := scr.Config()
-
-	if len(conf.Parameters) == 0 {
+	if len(scr.Config.Parameters) == 0 {
 		return
 	}
 
 	defer io.WriteString(buf, "\n") //nolint: errcheck
 
-	names := make([]string, 0, len(conf.Parameters))
+	names := make([]string, 0, len(scr.Config.Parameters))
 
-	for k := range conf.Parameters {
+	for k := range scr.Config.Parameters {
 		names = append(names, k)
 	}
 
@@ -258,8 +250,8 @@ func mainShowTableParameters(buf io.Writer, scr *script.Script) {
 	sort.Slice(names, func(i, j int) bool {
 		nameI := names[i]
 		nameJ := names[j]
-		paramI := conf.Parameters[nameI]
-		paramJ := conf.Parameters[nameJ]
+		paramI := scr.Config.Parameters[nameI]
+		paramJ := scr.Config.Parameters[nameJ]
 		valueI := mainShowBoolToInt(paramI.Required())
 		valueJ := mainShowBoolToInt(paramJ.Required())
 
@@ -278,7 +270,7 @@ func mainShowTableParameters(buf io.Writer, scr *script.Script) {
 	fmt.Fprintln(writer, "╴╴╴╴╴╴╴╴╴\t╴╴╴╴╴╴╴╴╴╴╴\t╴╴╴╴╴╴╴╴╴\t╴╴╴╴\t╴╴╴╴╴╴╴╴╴╴╴╴╴")
 
 	for _, name := range names {
-		param := conf.Parameters[name]
+		param := scr.Config.Parameters[name]
 
 		fmt.Fprintf(
 			writer,
@@ -292,15 +284,13 @@ func mainShowTableParameters(buf io.Writer, scr *script.Script) {
 }
 
 func mainShowTableFlags(buf io.Writer, scr *script.Script) {
-	conf := scr.Config()
-
-	if len(conf.Flags) == 0 {
+	if len(scr.Config.Flags) == 0 {
 		return
 	}
 
-	names := make([]string, 0, len(conf.Flags))
+	names := make([]string, 0, len(scr.Config.Flags))
 
-	for k := range conf.Flags {
+	for k := range scr.Config.Flags {
 		names = append(names, k)
 	}
 
@@ -308,8 +298,8 @@ func mainShowTableFlags(buf io.Writer, scr *script.Script) {
 	sort.Slice(names, func(i, j int) bool {
 		nameI := names[i]
 		nameJ := names[j]
-		flagI := conf.Flags[nameI]
-		flagJ := conf.Flags[nameJ]
+		flagI := scr.Config.Flags[nameI]
+		flagJ := scr.Config.Flags[nameJ]
 		valueI := mainShowBoolToInt(flagI.Required())
 		valueJ := mainShowBoolToInt(flagJ.Required())
 
@@ -328,7 +318,7 @@ func mainShowTableFlags(buf io.Writer, scr *script.Script) {
 	fmt.Fprintln(writer, "╴╴╴╴\t╴╴╴╴╴╴╴╴╴╴╴\t╴╴╴╴╴╴╴╴╴")
 
 	for _, name := range names {
-		flag := conf.Flags[name]
+		flag := scr.Config.Flags[name]
 
 		fmt.Fprintf(
 			writer,
