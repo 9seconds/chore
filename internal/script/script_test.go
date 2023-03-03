@@ -142,7 +142,7 @@ func (suite *ScriptTestSuite) TestEnviron() {
 			"k":  "v",
 			"XX": "y",
 		},
-		Flags: map[string]argparse.FlagValue{
+		Flags: map[string]string{
 			"cleanup": argparse.FlagTrue,
 			"welcome": argparse.FlagFalse,
 		},
@@ -171,7 +171,7 @@ func (suite *ScriptTestSuite) TestEnviron() {
 	suite.Equal("y", data[env.ParameterName("XX")])
 	suite.EqualValues(argparse.FlagTrue, data[env.FlagName("CLEANUP")])
 	suite.EqualValues(argparse.FlagFalse, data[env.FlagName("WELCOME")])
-	suite.Contains(data, env.EnvRecursion)
+	suite.Contains(data, env.EnvSelf)
 	suite.Contains(data, env.EnvIDRun)
 	suite.Contains(data, env.EnvIDChainRun)
 	suite.Contains(data, env.EnvIDIsolated)

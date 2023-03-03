@@ -6,9 +6,9 @@ import (
 	"sync"
 
 	"github.com/9seconds/chore/internal/argparse"
+	"github.com/9seconds/chore/internal/binutils"
 	"github.com/9seconds/chore/internal/config"
 	"github.com/9seconds/chore/internal/env"
-	"github.com/9seconds/chore/internal/ids"
 	"github.com/9seconds/chore/internal/paths"
 )
 
@@ -75,7 +75,7 @@ func (s *Script) Environ(ctx context.Context, args argparse.ParsedArgs) []string
 	waiterGroup := &sync.WaitGroup{}
 	values := make(chan string, 1)
 
-	env.GenerateRecursion(ctx, values, waiterGroup, s.Namespace, s.Executable, args)
+	env.GenerateSelf(ctx, values, waiterGroup, s.Namespace, s.Executable, args)
 	env.GenerateTime(ctx, values, waiterGroup)
 	env.GenerateMachineID(ctx, values, waiterGroup)
 	env.GenerateIds(ctx, values, waiterGroup, s.Path(), s.ID, args)
@@ -119,7 +119,7 @@ func New(namespace, executable string) (*Script, error) {
 	scr := &Script{
 		Namespace:  namespace,
 		Executable: executable,
-		ID:         ids.New(),
+		ID:         binutils.NewID(),
 	}
 
 	if err := ValidateScript(scr.Path()); err != nil {

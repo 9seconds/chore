@@ -2,6 +2,7 @@ package argparse
 
 import (
 	"fmt"
+	"os"
 	"strings"
 	"unicode/utf8"
 
@@ -14,22 +15,19 @@ const (
 	PrefixLiteral      = ':'
 	SeparatorKeyword   = '='
 
+	FlagTrue  = "t"
+	FlagFalse = "f"
+
 	DefaultListDelimiter = ":"
-
-	PositionalDelimiter = "--"
+	PositionalDelimiter  = "--"
 )
 
-type FlagValue rune
-
-const (
-	FlagTrue  FlagValue = 't'
-	FlagFalse FlagValue = 'f'
-)
+var ListDelimiter = string(os.PathListSeparator)
 
 func Parse(args []string, listDelimiter string) (ParsedArgs, error) { //nolint: cyclop
 	parsed := ParsedArgs{
 		Parameters:    make(map[string]string),
-		Flags:         make(map[string]FlagValue),
+		Flags:         make(map[string]string),
 		Positional:    []string{},
 		ListDelimiter: listDelimiter,
 	}

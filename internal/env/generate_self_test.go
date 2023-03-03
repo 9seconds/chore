@@ -22,7 +22,7 @@ func (suite *GenerateRecursionTestSuite) SetupTest() {
 			"param1": "33",
 			"param2": "34 35",
 		},
-		Flags: map[string]argparse.FlagValue{
+		Flags: map[string]string{
 			"flag1": argparse.FlagTrue,
 			"flag2": argparse.FlagFalse,
 		},
@@ -31,7 +31,7 @@ func (suite *GenerateRecursionTestSuite) SetupTest() {
 }
 
 func (suite *GenerateRecursionTestSuite) TestEnv() {
-	env.GenerateRecursion(
+	env.GenerateSelf(
 		suite.Context(),
 		suite.values,
 		suite.wg,
@@ -42,15 +42,15 @@ func (suite *GenerateRecursionTestSuite) TestEnv() {
 	data := suite.Collect()
 
 	suite.Len(data, 1)
-	suite.Contains(data[env.EnvRecursion], "run namespace2 script1")
-	suite.Contains(data[env.EnvRecursion], "param1=33")
-	suite.Contains(data[env.EnvRecursion], "'param2=34 35'")
-	suite.Contains(data[env.EnvRecursion], "+flag1")
-	suite.Contains(data[env.EnvRecursion], "-flag2")
-	suite.NotContains(data[env.EnvRecursion], "pos1")
-	suite.NotContains(data[env.EnvRecursion], "pos2")
-	suite.NotContains(data[env.EnvRecursion], "pos3")
-	suite.NotContains(data[env.EnvRecursion], "--")
+	suite.Contains(data[env.EnvSelf], "run namespace2 script1")
+	suite.Contains(data[env.EnvSelf], "param1=33")
+	suite.Contains(data[env.EnvSelf], "'param2=34 35'")
+	suite.Contains(data[env.EnvSelf], "+flag1")
+	suite.Contains(data[env.EnvSelf], "-flag2")
+	suite.NotContains(data[env.EnvSelf], "pos1")
+	suite.NotContains(data[env.EnvSelf], "pos2")
+	suite.NotContains(data[env.EnvSelf], "pos3")
+	suite.NotContains(data[env.EnvSelf], "--")
 }
 
 func TestGenerateRecursion(t *testing.T) {

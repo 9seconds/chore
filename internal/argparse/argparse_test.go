@@ -76,7 +76,7 @@ func (suite *ParseTestSuite) TestMixed() {
 		"k": "2",
 		"p": "v:d:e:",
 	}, parsed.Parameters)
-	suite.Equal(map[string]argparse.FlagValue{
+	suite.Equal(map[string]string{
 		"x": argparse.FlagTrue,
 		"k": argparse.FlagFalse,
 		"j": argparse.FlagFalse,

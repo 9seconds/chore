@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	"github.com/9seconds/chore/internal/argparse"
-	"github.com/9seconds/chore/internal/ids"
+	"github.com/9seconds/chore/internal/binutils"
 )
 
 const idLength = 32
@@ -25,12 +25,12 @@ func GenerateIds(
 
 		chainRun := os.Getenv(EnvIDChainRun)
 		if chainRun == "" {
-			chainRun = ids.New()
+			chainRun = binutils.NewID()
 		}
 
-		checksum := ids.Encode(args.Checksum())
-		isolatedID := ids.Chain(scriptID, checksum)
-		chainedIsolatedID := ids.Chain(os.Getenv(EnvIDChainIsolated), scriptID, checksum)
+		checksum := args.Checksum()
+		isolatedID := binutils.Chain(scriptID, checksum)
+		chainedIsolatedID := binutils.Chain(os.Getenv(EnvIDChainIsolated), scriptID, checksum)
 
 		sendValue(ctx, results, EnvIDRun, runID)
 		sendValue(ctx, results, EnvIDChainRun, chainRun)

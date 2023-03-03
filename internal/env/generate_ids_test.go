@@ -34,10 +34,10 @@ func (suite *GenerateIdsTestSuite) TestNoEnvs() {
 	suite.NotEmpty(data[env.EnvIDRun])
 	suite.NotEmpty(data[env.EnvIDChainRun])
 	suite.Equal(
-		"MIXSka8V-ASGnPVXEQIRCTeyUWVD8fv9C35EiLMG1vg",
+		"0NuX7xYp98TzxeCRL3WWmEDd7_m8m-8ZX9mOjvIUeXI",
 		data[env.EnvIDIsolated])
 	suite.Equal(
-		"ygwLMN-2WP1nlT8qS5-IIBI6SR0l0hF0jZA5xthqKfY",
+		"Em5rkM3HRPOqufbGU5YOjJ3ZFKNfPtzYBlMWVV6vwkY",
 		data[env.EnvIDChainIsolated])
 }
 
