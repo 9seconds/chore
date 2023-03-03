@@ -11,10 +11,14 @@ import (
 
 	"github.com/9seconds/chore/internal/cli"
 	"github.com/9seconds/chore/internal/commands"
+	"github.com/gosimple/slug"
 )
 
 func main() {
 	defer commands.Exit(0)
+
+	slug.Lowercase = false
+	slug.MaxLength = 100
 
 	log.SetFlags(log.Lshortfile | log.LstdFlags)
 

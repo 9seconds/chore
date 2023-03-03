@@ -4,18 +4,21 @@ import (
 	"context"
 	"crypto/sha256"
 	"fmt"
+	"sort"
 	"strings"
 	"sync"
 
 	"github.com/9seconds/chore/internal/binutils"
 	"github.com/9seconds/chore/internal/config"
+	"github.com/alessio/shellescape"
 )
 
 const (
-	SerializePrefixArgument     = "ar_"
-	SerializePrefixFlagPositive = "fp_"
-	SerializePrefixFlagNegative = "fn_"
-	SerializeKeywordSeparator   = "_is_"
+	SerializePrefixPositional   = "0"
+	SerializePrefixFlagPositive = "1"
+	SerializePrefixFlagNegative = "2"
+	SerializePrefixParameter    = "3"
+	SerializeParameterSeparator = "_"
 )
 
 type ParsedArgs struct {
@@ -24,6 +27,36 @@ type ParsedArgs struct {
 	Positional         []string
 	ExplicitPositional bool
 	ListDelimiter      string
+}
+
+func (p ParsedArgs) SerializedString() string {
+	result := make([]string, 0, len(p.Positional)+len(p.Flags)+len(p.Parameters))
+	params := make([]string, 0, len(p.Parameters))
+	flags := make([]string, 0, len(p.Flags))
+
+	for _, v := range p.Positional {
+		result = append(result, SerializePrefixPositional+v)
+	}
+
+	for k, v := range p.Parameters {
+		params = append(params, SerializePrefixParameter+k+SerializeParameterSeparator+v)
+	}
+
+	for key, value := range p.Flags {
+		if value == FlagTrue {
+			flags = append(flags, SerializePrefixFlagPositive+key)
+		} else {
+			flags = append(flags, SerializePrefixFlagNegative+key)
+		}
+	}
+
+	sort.Strings(params)
+	sort.Strings(flags)
+
+	result = append(result, params...)
+	result = append(result, flags...)
+
+	return shellescape.QuoteCommand(result)
 }
 
 func (p ParsedArgs) Validate( //nolint: cyclop

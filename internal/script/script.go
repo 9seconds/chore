@@ -10,6 +10,7 @@ import (
 	"github.com/9seconds/chore/internal/config"
 	"github.com/9seconds/chore/internal/env"
 	"github.com/9seconds/chore/internal/paths"
+	"github.com/gosimple/slug"
 )
 
 type Script struct {
@@ -57,11 +58,17 @@ func (s *Script) Environ(ctx context.Context, args argparse.ParsedArgs) []string
 	environ := []string{
 		env.MakeValue(env.EnvNamespace, s.Namespace),
 		env.MakeValue(env.EnvCaller, s.Executable),
+		env.MakeValue(env.EnvIDRun, s.ID),
 		env.MakeValue(env.EnvPathCaller, s.Path()),
 		env.MakeValue(env.EnvPathData, s.DataPath()),
 		env.MakeValue(env.EnvPathCache, s.CachePath()),
 		env.MakeValue(env.EnvPathState, s.StatePath()),
 		env.MakeValue(env.EnvPathTemp, s.TempPath()),
+		env.MakeValue(
+			env.EnvSlug,
+			slug.Make(fmt.Sprintf(
+				"%s-%s-%s-%s",
+				s.Namespace, s.Executable, s.ID, args.SerializedString()))),
 	}
 
 	for k, v := range args.Parameters {
@@ -78,7 +85,7 @@ func (s *Script) Environ(ctx context.Context, args argparse.ParsedArgs) []string
 	env.GenerateSelf(ctx, values, waiterGroup, s.Namespace, s.Executable, args)
 	env.GenerateTime(ctx, values, waiterGroup)
 	env.GenerateMachineID(ctx, values, waiterGroup)
-	env.GenerateIds(ctx, values, waiterGroup, s.Path(), s.ID, args)
+	env.GenerateIds(ctx, values, waiterGroup, s.Path(), args)
 	env.GenerateOS(ctx, values, waiterGroup)
 	env.GenerateUser(ctx, values, waiterGroup)
 	env.GenerateHostname(ctx, values, waiterGroup)

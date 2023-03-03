@@ -26,12 +26,11 @@ func (suite *GenerateIdsTestSuite) SetupTest() {
 }
 
 func (suite *GenerateIdsTestSuite) TestNoEnvs() {
-	env.GenerateIds(suite.Context(), suite.values, suite.wg, "xx", "xz", suite.args)
+	env.GenerateIds(suite.Context(), suite.values, suite.wg, "xx", suite.args)
 
 	data := suite.Collect()
 
-	suite.Len(data, 4)
-	suite.NotEmpty(data[env.EnvIDRun])
+	suite.Len(data, 3)
 	suite.NotEmpty(data[env.EnvIDChainRun])
 	suite.Equal(
 		"0NuX7xYp98TzxeCRL3WWmEDd7_m8m-8ZX9mOjvIUeXI",

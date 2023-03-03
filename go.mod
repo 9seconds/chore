@@ -14,6 +14,7 @@ require (
 	github.com/gabriel-vasile/mimetype v1.4.1
 	github.com/go-git/go-git/v5 v5.6.0
 	github.com/gofrs/uuid v4.4.0+incompatible
+	github.com/gosimple/slug v1.13.1
 	github.com/jarcoal/httpmock v1.2.0
 	github.com/rs/xid v1.4.0
 	github.com/spf13/cobra v1.6.1
@@ -35,6 +36,7 @@ require (
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/go-git/gcfg v1.5.0 // indirect
 	github.com/go-git/go-billy/v5 v5.4.1 // indirect
+	github.com/gosimple/unidecode v1.0.1 // indirect
 	github.com/hexops/gotextdiff v1.0.3 // indirect
 	github.com/imdario/mergo v0.3.13 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect

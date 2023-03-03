@@ -56,6 +56,24 @@ func (suite *ParsedArgsTestSuite) TestChecksum() {
 		args.Checksum())
 }
 
+func (suite *ParsedArgsTestSuite) TestSerializedString() {
+	args := argparse.ParsedArgs{
+		Parameters: map[string]string{
+			"v": "k",
+			"k": "kk",
+		},
+		Flags: map[string]string{
+			"cleanup": argparse.FlagTrue,
+			"welcome": argparse.FlagFalse,
+		},
+		Positional: []string{"1", "2", "3 4 5"},
+	}
+
+	suite.Equal(
+		"01 02 '03 4 5' 3k_kk 3v_k 1cleanup 2welcome",
+		args.SerializedString())
+}
+
 func (suite *ParsedArgsTestSuite) TestIsPositionalTime() {
 	suite.T().Run("empty", func(t *testing.T) {
 		args := argparse.ParsedArgs{
