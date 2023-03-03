@@ -7,6 +7,7 @@ import (
 
 	"github.com/9seconds/chore/internal/argparse"
 	"github.com/9seconds/chore/internal/commands"
+	"github.com/9seconds/chore/internal/paths"
 	"github.com/9seconds/chore/internal/script"
 	"github.com/spf13/cobra"
 )
@@ -44,10 +45,12 @@ func mainRun(cmd *cobra.Command, args []string) {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "command has failed: %v\n", err)
 
+		paths.TempDirCleanup()
 		os.Exit(1)
 	}
 
 	if exitCode != 0 {
+		paths.TempDirCleanup()
 		os.Exit(exitCode)
 	}
 }
@@ -67,8 +70,6 @@ func mainRunWrapper(cmd *cobra.Command, args []string) (int, error) {
 	if err := scr.Init(); err != nil {
 		return 0, fmt.Errorf("cannot initialize script: %w", err)
 	}
-
-	defer scr.Cleanup()
 
 	conf := scr.Config()
 

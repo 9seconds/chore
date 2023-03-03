@@ -80,8 +80,6 @@ func completeRun(cmd *cobra.Command, args []string, toComplete string) ([]string
 		return nil, cobra.ShellCompDirectiveError
 	}
 
-	defer scr.Cleanup()
-
 	conf := scr.Config()
 	completions := []string{}
 	directive := cobra.ShellCompDirectiveNoFileComp

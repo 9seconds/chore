@@ -44,8 +44,6 @@ func mainEditConfig(cmd *cobra.Command, args []string) error {
 		Executable: args[1],
 	}
 
-	defer scr.Cleanup()
-
 	if err := script.EnsureDir(paths.ConfigNamespace(scr.Namespace)); err != nil {
 		return fmt.Errorf("cannot ensure namespace dir: %w", err)
 	}

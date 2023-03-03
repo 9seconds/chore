@@ -24,7 +24,5 @@ func (suite *ScriptTestSuite) NewScript(namespace, executable string) *script.Sc
 		Executable: executable,
 	}
 
-	suite.t.Cleanup(scr.Cleanup)
-
 	return scr
 }

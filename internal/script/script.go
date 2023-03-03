@@ -3,7 +3,6 @@ package script
 import (
 	"context"
 	"fmt"
-	"os"
 	"sync"
 
 	"github.com/9seconds/chore/internal/argparse"
@@ -16,9 +15,8 @@ type Script struct {
 	Namespace  string
 	Executable string
 
-	config    config.Config
-	closeOnce sync.Once
-	tmpDir    string
+	config config.Config
+	tmpDir string
 }
 
 func (s *Script) String() string {
@@ -110,7 +108,7 @@ func (s *Script) Init() error {
 		return fmt.Errorf("cannot ensure script roots: %w", err)
 	}
 
-	dir, err := os.MkdirTemp("", paths.ChoreDir+"-")
+	dir, err := paths.TempDir()
 	if err != nil {
 		return fmt.Errorf("cannot initialize tmp dir: %w", err)
 	}
@@ -125,14 +123,4 @@ func (s *Script) Init() error {
 	s.config = conf
 
 	return nil
-}
-
-func (s *Script) Cleanup() {
-	s.closeOnce.Do(func() {
-		if s.tmpDir != "" {
-			os.RemoveAll(s.tmpDir)
-		}
-
-		s.tmpDir = ""
-	})
 }

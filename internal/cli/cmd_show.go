@@ -83,8 +83,6 @@ func mainShow(cmd *cobra.Command, args []string) error { //nolint: cyclop
 		return fmt.Errorf("cannot initialize script: %w", err)
 	}
 
-	defer scr.Cleanup()
-
 	showPaths, err := cmd.Flags().GetBool("show-path")
 	if err != nil {
 		return err

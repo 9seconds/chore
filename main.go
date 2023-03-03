@@ -10,9 +10,12 @@ import (
 	"syscall"
 
 	"github.com/9seconds/chore/internal/cli"
+	"github.com/9seconds/chore/internal/paths"
 )
 
 func main() {
+	defer paths.TempDirCleanup()
+
 	log.SetFlags(log.Lshortfile | log.LstdFlags)
 
 	ctx, cancel := signal.NotifyContext(

@@ -41,6 +41,8 @@ func (suite *CustomRootTestSuite) Setup(t *testing.T) {
 		xdg.CacheHome = oldCacheHome
 		xdg.StateHome = oldStateHome
 		xdg.RuntimeDir = oldRuntimeDir
+
+		paths.TempDirCleanup()
 	})
 
 	xdg.ConfigHome = filepath.Join(suite.fsRoot, "config_home")
