@@ -7,7 +7,6 @@ import (
 
 	"github.com/9seconds/chore/internal/argparse"
 	"github.com/9seconds/chore/internal/commands"
-	"github.com/9seconds/chore/internal/paths"
 	"github.com/9seconds/chore/internal/script"
 	"github.com/spf13/cobra"
 )
@@ -44,14 +43,11 @@ func mainRun(cmd *cobra.Command, args []string) {
 	exitCode, err := mainRunWrapper(cmd, args)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "command has failed: %v\n", err)
-
-		paths.TempDirCleanup()
-		os.Exit(1)
+		commands.Exit(1)
 	}
 
 	if exitCode != 0 {
-		paths.TempDirCleanup()
-		os.Exit(exitCode)
+		commands.Exit(exitCode)
 	}
 }
 

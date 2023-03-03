@@ -35,20 +35,20 @@ func EnsureFile(path, content string) error {
 	return nil
 }
 
-func EnsureRoots(ns, script string) error {
-	if err := EnsureDir(ConfigNamespace(ns)); err != nil {
+func EnsureRoots(namespace, script string) error {
+	if err := EnsureDir(ConfigNamespace(namespace)); err != nil {
 		return fmt.Errorf("cannot create config root: %w", err)
 	}
 
-	if err := EnsureDir(DataNamespaceScript(ns, script)); err != nil {
+	if err := EnsureDir(DataNamespaceScript(namespace, script)); err != nil {
 		return fmt.Errorf("cannot create data root: %w", err)
 	}
 
-	if err := EnsureDir(CacheNamespaceScript(ns, script)); err != nil {
+	if err := EnsureDir(CacheNamespaceScript(namespace, script)); err != nil {
 		return fmt.Errorf("cannot create cache root: %w", err)
 	}
 
-	if err := EnsureDir(StateNamespaceScript(ns, script)); err != nil {
+	if err := EnsureDir(StateNamespaceScript(namespace, script)); err != nil {
 		return fmt.Errorf("cannot create state root: %w", err)
 	}
 

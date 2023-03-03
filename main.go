@@ -10,11 +10,11 @@ import (
 	"syscall"
 
 	"github.com/9seconds/chore/internal/cli"
-	"github.com/9seconds/chore/internal/paths"
+	"github.com/9seconds/chore/internal/commands"
 )
 
 func main() {
-	defer paths.TempDirCleanup()
+	defer commands.Exit(0)
 
 	log.SetFlags(log.Lshortfile | log.LstdFlags)
 
@@ -46,7 +46,7 @@ func main() {
 
 	if err := root.ExecuteContext(ctx); err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
-		os.Exit(1)
+		commands.Exit(1)
 	}
 
 	cancel()

@@ -1,7 +1,7 @@
 APP_NAME := chore
 GOBIN    := .bin
 
-GOLANGCI_LINT_VERSION := v1.50.1
+GOLANGCI_LINT_VERSION := v1.51.2
 GOFUMPT_VERSION       := v0.4.0
 
 STATIC_FLAGS := -buildmode=pie -modcacherw -trimpath -mod=readonly -ldflags=-linkmode=external -ldflags=-buildid='' -ldflags="-s -w"
@@ -64,4 +64,4 @@ clean:
 
 .PHONY: update
 update:
-	@go get -u && go mod tidy -go=1.19
+	@go get -u && go mod tidy -go=1.20

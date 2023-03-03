@@ -9,8 +9,6 @@ import (
 	"github.com/9seconds/chore/internal/binutils"
 )
 
-const idLength = 32
-
 func GenerateIds(
 	ctx context.Context,
 	results chan<- string,

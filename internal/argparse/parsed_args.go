@@ -93,9 +93,9 @@ func (p ParsedArgs) IsPositionalTime() bool {
 func (p ParsedArgs) Checksum() string {
 	mixer := sha256.New()
 
-	binutils.MixStringsMap(mixer, p.Parameters)
-	binutils.MixStringsMap(mixer, p.Flags)
-	binutils.MixStringSlice(mixer, p.Positional)
+	binutils.MixStringsMap(mixer, p.Parameters)  //nolint: errcheck
+	binutils.MixStringsMap(mixer, p.Flags)       //nolint: errcheck
+	binutils.MixStringSlice(mixer, p.Positional) //nolint: errcheck
 
 	return binutils.ToString(mixer.Sum(nil))
 }

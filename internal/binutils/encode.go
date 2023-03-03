@@ -9,7 +9,7 @@ import (
 func Chain(base string, values ...string) string {
 	mac := hmac.New(sha256.New, []byte(base))
 
-	MixStringSlice(mac, values)
+	MixStringSlice(mac, values) //nolint: errcheck
 
 	return ToString(mac.Sum(nil))
 }
