@@ -26,42 +26,19 @@ func (suite *GenerateIdsTestSuite) SetupTest() {
 }
 
 func (suite *GenerateIdsTestSuite) TestNoEnvs() {
-	env.GenerateIds(suite.Context(), suite.values, suite.wg, "xx", suite.args)
+	env.GenerateIds(suite.Context(), suite.values, suite.wg, "xx", "xz", suite.args)
 
 	data := suite.Collect()
 
 	suite.Len(data, 4)
-	suite.NotEmpty(data[env.EnvIDUnique])
-	suite.NotEmpty(data[env.EnvIDChainUnique])
+	suite.NotEmpty(data[env.EnvIDRun])
+	suite.NotEmpty(data[env.EnvIDChainRun])
 	suite.Equal(
-		"v3CalS7yGSohMYSBoKlD5xFQCFQ8Bi02nVWOD2DAFZE",
+		"MIXSka8V-ASGnPVXEQIRCTeyUWVD8fv9C35EiLMG1vg",
 		data[env.EnvIDIsolated])
 	suite.Equal(
-		"1Ek0XW68Lh0bis9SCJqkEjGSWe0STHuldW7l-DABoe4",
+		"ygwLMN-2WP1nlT8qS5-IIBI6SR0l0hF0jZA5xthqKfY",
 		data[env.EnvIDChainIsolated])
-}
-
-func (suite *GenerateIdsTestSuite) TestUniquesAreDifferent() {
-	env.GenerateIds(suite.Context(), suite.values, suite.wg, "xx", suite.args)
-
-	data := suite.Collect()
-	unique := data[env.EnvIDUnique]
-	suite.values = make(chan string, 1)
-
-	env.GenerateIds(suite.Context(), suite.values, suite.wg, "xx", suite.args)
-
-	data = suite.Collect()
-
-	suite.NotEqual(unique, data[env.EnvIDUnique])
-}
-
-func (suite *GenerateIdsTestSuite) TestChainUnique() {
-	suite.Setenv(env.EnvIDChainUnique, "xx2")
-	env.GenerateIds(suite.Context(), suite.values, suite.wg, "xx", suite.args)
-
-	data := suite.Collect()
-
-	suite.NotContains(env.EnvIDChainUnique, data)
 }
 
 func TestGenerateIds(t *testing.T) {

@@ -8,12 +8,14 @@ import (
 	"github.com/9seconds/chore/internal/argparse"
 	"github.com/9seconds/chore/internal/config"
 	"github.com/9seconds/chore/internal/env"
+	"github.com/9seconds/chore/internal/ids"
 	"github.com/9seconds/chore/internal/paths"
 )
 
 type Script struct {
 	Namespace  string
 	Executable string
+	ID         string
 	Config     config.Config
 
 	tmpDir         string
@@ -76,7 +78,7 @@ func (s *Script) Environ(ctx context.Context, args argparse.ParsedArgs) []string
 	env.GenerateRecursion(ctx, values, waiterGroup, s.Namespace, s.Executable, args)
 	env.GenerateTime(ctx, values, waiterGroup)
 	env.GenerateMachineID(ctx, values, waiterGroup)
-	env.GenerateIds(ctx, values, waiterGroup, s.Path(), args)
+	env.GenerateIds(ctx, values, waiterGroup, s.Path(), s.ID, args)
 	env.GenerateOS(ctx, values, waiterGroup)
 	env.GenerateUser(ctx, values, waiterGroup)
 	env.GenerateHostname(ctx, values, waiterGroup)
@@ -117,6 +119,7 @@ func New(namespace, executable string) (*Script, error) {
 	scr := &Script{
 		Namespace:  namespace,
 		Executable: executable,
+		ID:         ids.New(),
 	}
 
 	if err := ValidateScript(scr.Path()); err != nil {

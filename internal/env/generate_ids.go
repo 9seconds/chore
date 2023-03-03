@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"github.com/9seconds/chore/internal/argparse"
+	"github.com/9seconds/chore/internal/ids"
 )
 
 const idLength = 32
@@ -14,7 +15,7 @@ func GenerateIds(
 	ctx context.Context,
 	results chan<- string,
 	waiters *sync.WaitGroup,
-	scriptID string,
+	scriptID, runID string,
 	args argparse.ParsedArgs,
 ) {
 	waiters.Add(1)
@@ -22,16 +23,19 @@ func GenerateIds(
 	go func() {
 		defer waiters.Done()
 
-		checksum := EncodeBytes(args.Checksum())
-		isolatedID := chainValues(checksum, scriptID)
-		chainedIsolatedID := chainValues(isolatedID, os.Getenv(EnvIDChainIsolated))
+		chainRun := os.Getenv(EnvIDChainRun)
+		if chainRun == "" {
+			chainRun = ids.New()
+		}
 
-		sendValue(ctx, results, EnvIDUnique, generateRandomString(idLength))
+		checksum := ids.Encode(args.Checksum())
+		isolatedID := ids.Chain(scriptID, checksum)
+		chainedIsolatedID := ids.Chain(os.Getenv(EnvIDChainIsolated), scriptID, checksum)
+
+		sendValue(ctx, results, EnvIDRun, runID)
+		sendValue(ctx, results, EnvIDChainRun, chainRun)
 		sendValue(ctx, results, EnvIDIsolated, isolatedID)
 		sendValue(ctx, results, EnvIDChainIsolated, chainedIsolatedID)
-
-		if _, ok := os.LookupEnv(EnvIDChainUnique); !ok {
-			sendValue(ctx, results, EnvIDChainUnique, generateRandomString(idLength))
-		}
+		sendValue(ctx, results, EnvIDChainIsolated, chainedIsolatedID)
 	}()
 }

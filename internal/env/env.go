@@ -34,8 +34,8 @@ const (
 	EnvPathState  = EnvPathPrefix + "STATE"
 	EnvPathTemp   = EnvPathPrefix + "TEMP"
 
-	EnvIDUnique        = EnvIDPrefix + "UNIQUE"
-	EnvIDChainUnique   = EnvIDChainPrefix + "UNIQUE"
+	EnvIDRun           = EnvIDPrefix + "RUN"
+	EnvIDChainRun      = EnvIDChainPrefix + "RUN"
 	EnvIDIsolated      = EnvIDPrefix + "ISOLATED"
 	EnvIDChainIsolated = EnvIDChainPrefix + "ISOLATED"
 
