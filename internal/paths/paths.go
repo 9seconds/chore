@@ -7,7 +7,8 @@ import (
 )
 
 const (
-	ChoreDir = "chore"
+	ChoreDir      = "chore"
+	VaultFileName = ".vault"
 )
 
 func ConfigRoot() string {
@@ -18,12 +19,16 @@ func ConfigNamespace(ns string) string {
 	return filepath.Join(ConfigRoot(), ns)
 }
 
+func ConfigNamespaceScriptVault(ns string) string {
+	return filepath.Join(ConfigNamespace(ns), VaultFileName)
+}
+
 func ConfigNamespaceScript(ns, script string) string {
 	return filepath.Join(ConfigNamespace(ns), script)
 }
 
 func ConfigNamespaceScriptConfig(ns, script string) string {
-	return ConfigNamespaceScript(ns, script) + ".toml"
+	return filepath.Join(ConfigNamespace(ns), "."+script+".toml")
 }
 
 func DataRoot() string {
