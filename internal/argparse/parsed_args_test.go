@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/9seconds/chore/internal/argparse"
-	"github.com/9seconds/chore/internal/config"
+	"github.com/9seconds/chore/internal/script/config"
 	"github.com/9seconds/chore/internal/testlib"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

@@ -6,7 +6,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/9seconds/chore/internal/config"
+	"github.com/9seconds/chore/internal/script/config"
 )
 
 const (

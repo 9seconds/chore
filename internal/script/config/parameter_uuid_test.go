@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/9seconds/chore/internal/config"
+	"github.com/9seconds/chore/internal/script/config"
 	"github.com/9seconds/chore/internal/testlib"
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"

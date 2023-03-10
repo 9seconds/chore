@@ -7,9 +7,9 @@ import (
 
 	"github.com/9seconds/chore/internal/argparse"
 	"github.com/9seconds/chore/internal/binutils"
-	"github.com/9seconds/chore/internal/config"
 	"github.com/9seconds/chore/internal/env"
 	"github.com/9seconds/chore/internal/paths"
+	"github.com/9seconds/chore/internal/script/config"
 	"github.com/gosimple/slug"
 )
 

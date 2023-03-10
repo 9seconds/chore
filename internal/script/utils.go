@@ -11,8 +11,8 @@ import (
 	"unicode"
 
 	"github.com/9seconds/chore/internal/access"
-	"github.com/9seconds/chore/internal/config"
 	"github.com/9seconds/chore/internal/paths"
+	"github.com/9seconds/chore/internal/script/config"
 )
 
 const dirPermission = 0o700
