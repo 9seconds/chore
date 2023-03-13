@@ -9,18 +9,19 @@ const (
 )
 
 const (
-	Prefix             = "CHORE_"
-	EnvParameterPrefix = Prefix + "P_"
-	EnvFlagPrefix      = Prefix + "F_"
-	EnvPathPrefix      = Prefix + "PATH_"
-	EnvNetworkPrefix   = Prefix + "NETWORK_"
-	EnvStartedAtPrefix = Prefix + "STARTED_AT_"
-	EnvIDPrefix        = Prefix + "ID_"
-	EnvIDChainPrefix   = Prefix + "CHAIN_ID_"
-	EnvOSPrefix        = Prefix + "OS_"
-	EnvOSVersionPrefix = EnvOSPrefix + "VERSION_"
-	EnvGitPrefix       = Prefix + "GIT_"
-	EnvUserPrefix      = Prefix + "USER_"
+	Prefix                 = "CHORE_"
+	EnvParameterPrefix     = Prefix + "P_"
+	EnvParameterLastPrefix = Prefix + "PL_"
+	EnvFlagPrefix          = Prefix + "F_"
+	EnvPathPrefix          = Prefix + "PATH_"
+	EnvNetworkPrefix       = Prefix + "NETWORK_"
+	EnvStartedAtPrefix     = Prefix + "STARTED_AT_"
+	EnvIDPrefix            = Prefix + "ID_"
+	EnvIDChainPrefix       = Prefix + "CHAIN_ID_"
+	EnvOSPrefix            = Prefix + "OS_"
+	EnvOSVersionPrefix     = EnvOSPrefix + "VERSION_"
+	EnvGitPrefix           = Prefix + "GIT_"
+	EnvUserPrefix          = Prefix + "USER_"
 
 	Debug = Prefix + "DEBUG"
 
@@ -96,6 +97,10 @@ const (
 
 func ParameterName(name string) string {
 	return EnvParameterPrefix + strings.ToUpper(name)
+}
+
+func ParameterLastName(name string) string {
+	return EnvParameterLastPrefix + strings.ToUpper(name)
 }
 
 func FlagName(name string) string {

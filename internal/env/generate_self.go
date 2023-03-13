@@ -30,18 +30,7 @@ func GenerateSelf(
 		}
 
 		cli := []string{executable, "run", namespace, script}
-
-		for name, value := range args.Parameters {
-			cli = append(cli, name+string(argparse.SeparatorKeyword)+value)
-		}
-
-		for name, value := range args.Flags {
-			if value == argparse.FlagTrue {
-				cli = append(cli, string(argparse.PrefixFlagPositive)+name)
-			} else {
-				cli = append(cli, string(argparse.PrefixFlagNegative)+name)
-			}
-		}
+		cli = append(cli, args.ToSelfStringChunks()...)
 
 		sendValue(ctx, results, EnvSelf, shellescape.QuoteCommand(cli))
 	}()

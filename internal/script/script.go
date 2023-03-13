@@ -68,11 +68,20 @@ func (s *Script) Environ(ctx context.Context, args argparse.ParsedArgs) []string
 			env.EnvSlug,
 			slug.Make(fmt.Sprintf(
 				"%s-%s-%s-%s",
-				s.Namespace, s.Executable, s.ID, args.SerializedString()))),
+				s.Namespace, s.Executable, s.ID, args.ToSlugString()))),
 	}
 
-	for k, v := range args.Parameters {
-		environ = append(environ, env.MakeValue(env.ParameterName(k), v))
+	for name := range args.Parameters {
+		environ = append(
+			environ,
+			env.MakeValue(
+				env.ParameterName(name),
+				args.GetParameter(name)))
+		environ = append(
+			environ,
+			env.MakeValue(
+				env.ParameterLastName(name),
+				args.GetLastParameter(name)))
 	}
 
 	for k, v := range args.Flags {

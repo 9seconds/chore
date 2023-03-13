@@ -9,6 +9,7 @@ require (
 	github.com/Showmax/go-fqdn v1.0.0
 	github.com/adrg/xdg v0.4.0
 	github.com/alessio/shellescape v1.4.1
+	github.com/anmitsu/go-shlex v0.0.0-20200514113438-38f4b401e2be
 	github.com/denisbrodbeck/machineid v1.0.1
 	github.com/gabriel-vasile/mimetype v1.4.1
 	github.com/go-git/go-git/v5 v5.6.0

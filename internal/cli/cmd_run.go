@@ -33,7 +33,7 @@ func NewRun() *cobra.Command {
 	cmd.InitDefaultHelpFlag()
 
 	if err := cmd.Flags().MarkHidden("help"); err != nil {
-		panic(err)
+		panic(err.Error())
 	}
 
 	return cmd
@@ -52,11 +52,6 @@ func mainRun(cmd *cobra.Command, args []string) {
 }
 
 func mainRunWrapper(cmd *cobra.Command, args []string) (int, error) {
-	listDelimiter, err := cmd.Root().Flags().GetString("list-delimiter")
-	if err != nil {
-		return 0, fmt.Errorf("cannot get a value of 'list-delimiter' flag: %w", err)
-	}
-
 	ctx := cmd.Context()
 
 	scr, err := script.New(args[0], args[1])
@@ -68,7 +63,7 @@ func mainRunWrapper(cmd *cobra.Command, args []string) (int, error) {
 		return 0, fmt.Errorf("cannot initialize script directories: %w", err)
 	}
 
-	parsedArgs, err := argparse.Parse(args[2:], listDelimiter)
+	parsedArgs, err := argparse.Parse(args[2:])
 	if err != nil {
 		return 0, fmt.Errorf("cannot parse arguments: %w", err)
 	}

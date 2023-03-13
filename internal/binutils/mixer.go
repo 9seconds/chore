@@ -10,16 +10,16 @@ import (
 const (
 	MixTypeString      byte = 0x01
 	MixTypeStringSlice byte = 0x02
-	MixTypeStringMap   byte = 0x03
+	MixTypeMap         byte = 0x03
 )
 
 func MixString(writer io.Writer, str string) error {
 	if _, err := writer.Write([]byte{MixTypeString}); err != nil {
-		return fmt.Errorf("cannot mix string type: %w", err)
+		return fmt.Errorf("cannot write header: %w", err)
 	}
 
-	if err := binary.Write(writer, binary.LittleEndian, uint64(len(str))); err != nil {
-		return fmt.Errorf("cannot mix string length: %w", err)
+	if err := MixLength(writer, len(str)); err != nil {
+		return fmt.Errorf("cannot mix length: %w", err)
 	}
 
 	if _, err := io.WriteString(writer, str); err != nil {
@@ -29,50 +29,36 @@ func MixString(writer io.Writer, str string) error {
 	return nil
 }
 
-func MixStringSlice(writer io.Writer, strings []string) error {
+func MixStringSlice(writer io.Writer, data []string) error {
 	if _, err := writer.Write([]byte{MixTypeStringSlice}); err != nil {
-		return fmt.Errorf("cannot mix string slice type: %w", err)
+		return fmt.Errorf("cannot write header: %w", err)
 	}
 
-	if err := binary.Write(writer, binary.LittleEndian, uint64(len(strings))); err != nil {
-		return fmt.Errorf("cannot mix string length: %w", err)
+	if err := MixLength(writer, len(data)); err != nil {
+		return fmt.Errorf("cannot mix length: %w", err)
 	}
 
-	for idx := range strings {
-		if err := MixString(writer, strings[idx]); err != nil {
-			return fmt.Errorf("cannot mix %d string: %w", idx, err)
+	for _, v := range data {
+		if err := MixString(writer, v); err != nil {
+			return fmt.Errorf("cannot mix %s: %w", v, err)
 		}
 	}
 
 	return nil
 }
 
-func MixStringsMap(writer io.Writer, data map[string]string) error {
+func MixLength(writer io.Writer, length int) error {
+	return binary.Write(writer, binary.LittleEndian, uint64(length))
+}
+
+func SortedMapKeys[T ~string, V any](data map[T]V) []string {
 	keys := make([]string, 0, len(data))
 
 	for k := range data {
-		keys = append(keys, k)
+		keys = append(keys, string(k))
 	}
 
 	sort.Strings(keys)
 
-	if _, err := writer.Write([]byte{MixTypeStringMap}); err != nil {
-		return fmt.Errorf("cannot mix string map type: %w", err)
-	}
-
-	if err := binary.Write(writer, binary.LittleEndian, uint64(len(data))); err != nil {
-		return fmt.Errorf("cannot mix string length: %w", err)
-	}
-
-	for _, key := range keys {
-		if err := MixString(writer, key); err != nil {
-			return fmt.Errorf("cannot mix key %s: %w", key, err)
-		}
-
-		if err := MixString(writer, data[key]); err != nil {
-			return fmt.Errorf("cannot mix value of %s: %w", key, err)
-		}
-	}
-
-	return nil
+	return keys
 }

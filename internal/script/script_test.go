@@ -138,9 +138,9 @@ func (suite *ScriptTestSuite) TestEnviron() {
 	scr.Config.Git = git.AccessModeIfUndefined
 
 	environ := scr.Environ(context.Background(), argparse.ParsedArgs{
-		Parameters: map[string]string{
-			"k":  "v",
-			"XX": "y",
+		Parameters: map[string][]string{
+			"k":  {"v", "u"},
+			"XX": {"y"},
 		},
 		Flags: map[string]string{
 			"cleanup": argparse.FlagTrue,
@@ -158,7 +158,7 @@ func (suite *ScriptTestSuite) TestEnviron() {
 		require.True(suite.T(), found)
 	}
 
-	count := 46
+	count := 48
 
 	suite.Equal(scr.Namespace, data[env.EnvNamespace])
 	suite.Equal(scr.Executable, data[env.EnvCaller])
@@ -167,8 +167,10 @@ func (suite *ScriptTestSuite) TestEnviron() {
 	suite.Equal(scr.CachePath(), data[env.EnvPathCache])
 	suite.Equal(scr.StatePath(), data[env.EnvPathState])
 	suite.Equal(scr.TempPath(), data[env.EnvPathTemp])
-	suite.Equal("v", data[env.ParameterName("k")])
+	suite.Equal("v u", data[env.ParameterName("k")])
 	suite.Equal("y", data[env.ParameterName("XX")])
+	suite.Equal("u", data[env.ParameterLastName("k")])
+	suite.Equal("y", data[env.ParameterLastName("XX")])
 	suite.EqualValues(argparse.FlagTrue, data[env.FlagName("CLEANUP")])
 	suite.EqualValues(argparse.FlagFalse, data[env.FlagName("WELCOME")])
 	suite.Contains(data, env.EnvSelf)

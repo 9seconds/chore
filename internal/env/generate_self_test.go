@@ -18,9 +18,9 @@ func (suite *GenerateRecursionTestSuite) SetupTest() {
 	suite.EnvBaseTestSuite.SetupTest()
 
 	suite.args = argparse.ParsedArgs{
-		Parameters: map[string]string{
-			"param1": "33",
-			"param2": "34 35",
+		Parameters: map[string][]string{
+			"param1": {"33"},
+			"param2": {"34 35"},
 		},
 		Flags: map[string]string{
 			"flag1": argparse.FlagTrue,

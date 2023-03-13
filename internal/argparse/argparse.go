@@ -2,11 +2,12 @@ package argparse
 
 import (
 	"fmt"
-	"os"
+	"sort"
 	"strings"
 	"unicode/utf8"
 
 	"github.com/9seconds/chore/internal/script/config"
+	"github.com/anmitsu/go-shlex"
 )
 
 const (
@@ -18,18 +19,14 @@ const (
 	FlagTrue  = "t"
 	FlagFalse = "f"
 
-	DefaultListDelimiter = ":"
-	PositionalDelimiter  = "--"
+	PositionalDelimiter = "--"
 )
 
-var ListDelimiter = string(os.PathListSeparator)
-
-func Parse(args []string, listDelimiter string) (ParsedArgs, error) { //nolint: cyclop
+func Parse(args []string) (ParsedArgs, error) { //nolint: cyclop
 	parsed := ParsedArgs{
-		Parameters:    make(map[string]string),
-		Flags:         make(map[string]string),
-		Positional:    []string{},
-		ListDelimiter: listDelimiter,
+		Parameters: make(map[string][]string),
+		Flags:      make(map[string]string),
+		Positional: []string{},
 	}
 
 	for idx, arg := range args {
@@ -75,10 +72,19 @@ func Parse(args []string, listDelimiter string) (ParsedArgs, error) { //nolint: 
 				return parsed, fmt.Errorf("incorrect parameter %s", arg)
 			}
 
-			parsed.Parameters[name] = strings.TrimPrefix(value, listDelimiter)
+			values, err := shlex.Split(value, true)
+			if err != nil {
+				return parsed, fmt.Errorf("cannot split parameter %s: %w", arg, err)
+			}
+
+			parsed.Parameters[name] = append(parsed.Parameters[name], values...)
 		default:
 			parsed.Positional = append(parsed.Positional, arg)
 		}
+	}
+
+	for _, values := range parsed.Parameters {
+		sort.Strings(values)
 	}
 
 	return parsed, nil

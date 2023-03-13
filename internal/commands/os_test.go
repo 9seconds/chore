@@ -44,8 +44,8 @@ func (suite *OSTestSuite) SetupTest() {
 	require.NoError(t, scr.EnsureDirs())
 
 	parsedArgs := argparse.ParsedArgs{
-		Parameters: map[string]string{
-			"k": "v",
+		Parameters: map[string][]string{
+			"k": {"v"},
 		},
 		Positional: []string{"a", "b"},
 	}

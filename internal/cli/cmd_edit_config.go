@@ -26,9 +26,7 @@ func NewEditConfig() *cobra.Command {
 
 	var editorFlag flagEditor
 
-	flags := cmd.Flags()
-
-	flags.VarP(&editorFlag, "editor", "e", "editor to use")
+	cmd.Flags().VarP(&editorFlag, "editor", "e", "editor to use")
 
 	return cmd
 }

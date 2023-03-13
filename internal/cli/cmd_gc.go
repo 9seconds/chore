@@ -17,9 +17,7 @@ func NewGC() *cobra.Command {
 		ValidArgsFunction: cobra.NoFileCompletions,
 	}
 
-	flags := cmd.Flags()
-
-	flags.BoolP("dry-run", "n", false, "dry run")
+	cmd.Flags().BoolP("dry-run", "n", false, "dry run")
 
 	return cmd
 }

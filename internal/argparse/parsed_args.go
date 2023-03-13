@@ -11,52 +11,115 @@ import (
 	"github.com/9seconds/chore/internal/binutils"
 	"github.com/9seconds/chore/internal/script/config"
 	"github.com/alessio/shellescape"
+	"github.com/gosimple/slug"
 )
 
 const (
-	SerializePrefixPositional   = "0"
-	SerializePrefixFlagPositive = "1"
-	SerializePrefixFlagNegative = "2"
-	SerializePrefixParameter    = "3"
-	SerializeParameterSeparator = "_"
+	SerializePrefixPositional   = '0'
+	SerializePrefixFlagPositive = '1'
+	SerializePrefixFlagNegative = '2'
+	SerializePrefixParameter    = '3'
+	SerializeParameterSeparator = '_'
 )
 
 type ParsedArgs struct {
-	Parameters         map[string]string
+	Parameters         map[string][]string
 	Flags              map[string]string
 	Positional         []string
 	ExplicitPositional bool
-	ListDelimiter      string
 }
 
-func (p ParsedArgs) SerializedString() string {
-	result := make([]string, 0, len(p.Positional)+len(p.Flags)+len(p.Parameters))
-	params := make([]string, 0, len(p.Parameters))
-	flags := make([]string, 0, len(p.Flags))
+func (p ParsedArgs) GetParameter(key string) string {
+	return shellescape.QuoteCommand(p.Parameters[key])
+}
 
-	for _, v := range p.Positional {
-		result = append(result, SerializePrefixPositional+v)
+func (p ParsedArgs) GetLastParameter(key string) string {
+	if values := p.Parameters[key]; len(values) > 0 {
+		return values[len(values)-1]
 	}
 
-	for k, v := range p.Parameters {
-		params = append(params, SerializePrefixParameter+k+SerializeParameterSeparator+v)
+	return ""
+}
+
+func (p ParsedArgs) ToSelfStringChunks() []string {
+	chunks := make([]string, 0, len(p.Flags)+len(p.Parameters))
+
+	for _, key := range binutils.SortedMapKeys(p.Flags) {
+		prefix := PrefixFlagNegative
+		if p.Flags[key] == FlagTrue {
+			prefix = PrefixFlagPositive
+		}
+
+		chunks = append(chunks, fmt.Sprintf("%c%s", prefix, key))
 	}
 
-	for key, value := range p.Flags {
-		if value == FlagTrue {
-			flags = append(flags, SerializePrefixFlagPositive+key)
-		} else {
-			flags = append(flags, SerializePrefixFlagNegative+key)
+	for _, key := range binutils.SortedMapKeys(p.Parameters) {
+		for _, value := range p.Parameters[key] {
+			chunks = append(chunks, fmt.Sprintf("%s%c%s", key, SeparatorKeyword, value))
 		}
 	}
 
-	sort.Strings(params)
-	sort.Strings(flags)
+	return chunks
+}
 
-	result = append(result, params...)
-	result = append(result, flags...)
+func (p ParsedArgs) ToSlugString() string {
+	chunks := make([]string, 0, len(p.Positional)+len(p.Flags)+len(p.Parameters))
 
-	return shellescape.QuoteCommand(result)
+	for _, v := range p.Positional {
+		chunks = append(chunks, fmt.Sprintf("%c%s", SerializePrefixPositional, v))
+	}
+
+	params := make([]string, 0, len(p.Parameters))
+
+	for key := range p.Parameters {
+		params = append(params, key)
+	}
+
+	// sort param keys by an overall length of whole k=v sum, groupped by key
+	sort.Slice(params, func(one, another int) bool {
+		getLength := func(key string) int {
+			sum := len(p.Parameters) * (1 + len(key))
+
+			for _, v := range p.Parameters[key] {
+				sum += len(v)
+			}
+
+			return sum
+		}
+
+		return getLength(params[one]) < getLength(params[another])
+	})
+
+	for _, key := range params {
+		var values []string
+
+		values = append(values, p.Parameters[key]...)
+
+		sort.Sort(sort.Reverse(sort.StringSlice(values)))
+
+		for _, val := range values {
+			chunks = append(
+				chunks,
+				fmt.Sprintf(
+					"%c%s%c%s",
+					SerializePrefixParameter,
+					key,
+					SerializeParameterSeparator,
+					val))
+		}
+	}
+
+	for _, key := range binutils.SortedMapKeys(p.Flags) {
+		prefix := SerializePrefixFlagPositive
+
+		if p.Flags[key] != FlagTrue {
+			prefix = SerializePrefixFlagNegative
+		}
+
+		chunks = append(chunks, fmt.Sprintf("%c%s", prefix, key))
+	}
+
+	return slug.Make(strings.Join(chunks, " "))
 }
 
 func (p ParsedArgs) Validate( //nolint: cyclop
@@ -94,8 +157,8 @@ func (p ParsedArgs) Validate( //nolint: cyclop
 	waiters := &sync.WaitGroup{}
 	errChan := make(chan error)
 
-	for name, listValues := range p.Parameters {
-		for _, value := range strings.Split(listValues, p.ListDelimiter) {
+	for name, values := range p.Parameters {
+		for _, value := range values {
 			waiters.Add(1)
 
 			go func(name, value string) {
@@ -126,8 +189,18 @@ func (p ParsedArgs) IsPositionalTime() bool {
 func (p ParsedArgs) Checksum() string {
 	mixer := sha256.New()
 
-	binutils.MixStringsMap(mixer, p.Parameters)  //nolint: errcheck
-	binutils.MixStringsMap(mixer, p.Flags)       //nolint: errcheck
+	binutils.MixLength(mixer, len(p.Parameters)) //nolint: errcheck
+
+	for _, key := range binutils.SortedMapKeys(p.Parameters) {
+		binutils.MixString(mixer, key)                    //nolint: errcheck
+		binutils.MixStringSlice(mixer, p.Parameters[key]) //nolint: errcheck
+	}
+
+	for _, key := range binutils.SortedMapKeys(p.Flags) {
+		binutils.MixString(mixer, key)          //nolint: errcheck
+		binutils.MixString(mixer, p.Flags[key]) //nolint: errcheck
+	}
+
 	binutils.MixStringSlice(mixer, p.Positional) //nolint: errcheck
 
 	return binutils.ToString(mixer.Sum(nil))
