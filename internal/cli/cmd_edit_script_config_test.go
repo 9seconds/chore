@@ -16,7 +16,7 @@ type CmdEditScriptConfigTestSuite struct {
 }
 
 func (suite *CmdEditScriptConfigTestSuite) SetupTest() {
-	suite.CmdTestSuite.Setup("edit-config", cli.NewEditScriptConfig)
+	suite.CmdTestSuite.Setup("edit-script-config", cli.NewEditScriptConfig)
 
 	suite.EnsureScriptConfig("ns", "s", `description = "aaa"`)
 }

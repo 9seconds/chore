@@ -47,7 +47,7 @@ func mainEditScriptConfig(cmd *cobra.Command, args []string) error {
 	}
 
 	defaultContent := bytes.Buffer{}
-	tpl := getTemplate("static/edit-config-template.toml")
+	tpl := getTemplate("static/edit-script-config-template.toml")
 
 	if err := tpl.Execute(&defaultContent, scr); err != nil {
 		return fmt.Errorf("cannot render default template: %w", err)

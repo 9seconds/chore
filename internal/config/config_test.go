@@ -14,7 +14,7 @@ type ConfigTestSuite struct {
 }
 
 func (suite *ConfigTestSuite) TestErrorRead() {
-	reader := iotest.TimeoutReader(strings.NewReader("[passwords]"))
+	reader := iotest.TimeoutReader(strings.NewReader("[vault]"))
 	_, err := config.ReadConfig(reader)
 
 	suite.ErrorContains(err, "cannot parse TOML config")
@@ -23,7 +23,7 @@ func (suite *ConfigTestSuite) TestErrorRead() {
 
 func (suite *ConfigTestSuite) TestBadPasswords() {
 	reader := strings.NewReader(`
-		[passwords.xx]
+		[vault.xx]
 		y = 1
 	`)
 	_, err := config.ReadConfig(reader)
@@ -33,14 +33,14 @@ func (suite *ConfigTestSuite) TestBadPasswords() {
 
 func (suite *ConfigTestSuite) TestOk() {
 	reader := strings.NewReader(`
-		[passwords]
+		[vault]
 		y = "1"
 		z = "2"
 	`)
 
 	conf, err := config.ReadConfig(reader)
 	suite.NoError(err)
-	suite.Subset(conf.Passwords, map[string]string{"y": "1", "z": "2"})
+	suite.Subset(conf.Vault, map[string]string{"y": "1", "z": "2"})
 }
 
 func TestConfig(t *testing.T) {

@@ -8,7 +8,7 @@ import (
 )
 
 type Config struct {
-	Passwords map[string]string `toml:"passwords"`
+	Vault map[string]string `toml:"vault"`
 }
 
 func ReadConfig(reader io.Reader) (Config, error) {

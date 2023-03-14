@@ -42,6 +42,7 @@ func main() {
 	root.InitDefaultHelpCmd()
 
 	root.AddCommand(
+		cli.NewEditConfig(),
 		cli.NewRun(),
 		cli.NewShow(),
 		cli.NewEditScriptConfig(),
