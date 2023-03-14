@@ -16,7 +16,7 @@ func NewEditScript() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:        "edit-script [flags] namespace script",
 		Aliases:    []string{"e", "es"},
-		SuggestFor: []string{"edit-config", "ec"},
+		SuggestFor: []string{"edit-script-config", "ec", "esc"},
 		Short:      "Edit chore script",
 		Args: cobra.MatchAll(
 			cobra.ExactArgs(2), //nolint: gomnd

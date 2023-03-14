@@ -44,7 +44,7 @@ func main() {
 	root.AddCommand(
 		cli.NewRun(),
 		cli.NewShow(),
-		cli.NewEditConfig(),
+		cli.NewEditScriptConfig(),
 		cli.NewEditScript(),
 		cli.NewGC())
 

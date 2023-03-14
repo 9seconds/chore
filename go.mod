@@ -17,6 +17,7 @@ require (
 	github.com/gosimple/slug v1.13.1
 	github.com/jarcoal/httpmock v1.2.0
 	github.com/rs/xid v1.4.0
+	github.com/sethvargo/go-password v0.2.0
 	github.com/spf13/cobra v1.6.1
 	github.com/stretchr/testify v1.8.1
 	github.com/tchap/go-patricia/v2 v2.3.1

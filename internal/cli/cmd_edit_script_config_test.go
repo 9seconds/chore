@@ -11,17 +11,17 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type CmdEditConfigTestSuite struct {
+type CmdEditScriptConfigTestSuite struct {
 	CmdTestSuite
 }
 
-func (suite *CmdEditConfigTestSuite) SetupTest() {
-	suite.CmdTestSuite.Setup("edit-config", cli.NewEditConfig)
+func (suite *CmdEditScriptConfigTestSuite) SetupTest() {
+	suite.CmdTestSuite.Setup("edit-config", cli.NewEditScriptConfig)
 
 	suite.EnsureScriptConfig("ns", "s", `description = "aaa"`)
 }
 
-func (suite *CmdEditConfigTestSuite) TestNewFile() {
+func (suite *CmdEditScriptConfigTestSuite) TestNewFile() {
 	ctx, err := suite.ExecuteCommand([]string{"-e", "true", "xx", "x"})
 
 	suite.NoError(err)
@@ -42,7 +42,7 @@ func (suite *CmdEditConfigTestSuite) TestNewFile() {
 	suite.Greater(stat.Size(), int64(0))
 }
 
-func (suite *CmdEditConfigTestSuite) TestExistingFile() {
+func (suite *CmdEditScriptConfigTestSuite) TestExistingFile() {
 	ctx, err := suite.ExecuteCommand([]string{"-e", "true", "ns", "s"})
 
 	suite.NoError(err)
@@ -55,7 +55,7 @@ func (suite *CmdEditConfigTestSuite) TestExistingFile() {
 	suite.Equal(`description = "aaa"`, string(data))
 }
 
-func (suite *CmdEditConfigTestSuite) TestEditorFailed() {
+func (suite *CmdEditScriptConfigTestSuite) TestEditorFailed() {
 	ctx, err := suite.ExecuteCommand([]string{"-e", "false", "ns", "s"})
 
 	suite.ErrorContains(err, "command exited with 1")
@@ -68,7 +68,7 @@ func (suite *CmdEditConfigTestSuite) TestEditorFailed() {
 	suite.Equal(`description = "aaa"`, string(data))
 }
 
-func TestCmdEditConfig(t *testing.T) {
+func TestCmdEditScriptConfig(t *testing.T) {
 	if _, err := exec.LookPath("true"); err != nil {
 		t.Skipf("cannot find out true in PATH: %v", err)
 	}
@@ -77,5 +77,5 @@ func TestCmdEditConfig(t *testing.T) {
 		t.Skipf("cannot find out false in PATH: %v", err)
 	}
 
-	suite.Run(t, &CmdEditConfigTestSuite{})
+	suite.Run(t, &CmdEditScriptConfigTestSuite{})
 }

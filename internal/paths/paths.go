@@ -7,12 +7,17 @@ import (
 )
 
 const (
-	ChoreDir      = "chore"
-	VaultFileName = ".vault"
+	ChoreDir          = "chore"
+	VaultFileName     = ".vault"
+	AppConfigFileName = "config.toml"
 )
 
 func ConfigRoot() string {
 	return filepath.Join(xdg.ConfigHome, ChoreDir)
+}
+
+func AppConfigPath() string {
+	return filepath.Join(ConfigRoot(), AppConfigFileName)
 }
 
 func ConfigNamespace(ns string) string {
