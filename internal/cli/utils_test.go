@@ -5,8 +5,10 @@ import (
 	"os/exec"
 	"testing"
 
+	"github.com/9seconds/chore/internal/env"
 	"github.com/9seconds/chore/internal/paths"
 	"github.com/9seconds/chore/internal/testlib"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -68,4 +70,27 @@ func TestOpenEditor(t *testing.T) {
 	}
 
 	suite.Run(t, &OpenEditorTestSuite{})
+}
+
+func TestExtractRealNamespace(t *testing.T) {
+	if _, ok := os.LookupEnv(env.EnvNamespace); ok {
+		t.Skip("environment variable is defined")
+	}
+
+	namespace, exists := extractRealNamespace("ns")
+	assert.True(t, exists)
+	assert.Equal(t, namespace, "ns")
+
+	_, exists = extractRealNamespace(".")
+	assert.False(t, exists)
+
+	t.Setenv(env.EnvNamespace, "xx")
+
+	namespace, exists = extractRealNamespace(".")
+	assert.True(t, exists)
+	assert.Equal(t, namespace, "xx")
+
+	namespace, exists = extractRealNamespace("ns")
+	assert.True(t, exists)
+	assert.Equal(t, namespace, "ns")
 }

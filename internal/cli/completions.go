@@ -22,6 +22,13 @@ func completeNamespaces() ([]string, cobra.ShellCompDirective) {
 }
 
 func completeScripts(namespace string) ([]string, cobra.ShellCompDirective) {
+	namespace, exists := extractRealNamespace(namespace)
+	if !exists {
+		log.Printf("namespace is not defined")
+
+		return nil, cobra.ShellCompDirectiveError
+	}
+
 	scripts, err := script.ListScripts(namespace)
 	if err != nil {
 		log.Printf("cannot list scripts: %v", err)

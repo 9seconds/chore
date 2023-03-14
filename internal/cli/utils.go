@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/9seconds/chore/internal/commands"
+	"github.com/9seconds/chore/internal/env"
 )
 
 const (
@@ -46,4 +47,14 @@ func openEditor(ctx context.Context, editor, path string, templateContent []byte
 	}
 
 	return nil
+}
+
+func extractRealNamespace(namespace string) (string, bool) {
+	exists := true
+
+	if namespace == MagicNamespace {
+		namespace, exists = os.LookupEnv(env.EnvNamespace)
+	}
+
+	return namespace, exists
 }

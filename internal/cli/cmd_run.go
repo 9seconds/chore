@@ -54,7 +54,12 @@ func mainRun(cmd *cobra.Command, args []string) {
 func mainRunWrapper(cmd *cobra.Command, args []string) (int, error) {
 	ctx := cmd.Context()
 
-	scr, err := script.New(args[0], args[1])
+	namespace, exists := extractRealNamespace(args[0])
+	if !exists {
+		return 0, ErrNamespaceInvalid
+	}
+
+	scr, err := script.New(namespace, args[1])
 	if err != nil {
 		return 0, fmt.Errorf("cannot initialize script: %w", err)
 	}

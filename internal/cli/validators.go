@@ -11,6 +11,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const (
+	MagicNamespace = "."
+)
+
 var (
 	ErrNamespaceIsNotDirectory = errors.New("namespace is not a directory")
 	ErrNamespaceInvalid        = errors.New("namespace is invalid")
@@ -41,7 +45,12 @@ func validASCIIName(index int, err error) cobra.PositionalArgs {
 
 func validNamespace(index int) cobra.PositionalArgs {
 	return func(_ *cobra.Command, args []string) error {
-		stat, err := os.Stat(paths.ConfigNamespace(args[index]))
+		namespace, exists := extractRealNamespace(args[index])
+		if !exists {
+			return ErrNamespaceInvalid
+		}
+
+		stat, err := os.Stat(paths.ConfigNamespace(namespace))
 		if err != nil {
 			return fmt.Errorf("invalid namespace: %w", err)
 		}
@@ -56,8 +65,13 @@ func validNamespace(index int) cobra.PositionalArgs {
 
 func validScript(nsIndex, scrIndex int) cobra.PositionalArgs {
 	return func(cmd *cobra.Command, args []string) error {
+		namespace, exists := extractRealNamespace(args[nsIndex])
+		if !exists {
+			return ErrNamespaceInvalid
+		}
+
 		scr := &script.Script{
-			Namespace:  args[nsIndex],
+			Namespace:  namespace,
 			Executable: args[scrIndex],
 		}
 
