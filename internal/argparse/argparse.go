@@ -37,8 +37,10 @@ func Parse(args []string) (ParsedArgs, error) { //nolint: cyclop
 		rune, _ := utf8.DecodeRuneInString(arg)
 
 		switch {
-		case arg == PositionalDelimiter && !parsed.ExplicitPositional:
+		case arg == PositionalDelimiter && !parsed.IsPositionalTime():
 			parsed.ExplicitPositional = true
+		case parsed.ExplicitPositional:
+			parsed.Positional = append(parsed.Positional, arg)
 		case rune == PrefixLiteral:
 			parsed.Positional = append(parsed.Positional, arg[1:])
 		case rune == PrefixFlagPositive, rune == PrefixFlagNegative:

@@ -92,10 +92,10 @@ func (suite *ParseTestSuite) TestExplicitPositionals() {
 
 	suite.T().Run("non-empty", func(t *testing.T) {
 		parsed, err := argparse.Parse(
-			[]string{"--", "a", ":--", "b"})
+			[]string{"-x", "--", "a", ":--", "b", "-c"})
 		assert.NoError(t, err)
 		assert.True(t, parsed.IsPositionalTime())
-		assert.Equal(t, []string{"a", "--", "b"}, parsed.Positional)
+		assert.Equal(t, []string{"a", ":--", "b", "-c"}, parsed.Positional)
 	})
 }
 
