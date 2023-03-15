@@ -48,6 +48,10 @@ func main() {
 		cli.NewVault(),
 		cli.NewGC())
 
+	root.SetIn(os.Stdin)
+	root.SetOut(os.Stdout)
+	root.SetErr(os.Stderr)
+
 	if err := root.ExecuteContext(ctx); err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
 		commands.Exit(1)

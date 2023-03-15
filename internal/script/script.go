@@ -80,8 +80,8 @@ func (s *Script) Environ(ctx context.Context, args argparse.ParsedArgs) []string
 		environ = append(
 			environ,
 			env.MakeValue(
-				env.ParameterLastName(name),
-				args.GetLastParameter(name)))
+				env.ParameterNameList(name),
+				args.GetParameterList(name)))
 	}
 
 	for k, v := range args.Flags {

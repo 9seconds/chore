@@ -10,7 +10,6 @@ import (
 
 	"github.com/9seconds/chore/internal/binutils"
 	"github.com/9seconds/chore/internal/script/config"
-	"github.com/alessio/shellescape"
 	"github.com/gosimple/slug"
 )
 
@@ -29,11 +28,18 @@ type ParsedArgs struct {
 	ExplicitPositional bool
 }
 
-func (p ParsedArgs) GetParameter(key string) string {
-	return shellescape.QuoteCommand(p.Parameters[key])
+func (p ParsedArgs) GetParameterList(key string) string {
+	builder := strings.Builder{}
+
+	for _, v := range p.Parameters[key] {
+		builder.WriteString(v)
+		builder.WriteRune('\n')
+	}
+
+	return builder.String()
 }
 
-func (p ParsedArgs) GetLastParameter(key string) string {
+func (p ParsedArgs) GetParameter(key string) string {
 	if values := p.Parameters[key]; len(values) > 0 {
 		return values[len(values)-1]
 	}

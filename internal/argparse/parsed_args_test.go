@@ -207,10 +207,10 @@ func (suite *ParsedArgsTestSuite) TestValidateListFail() {
 	suite.ErrorContains(err, "xxx")
 }
 
-func (suite *ParsedArgsTestSuite) TestGetParameter() {
+func (suite *ParsedArgsTestSuite) TestGetParameterList() {
 	testTable := map[string]string{
-		"int1":  "1 'xxx yyy' 3",
-		"json1": "'{}'",
+		"int1":  "1\nxxx yyy\n3\n",
+		"json1": "{}\n",
 		"":      "",
 	}
 	args := argparse.ParsedArgs{
@@ -229,12 +229,12 @@ func (suite *ParsedArgsTestSuite) TestGetParameter() {
 		expected := expected
 
 		suite.T().Run(testValue, func(t *testing.T) {
-			assert.Equal(t, expected, args.GetParameter(testValue))
+			assert.Equal(t, expected, args.GetParameterList(testValue))
 		})
 	}
 }
 
-func (suite *ParsedArgsTestSuite) TestGetLastParameter() {
+func (suite *ParsedArgsTestSuite) TestGetParameter() {
 	testTable := map[string]string{
 		"int1":  "3",
 		"json1": "{}",
@@ -256,7 +256,7 @@ func (suite *ParsedArgsTestSuite) TestGetLastParameter() {
 		expected := expected
 
 		suite.T().Run(testValue, func(t *testing.T) {
-			assert.Equal(t, expected, args.GetLastParameter(testValue))
+			assert.Equal(t, expected, args.GetParameter(testValue))
 		})
 	}
 }

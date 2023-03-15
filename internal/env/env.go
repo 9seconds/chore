@@ -11,7 +11,7 @@ const (
 const (
 	Prefix                 = "CHORE_"
 	EnvParameterPrefix     = Prefix + "P_"
-	EnvParameterLastPrefix = Prefix + "PL_"
+	EnvParameterPrefixList = Prefix + "PL_"
 	EnvFlagPrefix          = Prefix + "F_"
 	EnvPathPrefix          = Prefix + "PATH_"
 	EnvNetworkPrefix       = Prefix + "NETWORK_"
@@ -99,8 +99,8 @@ func ParameterName(name string) string {
 	return EnvParameterPrefix + strings.ToUpper(name)
 }
 
-func ParameterLastName(name string) string {
-	return EnvParameterLastPrefix + strings.ToUpper(name)
+func ParameterNameList(name string) string {
+	return EnvParameterPrefixList + strings.ToUpper(name)
 }
 
 func FlagName(name string) string {
