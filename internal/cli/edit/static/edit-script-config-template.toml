@@ -1,6 +1,6 @@
 # vim: set ft=toml ts=2 sw=2 sts=2 et:
 #
-# this is a configuration for {{ .Namespace }}/{{ .Executable }}
+# This is a configuration for {{ .Namespace }}/{{ .Executable }}
 # chore script. A configuraion language is TOML
 #
 # https://toml.io/en/

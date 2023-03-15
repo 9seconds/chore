@@ -6,64 +6,17 @@ import (
 	"strings"
 
 	"github.com/9seconds/chore/internal/argparse"
+	"github.com/9seconds/chore/internal/cli/completions"
 	"github.com/9seconds/chore/internal/script"
 	"github.com/spf13/cobra"
 )
 
-func completeNamespaces() ([]string, cobra.ShellCompDirective) {
-	namespaces, err := script.ListNamespaces()
-	if err != nil {
-		log.Printf("cannot list namespaces: %v", err)
-
-		return nil, cobra.ShellCompDirectiveError
-	}
-
-	return namespaces, cobra.ShellCompDirectiveNoFileComp
-}
-
-func completeScripts(namespace string) ([]string, cobra.ShellCompDirective) {
-	namespace, exists := extractRealNamespace(namespace)
-	if !exists {
-		log.Printf("namespace is not defined")
-
-		return nil, cobra.ShellCompDirectiveError
-	}
-
-	scripts, err := script.ListScripts(namespace)
-	if err != nil {
-		log.Printf("cannot list scripts: %v", err)
-
-		return nil, cobra.ShellCompDirectiveError
-	}
-
-	return scripts, cobra.ShellCompDirectiveNoFileComp
-}
-
-func completeNamespace(_ *cobra.Command, args []string, _ string) ([]string, cobra.ShellCompDirective) {
-	if len(args) == 0 {
-		return completeNamespaces()
-	}
-
-	return nil, cobra.ShellCompDirectiveError
-}
-
-func completeNamespaceScript(_ *cobra.Command, args []string, _ string) ([]string, cobra.ShellCompDirective) {
-	switch len(args) {
-	case 0:
-		return completeNamespaces()
-	case 1:
-		return completeScripts(args[0])
-	}
-
-	return nil, cobra.ShellCompDirectiveNoFileComp
-}
-
 func completeRun(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) { //nolint: cyclop
 	switch len(args) {
 	case 0:
-		return completeNamespaces()
+		return completions.CompleteNamespaces(cmd, args, toComplete)
 	case 1:
-		return completeScripts(args[0])
+		return completions.CompleteNamespaceScript(cmd, args, toComplete)
 	}
 
 	parsed, err := argparse.Parse(args[2:])

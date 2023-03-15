@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/9seconds/chore/internal/argparse"
+	"github.com/9seconds/chore/internal/cli/validators"
 	"github.com/9seconds/chore/internal/commands"
 	"github.com/9seconds/chore/internal/script"
 	"github.com/spf13/cobra"
@@ -18,10 +19,7 @@ func NewRun() *cobra.Command {
 		Short:   "Run chore script",
 		Args: cobra.MatchAll(
 			cobra.MinimumNArgs(2), //nolint: gomnd
-			validASCIIName(0, ErrNamespaceInvalid),
-			validASCIIName(1, ErrScriptInvalid),
-			validNamespace(0),
-			validScript(0, 1),
+			validators.Script(0, 1),
 		),
 		Run:                   mainRun,
 		ValidArgsFunction:     completeRun,
@@ -53,11 +51,7 @@ func mainRun(cmd *cobra.Command, args []string) {
 
 func mainRunWrapper(cmd *cobra.Command, args []string) (int, error) {
 	ctx := cmd.Context()
-
-	namespace, exists := extractRealNamespace(args[0])
-	if !exists {
-		return 0, ErrNamespaceInvalid
-	}
+	namespace, _ := script.ExtractRealNamespace(args[0])
 
 	scr, err := script.New(namespace, args[1])
 	if err != nil {

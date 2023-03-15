@@ -1,25 +1,25 @@
-package cli_test
+package edit_test
 
 import (
 	"os"
 	"testing"
 
-	"github.com/9seconds/chore/internal/cli"
+	"github.com/9seconds/chore/internal/cli/edit"
 	"github.com/9seconds/chore/internal/config"
 	"github.com/9seconds/chore/internal/paths"
 	"github.com/stretchr/testify/suite"
 )
 
-type CmdEditConfigTestSuite struct {
-	CmdTestSuite
+type AppConfigTestSuite struct {
+	EditTestSuite
 }
 
-func (suite *CmdEditConfigTestSuite) SetupTest() {
-	suite.CmdTestSuite.Setup("edit-config", cli.NewEditConfig)
+func (suite *AppConfigTestSuite) SetupTest() {
+	suite.EditTestSuite.Setup("app-config", edit.NewAppConfig)
 }
 
-func (suite *CmdEditConfigTestSuite) TestNewFile() {
-	ctx, err := suite.ExecuteCommand([]string{"-e", "true"})
+func (suite *AppConfigTestSuite) TestNewFile() {
+	ctx, err := suite.ExecuteCommand()
 	suite.NoError(err)
 	suite.Empty(ctx.StdoutLines())
 	suite.Empty(ctx.StderrLines())
@@ -35,6 +35,6 @@ func (suite *CmdEditConfigTestSuite) TestNewFile() {
 	suite.Empty(conf.Vault)
 }
 
-func TestCmdEditConfig(t *testing.T) {
-	suite.Run(t, &CmdEditConfigTestSuite{})
+func TestAppConfig(t *testing.T) {
+	suite.Run(t, &AppConfigTestSuite{})
 }

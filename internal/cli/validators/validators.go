@@ -1,4 +1,4 @@
-package cli
+package validators
 
 import (
 	"errors"
@@ -11,10 +11,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const (
-	MagicNamespace = "."
-)
-
 var (
 	ErrNamespaceIsNotDirectory = errors.New("namespace is not a directory")
 	ErrNamespaceInvalid        = errors.New("namespace is invalid")
@@ -23,7 +19,7 @@ var (
 	asciiNameRegexp = regexp.MustCompile(`^[a-zA-Z0-9_-]+$`)
 )
 
-func argumentOptional(index int, callback cobra.PositionalArgs) cobra.PositionalArgs {
+func ArgumentOptional(index int, callback cobra.PositionalArgs) cobra.PositionalArgs {
 	return func(cmd *cobra.Command, args []string) error {
 		if len(args) <= index {
 			return nil
@@ -33,7 +29,7 @@ func argumentOptional(index int, callback cobra.PositionalArgs) cobra.Positional
 	}
 }
 
-func validASCIIName(index int, err error) cobra.PositionalArgs {
+func ASCIIName(index int, err error) cobra.PositionalArgs {
 	return func(_ *cobra.Command, args []string) error {
 		if !asciiNameRegexp.MatchString(args[index]) {
 			return err
@@ -43,9 +39,9 @@ func validASCIIName(index int, err error) cobra.PositionalArgs {
 	}
 }
 
-func validNamespace(index int) cobra.PositionalArgs {
+func Namespace(index int) cobra.PositionalArgs {
 	return func(_ *cobra.Command, args []string) error {
-		namespace, exists := extractRealNamespace(args[index])
+		namespace, exists := script.ExtractRealNamespace(args[index])
 		if !exists {
 			return ErrNamespaceInvalid
 		}
@@ -63,9 +59,9 @@ func validNamespace(index int) cobra.PositionalArgs {
 	}
 }
 
-func validScript(nsIndex, scrIndex int) cobra.PositionalArgs {
+func Script(nsIndex, scrIndex int) cobra.PositionalArgs {
 	return func(cmd *cobra.Command, args []string) error {
-		namespace, exists := extractRealNamespace(args[nsIndex])
+		namespace, exists := script.ExtractRealNamespace(args[nsIndex])
 		if !exists {
 			return ErrNamespaceInvalid
 		}

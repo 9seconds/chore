@@ -45,7 +45,7 @@ regexp = '^\d\w+$'`)
 }
 
 func (suite *CmdShowTestSuite) TestNoArguments() {
-	ctx, err := suite.ExecuteCommand(nil)
+	ctx, err := suite.ExecuteCommand()
 
 	suite.NoError(err)
 	suite.Empty(ctx.StderrLines())
@@ -53,7 +53,7 @@ func (suite *CmdShowTestSuite) TestNoArguments() {
 }
 
 func (suite *CmdShowTestSuite) TestListNamespace() {
-	ctx, err := suite.ExecuteCommand([]string{"ns"})
+	ctx, err := suite.ExecuteCommand("ns")
 
 	suite.NoError(err)
 	suite.Empty(ctx.StderrLines())
@@ -61,7 +61,7 @@ func (suite *CmdShowTestSuite) TestListNamespace() {
 }
 
 func (suite *CmdShowTestSuite) TestShow() { //nolint: cyclop
-	ctx, err := suite.ExecuteCommand([]string{"ns", "s"})
+	ctx, err := suite.ExecuteCommand("ns", "s")
 
 	scr := &script.Script{
 		Namespace:  "ns",

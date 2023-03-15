@@ -14,6 +14,8 @@ import (
 	"text/tabwriter"
 	"unicode"
 
+	"github.com/9seconds/chore/internal/cli/completions"
+	"github.com/9seconds/chore/internal/cli/validators"
 	"github.com/9seconds/chore/internal/script"
 	"github.com/spf13/cobra"
 )
@@ -46,13 +48,11 @@ func NewShow() *cobra.Command {
 		Short:   "Show details on scripts and namespaces.",
 		Args: cobra.MatchAll(
 			cobra.MaximumNArgs(2), //nolint: gomnd
-			argumentOptional(0, validASCIIName(0, ErrNamespaceInvalid)),
-			argumentOptional(1, validASCIIName(1, ErrScriptInvalid)),
-			argumentOptional(0, validNamespace(0)),
-			argumentOptional(1, validScript(0, 1)),
+			validators.ArgumentOptional(0, validators.Namespace(0)),
+			validators.ArgumentOptional(1, validators.Script(0, 1)),
 		),
 		RunE:              mainShow,
-		ValidArgsFunction: completeNamespaceScript,
+		ValidArgsFunction: completions.CompleteNamespaceScript,
 	}
 
 	flags := cmd.Flags()

@@ -11,14 +11,29 @@ import (
 	"unicode"
 
 	"github.com/9seconds/chore/internal/access"
+	"github.com/9seconds/chore/internal/env"
 	"github.com/9seconds/chore/internal/paths"
 	"github.com/9seconds/chore/internal/script/config"
 )
 
-const dirPermission = 0o700
+const (
+	MagicNamespace = "."
+
+	DirPermission = 0o700
+)
 
 func EnsureDir(path string) error {
-	return os.MkdirAll(path, dirPermission)
+	return os.MkdirAll(path, DirPermission)
+}
+
+func ExtractRealNamespace(name string) (string, bool) {
+	exists := true
+
+	if name == MagicNamespace {
+		name, exists = os.LookupEnv(env.EnvNamespace)
+	}
+
+	return name, exists
 }
 
 func ListNamespaces() ([]string, error) {

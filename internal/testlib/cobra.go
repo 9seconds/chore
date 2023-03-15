@@ -44,23 +44,29 @@ type CobraTestSuite struct {
 	CtxTestSuite
 	CustomRootTestSuite
 
+	subcommand  string
 	makeCommand func() *cobra.Command
 }
 
-func (suite *CobraTestSuite) Setup(t *testing.T, makeCommand func() *cobra.Command) {
+func (suite *CobraTestSuite) Setup(t *testing.T, subcommand string, makeCommand func() *cobra.Command) {
 	t.Helper()
 	suite.CtxTestSuite.Setup(t)
 	suite.CustomRootTestSuite.Setup(t)
 
+	suite.subcommand = subcommand
 	suite.makeCommand = makeCommand
 }
 
-func (suite *CobraTestSuite) ExecuteCommand(args []string) (*CobraCommandContext, error) {
+func (suite *CobraTestSuite) ExecuteCommand(args ...string) (*CobraCommandContext, error) {
 	suite.t.Helper()
 
 	cmd := suite.makeCommand()
 	ctx := &CobraCommandContext{
 		Context: suite.Context(),
+	}
+
+	if suite.subcommand != "" {
+		args = append([]string{suite.subcommand}, args...)
 	}
 
 	cmd.SetIn(&ctx.Stdin)

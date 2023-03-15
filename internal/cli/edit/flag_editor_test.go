@@ -1,20 +1,21 @@
-package cli
+package edit_test
 
 import (
 	"os/exec"
 	"testing"
 
+	"github.com/9seconds/chore/internal/cli/edit"
 	"github.com/stretchr/testify/suite"
 )
 
 type FlagEditorTestSuite struct {
 	suite.Suite
 
-	flag *flagEditor
+	flag *edit.FlagEditor
 }
 
 func (suite *FlagEditorTestSuite) SetupTest() {
-	suite.flag = &flagEditor{}
+	suite.flag = &edit.FlagEditor{}
 }
 
 func (suite *FlagEditorTestSuite) Setenv(key, value string) {

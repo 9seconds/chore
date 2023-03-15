@@ -1,10 +1,11 @@
-package cli
+package validators_test
 
 import (
 	"errors"
 	"fmt"
 	"testing"
 
+	"github.com/9seconds/chore/internal/cli/validators"
 	"github.com/9seconds/chore/internal/paths"
 	"github.com/9seconds/chore/internal/testlib"
 	"github.com/spf13/cobra"
@@ -12,40 +13,40 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type ValidNamespaceTestSuite struct {
+type NamespaceTestSuite struct {
 	suite.Suite
 
 	testlib.CustomRootTestSuite
 	fn cobra.PositionalArgs
 }
 
-func (suite *ValidNamespaceTestSuite) SetupTest() {
+func (suite *NamespaceTestSuite) SetupTest() {
 	suite.CustomRootTestSuite.Setup(suite.T())
 
-	suite.fn = validNamespace(0)
+	suite.fn = validators.Namespace(0)
 
 	suite.EnsureFile(paths.ConfigNamespace("xx"), "", 0o600)
 }
 
-func (suite *ValidNamespaceTestSuite) TestUnknownPath() {
+func (suite *NamespaceTestSuite) TestUnknownPath() {
 	suite.ErrorContains(suite.fn(nil, []string{"aaa"}), "invalid namespace")
 }
 
-func (suite *ValidNamespaceTestSuite) TestNotDirectory() {
-	suite.ErrorIs(suite.fn(nil, []string{"xx"}), ErrNamespaceIsNotDirectory)
+func (suite *NamespaceTestSuite) TestNotDirectory() {
+	suite.ErrorIs(suite.fn(nil, []string{"xx"}), validators.ErrNamespaceIsNotDirectory)
 }
 
-type ValidScriptTestSuite struct {
+type ScriptTestSuite struct {
 	suite.Suite
 
 	testlib.CustomRootTestSuite
 	fn cobra.PositionalArgs
 }
 
-func (suite *ValidScriptTestSuite) SetupTest() {
+func (suite *ScriptTestSuite) SetupTest() {
 	suite.CustomRootTestSuite.Setup(suite.T())
 
-	suite.fn = validScript(0, 1)
+	suite.fn = validators.Script(0, 1)
 
 	suite.EnsureFile(paths.ConfigNamespace("xx"), "", 0o600)
 	suite.EnsureDir(paths.ConfigNamespace("yy"))
@@ -53,49 +54,55 @@ func (suite *ValidScriptTestSuite) SetupTest() {
 	suite.EnsureScript("aa", "a", "")
 }
 
-func (suite *ValidScriptTestSuite) TestUnknownNamespace() {
+func (suite *ScriptTestSuite) TestUnknownNamespace() {
 	suite.ErrorContains(
 		suite.fn(nil, []string{"cc", "dd"}),
 		"no such file or directory")
 }
 
-func (suite *ValidScriptTestSuite) TestUnknownScript() {
+func (suite *ScriptTestSuite) TestUnknownScript() {
 	suite.ErrorContains(
 		suite.fn(nil, []string{"yy", "dd"}),
 		"no such file or directory")
 }
 
-func (suite *ValidScriptTestSuite) TestNotScript() {
+func (suite *ScriptTestSuite) TestNotScript() {
 	suite.NoError(suite.fn(nil, []string{"aa", "a"}))
 }
 
-func (suite *ValidScriptTestSuite) TestOk() {
+func (suite *ScriptTestSuite) TestOk() {
 	suite.ErrorContains(
 		suite.fn(nil, []string{"zz", "a"}),
 		"no such file or directory")
 }
 
-func TestArgumentOptional(t *testing.T) {
-	testable := argumentOptional(1, func(_ *cobra.Command, args []string) error {
+type ArgumentOptionalTestSuite struct {
+	suite.Suite
+
+	fn cobra.PositionalArgs
+}
+
+func (suite *ArgumentOptionalTestSuite) SetupTest() {
+	suite.fn = validators.ArgumentOptional(1, func(_ *cobra.Command, args []string) error {
 		return fmt.Errorf("hello %s", args[1])
-	})
-
-	t.Run("empty", func(t *testing.T) {
-		assert.NoError(t, testable(nil, nil))
-	})
-
-	t.Run("not-enough-arguments", func(t *testing.T) {
-		assert.NoError(t, testable(nil, []string{"1"}))
-	})
-
-	t.Run("enough-arguments", func(t *testing.T) {
-		assert.ErrorContains(t, testable(nil, []string{"1", "2"}), "hello 2")
 	})
 }
 
-func TestValidASCIIName(t *testing.T) {
+func (suite *ArgumentOptionalTestSuite) TestEmpty() {
+	suite.NoError(suite.fn(nil, nil))
+}
+
+func (suite *ArgumentOptionalTestSuite) TestNotEnoughArguments() {
+	suite.NoError(suite.fn(nil, []string{"1"}))
+}
+
+func (suite *ArgumentOptionalTestSuite) TestEnoughArguments() {
+	suite.ErrorContains(suite.fn(nil, []string{"1", "2"}), "hello 2")
+}
+
+func TestASCIIName(t *testing.T) {
 	err := errors.New("error")
-	testable := validASCIIName(0, err)
+	testable := validators.ASCIIName(0, err)
 
 	testTable := map[string]bool{
 		"":       false,
@@ -121,10 +128,14 @@ func TestValidASCIIName(t *testing.T) {
 	}
 }
 
-func TestValidNamespace(t *testing.T) {
-	suite.Run(t, &ValidNamespaceTestSuite{})
+func TestArgumentOptional(t *testing.T) {
+	suite.Run(t, &ArgumentOptionalTestSuite{})
 }
 
-func TestValidScript(t *testing.T) {
-	suite.Run(t, &ValidScriptTestSuite{})
+func TestNamespace(t *testing.T) {
+	suite.Run(t, &NamespaceTestSuite{})
+}
+
+func TestScript(t *testing.T) {
+	suite.Run(t, &ScriptTestSuite{})
 }

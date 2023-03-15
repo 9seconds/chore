@@ -1,4 +1,4 @@
-package cli
+package edit
 
 import (
 	"errors"
@@ -8,11 +8,11 @@ import (
 
 var ErrCannotFindOutEditor = errors.New("cannot find out editor")
 
-type flagEditor struct {
+type FlagEditor struct {
 	Value string
 }
 
-func (f *flagEditor) Get() (string, error) {
+func (f *FlagEditor) Get() (string, error) {
 	if value := f.String(); value != "" {
 		return value, nil
 	}
@@ -40,15 +40,15 @@ func (f *flagEditor) Get() (string, error) {
 	return "", ErrCannotFindOutEditor
 }
 
-func (f *flagEditor) Type() string {
+func (f *FlagEditor) Type() string {
 	return "executable"
 }
 
-func (f *flagEditor) String() string {
+func (f *FlagEditor) String() string {
 	return f.Value
 }
 
-func (f *flagEditor) Set(value string) error {
+func (f *FlagEditor) Set(value string) error {
 	var err error
 
 	if value != "" {

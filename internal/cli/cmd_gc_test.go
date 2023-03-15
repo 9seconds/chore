@@ -26,7 +26,7 @@ func (suite *CmdGCTestSuite) TestDryRun() {
 		testValue := testValue
 
 		suite.T().Run(testValue, func(t *testing.T) {
-			ctx, err := suite.ExecuteCommand([]string{testValue})
+			ctx, err := suite.ExecuteCommand(testValue)
 
 			assert.NoError(t, err)
 			assert.DirExists(t, paths.ConfigNamespace("xx"))
@@ -45,7 +45,7 @@ func (suite *CmdGCTestSuite) TestDryRun() {
 }
 
 func (suite *CmdGCTestSuite) TestRun() {
-	ctx, err := suite.ExecuteCommand([]string{})
+	ctx, err := suite.ExecuteCommand()
 
 	suite.NoError(err)
 	suite.NoDirExists(paths.ConfigNamespace("xx"))

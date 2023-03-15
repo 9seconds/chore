@@ -9,25 +9,16 @@ import (
 
 type CmdTestSuite struct {
 	suite.Suite
-	testlib.CobraTestSuite
 
-	subcommand string
+	testlib.CobraTestSuite
 }
 
 func (suite *CmdTestSuite) Setup(subcommand string, makeCommand func() *cobra.Command) {
-	suite.CobraTestSuite.Setup(suite.T(), func() *cobra.Command {
+	suite.CobraTestSuite.Setup(suite.T(), subcommand, func() *cobra.Command {
 		root := cli.NewRoot("version")
 
 		root.AddCommand(makeCommand())
 
 		return root
 	})
-
-	suite.subcommand = subcommand
-}
-
-func (suite *CmdTestSuite) ExecuteCommand(args []string) (*testlib.CobraCommandContext, error) {
-	args = append([]string{suite.subcommand}, args...)
-
-	return suite.CobraTestSuite.ExecuteCommand(args)
 }
