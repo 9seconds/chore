@@ -24,6 +24,7 @@ require (
 	github.com/thlib/go-timezone-local v0.0.0-20210907160436-ef149e42d28e
 	golang.org/x/crypto v0.7.0
 	golang.org/x/sys v0.6.0
+	golang.org/x/term v0.6.0
 	gopkg.in/ini.v1 v1.67.0
 	howett.net/plist v1.0.0
 )

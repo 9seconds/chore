@@ -7,7 +7,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CompleteNamespaces(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
+func CompleteNamespaces(_ *cobra.Command, args []string, _ string) ([]string, cobra.ShellCompDirective) {
+	if len(args) > 0 {
+		return nil, cobra.ShellCompDirectiveNoFileComp
+	}
+
 	namespaces, err := script.ListNamespaces()
 	if err != nil {
 		log.Printf("cannot list namespaces: %v", err)
