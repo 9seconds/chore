@@ -39,6 +39,14 @@ func completeScripts(namespace string) ([]string, cobra.ShellCompDirective) {
 	return scripts, cobra.ShellCompDirectiveNoFileComp
 }
 
+func completeNamespace(_ *cobra.Command, args []string, _ string) ([]string, cobra.ShellCompDirective) {
+	if len(args) == 0 {
+		return completeNamespaces()
+	}
+
+	return nil, cobra.ShellCompDirectiveError
+}
+
 func completeNamespaceScript(_ *cobra.Command, args []string, _ string) ([]string, cobra.ShellCompDirective) {
 	switch len(args) {
 	case 0:

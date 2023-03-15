@@ -47,6 +47,7 @@ func main() {
 		cli.NewShow(),
 		cli.NewEditScriptConfig(),
 		cli.NewEditScript(),
+		cli.NewVault(),
 		cli.NewGC())
 
 	if err := root.ExecuteContext(ctx); err != nil {
