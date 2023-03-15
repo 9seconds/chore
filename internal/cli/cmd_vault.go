@@ -76,16 +76,18 @@ func NewVault() *cobra.Command {
 	}
 
 	delCmd := &cobra.Command{
-		Use:                   "delete namespace key",
+		Use:                   "delete namespace key...",
 		Short:                 "Delete a key from a vault",
 		ValidArgsFunction:     completeNamespace,
 		DisableFlagsInUseLine: true,
 		Args: cobra.MatchAll(
-			cobra.ExactArgs(2),
+			cobra.MinimumNArgs(2),
 			validNamespace(0),
 		),
 		RunE: mainVault(func(cmd *cobra.Command, vlt vault.Vault, args []string) bool {
-			vlt.Delete(args[0])
+			for _, v := range args {
+				vlt.Delete(v)
+			}
 
 			return true
 		}),
