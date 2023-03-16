@@ -72,7 +72,7 @@ func CompleteNamespaceScript(
 	args []string,
 	toComplete string,
 ) ([]string, cobra.ShellCompDirective) {
-	if len(args) < 2 {
+	if len(args) < 2 { //nolint: gomnd
 		return CompleteAllNamespaceScripts(cmd, args, toComplete)
 	}
 

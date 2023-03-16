@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/9seconds/chore/internal/cli/completions"
 	"github.com/9seconds/chore/internal/cli/validators"
 	"github.com/9seconds/chore/internal/vault"
 	"github.com/spf13/cobra"
@@ -19,7 +18,7 @@ func NewSet() *cobra.Command {
 	return &cobra.Command{
 		Use:                   "set namespace key [value]",
 		Short:                 "Set a vault secret",
-		ValidArgsFunction:     completions.CompleteNamespaces,
+		ValidArgsFunction:     completeSecretKey,
 		DisableFlagsInUseLine: true,
 		Args: cobra.MatchAll(
 			cobra.RangeArgs(2, 3), //nolint: gomnd

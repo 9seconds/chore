@@ -20,7 +20,7 @@ func NewRm() *cobra.Command {
 		DisableFlagsInUseLine: true,
 		ValidArgsFunction:     completions.CompleteAllNamespaceScripts,
 		Args: cobra.MatchAll(
-			cobra.MinimumNArgs(2),
+			cobra.MinimumNArgs(2), //nolint: gomnd
 			validators.Namespace(0),
 		),
 		RunE: mainRm,
@@ -38,7 +38,7 @@ func mainRm(cmd *cobra.Command, args []string) error {
 	}
 
 	namespace, _ := script.ExtractRealNamespace(args[0])
-	toRemove := make([]string, 0, 5*(len(args)-1))
+	toRemove := make([]string, 0, 5*(len(args)-1)) //nolint: gomnd
 
 	for _, name := range args[1:] {
 		scr := &script.Script{

@@ -3,7 +3,6 @@ package vault
 import (
 	"errors"
 
-	"github.com/9seconds/chore/internal/cli/completions"
 	"github.com/9seconds/chore/internal/cli/validators"
 	"github.com/9seconds/chore/internal/vault"
 	"github.com/spf13/cobra"
@@ -15,7 +14,7 @@ func NewGet() *cobra.Command {
 	return &cobra.Command{
 		Use:                   "get namespace key",
 		Short:                 "Get vaule of a vault secret",
-		ValidArgsFunction:     completions.CompleteNamespaces,
+		ValidArgsFunction:     completeSecretKey,
 		DisableFlagsInUseLine: true,
 		Args: cobra.MatchAll(
 			cobra.ExactArgs(2), //nolint: gomnd
