@@ -52,7 +52,7 @@ func EnsureRoots(namespace, script string) error {
 		return fmt.Errorf("cannot create state root: %w", err)
 	}
 
-	if err := EnsureFile(filepath.Join(CacheRoot(), CacheDirTagName), CacheDirTagContent); err != nil {
+	if err := EnsureFile(CacheDirTagPath(), CacheDirTagContent); err != nil {
 		return fmt.Errorf("cannot create cachedirtag: %w", err)
 	}
 

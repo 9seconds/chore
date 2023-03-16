@@ -15,13 +15,17 @@ import (
 )
 
 func Collect(validScripts []*script.Script) ([]string, error) { //nolint: cyclop
-	safeFiles := map[string]bool{}
+	safeFiles := map[string]bool{
+		paths.CacheDirTagPath(): true,
+		paths.AppConfigPath():   true,
+	}
 	safePaths := patricia.NewTrie()
 
 	for _, scr := range validScripts {
 		log.Printf("add %q to safe files", scr.Path())
 
 		safeFiles[scr.Path()] = true
+		safeFiles[paths.ConfigNamespaceScriptVault(scr.Namespace)] = true
 
 		safePaths.Set(patricia.Prefix(scr.Path()), true)
 		safePaths.Set(patricia.Prefix(scr.DataPath()), true)

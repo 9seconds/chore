@@ -16,6 +16,10 @@ func ConfigRoot() string {
 	return filepath.Join(xdg.ConfigHome, ChoreDir)
 }
 
+func CacheDirTagPath() string {
+	return filepath.Join(CacheRoot(), CacheDirTagName)
+}
+
 func AppConfigPath() string {
 	return filepath.Join(ConfigRoot(), AppConfigFileName)
 }
