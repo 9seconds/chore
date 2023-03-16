@@ -8,7 +8,7 @@ import (
 func NewEdit() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:              "edit",
-		Short:            "Open editors for scripts and configs",
+		Short:            "Edit scripts and configs",
 		TraverseChildren: true,
 	}
 
