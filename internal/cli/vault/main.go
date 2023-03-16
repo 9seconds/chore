@@ -19,7 +19,7 @@ func main(callback mainCallback) cobra.PositionalArgs {
 	return func(cmd *cobra.Command, args []string) error {
 		namespace, _ := script.ExtractRealNamespace(args[0])
 
-		conf, err := getConfig()
+		conf, err := config.Get()
 		if err != nil {
 			return fmt.Errorf("cannot get application config: %w", err)
 		}
@@ -46,23 +46,6 @@ func main(callback mainCallback) cobra.PositionalArgs {
 
 		return nil
 	}
-}
-
-func getConfig() (config.Config, error) {
-	conf := config.Config{}
-
-	confReader, err := os.Open(paths.AppConfigPath())
-
-	switch {
-	case errors.Is(err, fs.ErrNotExist):
-		return conf, nil
-	case err != nil:
-		return conf, fmt.Errorf("cannot open application config: %w", err)
-	}
-
-	defer confReader.Close()
-
-	return config.ReadConfig(confReader)
 }
 
 func getVault(path, password string) (vault.Vault, error) {

@@ -8,6 +8,7 @@ import (
 	"github.com/9seconds/chore/internal/argparse"
 	"github.com/9seconds/chore/internal/cli/validators"
 	"github.com/9seconds/chore/internal/commands"
+	"github.com/9seconds/chore/internal/config"
 	"github.com/9seconds/chore/internal/script"
 	"github.com/spf13/cobra"
 )
@@ -53,6 +54,11 @@ func mainRunWrapper(cmd *cobra.Command, args []string) (int, error) {
 	ctx := cmd.Context()
 	namespace, _ := script.ExtractRealNamespace(args[0])
 
+	conf, err := config.Get()
+	if err != nil {
+		return 0, fmt.Errorf("cannot open application config: %w", err)
+	}
+
 	scr, err := script.New(namespace, args[1])
 	if err != nil {
 		return 0, fmt.Errorf("cannot initialize script: %w", err)
@@ -71,16 +77,20 @@ func mainRunWrapper(cmd *cobra.Command, args []string) (int, error) {
 		return 0, fmt.Errorf("cannot validate arguments: %w", err)
 	}
 
-	environ := scr.Environ(ctx, parsedArgs)
-
+	environ := conf.Environ(namespace)
 	for _, v := range environ {
-		log.Printf("env: %s", v)
+		log.Printf("config env: %s", v)
+	}
+
+	scriptEnviron := scr.Environ(ctx, parsedArgs)
+	for _, v := range scriptEnviron {
+		log.Printf("script env: %s", v)
 	}
 
 	runCmd := commands.New(
 		scr.Path(),
 		parsedArgs.Positional,
-		environ,
+		append(environ, scriptEnviron...),
 		os.Stdin,
 		os.Stdout,
 		os.Stderr)

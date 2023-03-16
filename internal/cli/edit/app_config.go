@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"sort"
 
 	"github.com/9seconds/chore/internal/config"
 	"github.com/9seconds/chore/internal/paths"
@@ -12,6 +13,7 @@ import (
 )
 
 type appConfigTemplateContext struct {
+	Env   []string
 	Vault map[string]string
 }
 
@@ -36,8 +38,11 @@ func NewAppConfig() *cobra.Command {
 			}
 
 			for _, ns := range namespaces {
+				context.Env = append(context.Env, ns)
 				context.Vault[ns] = config.GeneratePassword()
 			}
+
+			sort.Strings(context.Env)
 
 			tpl := getTemplate("static/edit-config-template.toml")
 			if err := tpl.Execute(content, context); err != nil {

@@ -5,6 +5,21 @@
 # https://toml.io/en/
 # https://github.com/9seconds/chore
 
+# env is a mapping of environment variables for each namespace
+# to their value. These environment variables are going to be injected
+# into script envrionment as is. Priority is:
+#  1. Variables of a parent
+#  2. THESE ENVIRONMENT VARIABLES
+#  3. Script envrionment variables
+
+# template is
+# [env."name of the namespace"]
+# varname = "value of a var name"  # always string to string
+{{- range .Env }}
+[env.{{ . }}]
+# key = "value"
+{{ end}}
+
 # vault is a mapping for namespace name to a password for a
 # secret vault that is used for that namespace
 [vault]
