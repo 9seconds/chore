@@ -55,15 +55,15 @@ func (suite *ScriptTestSuite) SetupTest() {
 }
 
 func (suite *ScriptTestSuite) TestUnknownNamespace() {
-	suite.ErrorContains(
+	suite.ErrorIs(
 		suite.fn(nil, []string{"cc", "dd"}),
-		"no such file or directory")
+		validators.ErrScriptInvalid)
 }
 
 func (suite *ScriptTestSuite) TestUnknownScript() {
-	suite.ErrorContains(
+	suite.ErrorIs(
 		suite.fn(nil, []string{"yy", "dd"}),
-		"no such file or directory")
+		validators.ErrScriptInvalid)
 }
 
 func (suite *ScriptTestSuite) TestNotScript() {
@@ -71,9 +71,9 @@ func (suite *ScriptTestSuite) TestNotScript() {
 }
 
 func (suite *ScriptTestSuite) TestOk() {
-	suite.ErrorContains(
+	suite.ErrorIs(
 		suite.fn(nil, []string{"zz", "a"}),
-		"no such file or directory")
+		validators.ErrScriptInvalid)
 }
 
 type ArgumentOptionalTestSuite struct {

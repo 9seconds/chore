@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/9seconds/chore/internal/cli/edit"
+	"github.com/9seconds/chore/internal/cli/validators"
 	"github.com/9seconds/chore/internal/paths"
 	"github.com/9seconds/chore/internal/script/config"
 	"github.com/stretchr/testify/suite"
@@ -23,12 +24,12 @@ func (suite *ScriptConfigTest) SetupTest() {
 
 func (suite *ScriptConfigTest) TestUnknownNamespace() {
 	_, err := suite.ExecuteCommand("xx", "x")
-	suite.ErrorContains(err, "cannot stat path")
+	suite.ErrorIs(err, validators.ErrScriptInvalid)
 }
 
 func (suite *ScriptConfigTest) TestUnknownScript() {
 	_, err := suite.ExecuteCommand("ns", "x")
-	suite.ErrorContains(err, "cannot stat path")
+	suite.ErrorIs(err, validators.ErrScriptInvalid)
 }
 
 func (suite *ScriptConfigTest) TestNewFile() {

@@ -15,7 +15,7 @@ import (
 
 func NewRm() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:                   "rm namespace script...",
+		Use:                   "rm [flags] namespace script...",
 		Short:                 "Remove scripts and its directories from a namespace",
 		DisableFlagsInUseLine: true,
 		ValidArgsFunction:     completions.CompleteAllNamespaceScripts,

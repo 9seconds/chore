@@ -48,7 +48,7 @@ test:
 
 .PHONY: full-test
 full-test:
-	@go test -v -parallel $(shell nproc) -race -cover -coverprofile coverage.out ./...
+	@go test -parallel $(shell nproc) -race -cover -coverprofile coverage.out ./...
 
 .PHONY: lint
 lint: $(GOBIN)/golangci-lint

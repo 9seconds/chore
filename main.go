@@ -45,6 +45,7 @@ func main() {
 		cli.NewEdit(),
 		cli.NewRun(),
 		cli.NewRm(),
+		cli.NewMv(),
 		cli.NewShow(),
 		cli.NewVault(),
 		cli.NewGC())

@@ -71,6 +71,10 @@ func Script(nsIndex, scrIndex int) cobra.PositionalArgs {
 			Executable: args[scrIndex],
 		}
 
-		return script.ValidateScript(scr.Path())
+		if err := script.ValidateScript(scr.Path()); err != nil {
+			return ErrScriptInvalid
+		}
+
+		return nil
 	}
 }
