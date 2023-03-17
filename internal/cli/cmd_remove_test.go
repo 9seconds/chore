@@ -8,12 +8,12 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type CmdRmTestSuite struct {
+type CmdRemoveTestSuite struct {
 	CmdTestSuite
 }
 
-func (suite *CmdRmTestSuite) SetupTest() {
-	suite.CmdTestSuite.Setup("rm", cli.NewRm)
+func (suite *CmdRemoveTestSuite) SetupTest() {
+	suite.CmdTestSuite.Setup("rm", cli.NewRemove)
 
 	suite.EnsureFile(paths.ConfigNamespaceScript("xx", "x"), "", 0o666)
 	suite.EnsureFile(paths.ConfigNamespaceScriptConfig("xx", "x"), "", 0o666)
@@ -25,7 +25,7 @@ func (suite *CmdRmTestSuite) SetupTest() {
 	suite.EnsureFile(paths.StateNamespaceScript("xx", "z"), "", 0o666)
 }
 
-func (suite *CmdRmTestSuite) TestDryRun() {
+func (suite *CmdRemoveTestSuite) TestDryRun() {
 	ctx, err := suite.ExecuteCommand("-n", "xx", "x", "y", "z")
 
 	suite.NoError(err)
@@ -34,7 +34,7 @@ func (suite *CmdRmTestSuite) TestDryRun() {
 	suite.NotContains(ctx.StdoutLines(), paths.ConfigNamespaceScript("xx", "y"))
 }
 
-func (suite *CmdRmTestSuite) TestRun() {
+func (suite *CmdRemoveTestSuite) TestRun() {
 	ctx, err := suite.ExecuteCommand("xx", "x", "y", "z")
 
 	suite.NoError(err)
@@ -50,6 +50,6 @@ func (suite *CmdRmTestSuite) TestRun() {
 	suite.NoFileExists(paths.StateNamespaceScript("xx", "z"), "", 0o666)
 }
 
-func TestCmdRm(t *testing.T) {
-	suite.Run(t, &CmdRmTestSuite{})
+func TestCmdRemove(t *testing.T) {
+	suite.Run(t, &CmdRemoveTestSuite{})
 }

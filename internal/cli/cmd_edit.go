@@ -8,6 +8,7 @@ import (
 func NewEdit() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:              "edit",
+		Aliases:          []string{"e"},
 		Short:            "Edit scripts and configs",
 		TraverseChildren: true,
 	}

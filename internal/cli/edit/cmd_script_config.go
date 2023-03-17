@@ -15,6 +15,7 @@ import (
 func NewScriptConfig() *cobra.Command {
 	return &cobra.Command{
 		Use:               "script-config namespace script",
+		Aliases:           []string{"c"},
 		Short:             "Edit chore script configuration TOML",
 		ValidArgsFunction: completions.CompleteNamespaceScript,
 		Args: cobra.MatchAll(

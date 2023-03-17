@@ -13,9 +13,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewRm() *cobra.Command {
+func NewRemove() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:                   "rm [flags] namespace script...",
+		Use:                   "remove [flags] namespace script...",
+		Aliases:               []string{"rm"},
 		Short:                 "Remove scripts and its directories from a namespace",
 		DisableFlagsInUseLine: true,
 		ValidArgsFunction:     completions.CompleteAllNamespaceScripts,
@@ -23,7 +24,7 @@ func NewRm() *cobra.Command {
 			cobra.MinimumNArgs(2), //nolint: gomnd
 			validators.Namespace(0),
 		),
-		RunE: mainRm,
+		RunE: mainRemove,
 	}
 
 	cmd.Flags().BoolP("dry-run", "n", false, "dry run")
@@ -31,7 +32,7 @@ func NewRm() *cobra.Command {
 	return cmd
 }
 
-func mainRm(cmd *cobra.Command, args []string) error {
+func mainRemove(cmd *cobra.Command, args []string) error {
 	dryRun, err := cmd.Flags().GetBool("dry-run")
 	if err != nil {
 		return err

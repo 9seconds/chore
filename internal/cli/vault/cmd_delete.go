@@ -9,6 +9,7 @@ import (
 func NewDelete() *cobra.Command {
 	return &cobra.Command{
 		Use:                   "delete namespace key...",
+		Aliases:               []string{"d"},
 		Short:                 "Delete vault secrets",
 		ValidArgsFunction:     completeSecretKeys,
 		DisableFlagsInUseLine: true,

@@ -44,8 +44,8 @@ func main() {
 	root.AddCommand(
 		cli.NewEdit(),
 		cli.NewRun(),
-		cli.NewRm(),
-		cli.NewMv(),
+		cli.NewRemove(),
+		cli.NewRename(),
 		cli.NewShow(),
 		cli.NewVault(),
 		cli.NewGC())

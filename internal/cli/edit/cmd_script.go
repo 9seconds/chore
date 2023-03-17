@@ -21,6 +21,7 @@ type scriptTemplateContext struct {
 func NewScript() *cobra.Command {
 	return &cobra.Command{
 		Use:               "script namespace script",
+		Aliases:           []string{"s"},
 		Short:             "Edit script",
 		ValidArgsFunction: completions.CompleteNamespaceScript,
 		Args: cobra.MatchAll(

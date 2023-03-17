@@ -17,6 +17,7 @@ var ErrStdinIsNotTerminal = errors.New("stdin is not connected to a valid termin
 func NewSet() *cobra.Command {
 	return &cobra.Command{
 		Use:                   "set namespace key [value]",
+		Aliases:               []string{"s"},
 		Short:                 "Set a vault secret",
 		ValidArgsFunction:     completeSecretKey,
 		DisableFlagsInUseLine: true,

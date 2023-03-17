@@ -7,8 +7,9 @@ import (
 
 func NewVault() *cobra.Command {
 	rootCmd := &cobra.Command{
-		Use:   "vault",
-		Short: "Access storage of secrets for the namespace",
+		Use:     "vault",
+		Aliases: []string{"v"},
+		Short:   "Access storage of secrets for the namespace",
 	}
 
 	rootCmd.AddCommand(

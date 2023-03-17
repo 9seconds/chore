@@ -12,17 +12,18 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewMv() *cobra.Command {
+func NewRename() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:                   "mv [flags] namespace from to",
-		Short:                 "Moves/renames scripts and its directories.",
+		Use:                   "rename [flags] namespace from to",
+		Aliases:               []string{"mv"},
+		Short:                 "Renames scripts and its directories.",
 		DisableFlagsInUseLine: true,
 		ValidArgsFunction:     completions.CompleteNamespaceScript,
 		Args: cobra.MatchAll(
 			cobra.ExactArgs(3), //nolint: gomnd
 			validators.Script(0, 1),
 		),
-		RunE: mainMv,
+		RunE: mainRename,
 	}
 
 	cmd.Flags().BoolP("force", "f", false, "Do, not ask")
@@ -30,7 +31,7 @@ func NewMv() *cobra.Command {
 	return cmd
 }
 
-func mainMv(cmd *cobra.Command, args []string) error {
+func mainRename(cmd *cobra.Command, args []string) error {
 	if args[1] == args[2] {
 		return nil
 	}
@@ -58,14 +59,14 @@ func mainMv(cmd *cobra.Command, args []string) error {
 		scriptFrom.StatePath():  scriptTo.StatePath(),
 	}
 
-	if err := mainMvValidate(force, moveMap); err != nil {
+	if err := mainRenameValidate(force, moveMap); err != nil {
 		return err
 	}
 
-	return mainMvProcess(moveMap)
+	return MainRenameProcess(moveMap)
 }
 
-func mainMvValidate(force bool, moveMap map[string]string) error {
+func mainRenameValidate(force bool, moveMap map[string]string) error {
 	for _, path := range moveMap {
 		_, err := os.Stat(path)
 
@@ -81,7 +82,7 @@ func mainMvValidate(force bool, moveMap map[string]string) error {
 	return nil
 }
 
-func mainMvProcess(moveMap map[string]string) error {
+func MainRenameProcess(moveMap map[string]string) error {
 	for src, dest := range moveMap {
 		if err := os.RemoveAll(dest); err != nil {
 			return fmt.Errorf("cannot remove %s: %w", dest, err)

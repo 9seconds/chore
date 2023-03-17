@@ -12,6 +12,7 @@ import (
 func NewList() *cobra.Command {
 	return &cobra.Command{
 		Use:                   "list namespace",
+		Aliases:               []string{"l"},
 		Short:                 "List keys of a vault secrets",
 		ValidArgsFunction:     completions.CompleteNamespaces,
 		DisableFlagsInUseLine: true,

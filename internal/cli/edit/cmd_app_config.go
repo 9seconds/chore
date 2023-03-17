@@ -20,6 +20,7 @@ type appConfigTemplateContext struct {
 func NewAppConfig() *cobra.Command {
 	return &cobra.Command{
 		Use:               "app-config",
+		Aliases:           []string{"a"},
 		Short:             "Edit chore configuration TOML",
 		Args:              cobra.NoArgs,
 		ValidArgsFunction: cobra.NoFileCompletions,

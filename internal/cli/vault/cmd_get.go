@@ -13,6 +13,7 @@ var ErrKeyUnknown = errors.New("key is unknown")
 func NewGet() *cobra.Command {
 	return &cobra.Command{
 		Use:                   "get namespace key",
+		Aliases:               []string{"g"},
 		Short:                 "Get vaule of a vault secret",
 		ValidArgsFunction:     completeSecretKey,
 		DisableFlagsInUseLine: true,
