@@ -18,7 +18,7 @@ func (suite *ParseTestSuite) TestInvalidArgument() {
 }
 
 func (suite *ParseTestSuite) TestUnexpectedFlag() {
-	for _, testName := range []string{"+c", "-c"} {
+	for _, testName := range []string{"+c", "_c"} {
 		testName := testName
 
 		suite.T().Run(testName, func(t *testing.T) {
@@ -30,7 +30,7 @@ func (suite *ParseTestSuite) TestUnexpectedFlag() {
 }
 
 func (suite *ParseTestSuite) TestIncorrectFlag() {
-	for _, testValue := range []string{"-", "+"} {
+	for _, testValue := range []string{"_", "+"} {
 		testValue := testValue
 
 		suite.T().Run(testValue, func(t *testing.T) {
@@ -56,16 +56,16 @@ func (suite *ParseTestSuite) TestMixed() {
 		"c=1",
 		"+x",
 		"+k",
-		"-k",
-		"-k",
-		"-j",
+		"_k",
+		"_k",
+		"_j",
 		"p=d",
 		"k=2",
 		"c=3",
 		"p=v",
 		"arg1",
 		"arg2",
-		":-j",
+		":_j",
 		":k=v",
 	})
 
@@ -80,7 +80,7 @@ func (suite *ParseTestSuite) TestMixed() {
 		"k": argparse.FlagFalse,
 		"j": argparse.FlagFalse,
 	}, parsed.Flags)
-	suite.Equal([]string{"arg1", "arg2", "-j", "k=v"}, parsed.Positional)
+	suite.Equal([]string{"arg1", "arg2", "_j", "k=v"}, parsed.Positional)
 }
 
 func (suite *ParseTestSuite) TestExplicitPositionals() {
@@ -92,7 +92,7 @@ func (suite *ParseTestSuite) TestExplicitPositionals() {
 
 	suite.T().Run("non-empty", func(t *testing.T) {
 		parsed, err := argparse.Parse(
-			[]string{"-x", "--", "a", ":--", "b", "-c"})
+			[]string{"_x", "--", "a", ":--", "b", "-c"})
 		assert.NoError(t, err)
 		assert.True(t, parsed.IsPositionalTime())
 		assert.Equal(t, []string{"a", ":--", "b", "-c"}, parsed.Positional)

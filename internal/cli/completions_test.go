@@ -107,8 +107,8 @@ description = "works too"
 	suite.Equal([]string{
 		"+flag1\tflag1 description (yes)",
 		"+param\tworks too (yes)",
-		"-flag1\tflag1 description (no)",
-		"-param\tworks too (no)",
+		"_flag1\tflag1 description (no)",
+		"_param\tworks too (no)",
 		"param=",
 	}, values)
 	suite.Equal(cobra.ShellCompDirectiveNoFileComp, directive)

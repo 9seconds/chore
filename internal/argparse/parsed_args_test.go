@@ -275,7 +275,7 @@ func (suite *ParsedArgsTestSuite) TestToSelfStringChunks() {
 	}
 
 	suite.Equal(
-		[]string{"-flag1", "+flag2", "int1=1", "int1=xxx yyy", "int1=3", "json1={}"},
+		[]string{"_flag1", "+flag2", "int1=1", "int1=xxx yyy", "int1=3", "json1={}"},
 		args.ToSelfStringChunks())
 }
 

@@ -46,7 +46,7 @@ func (suite *GenerateRecursionTestSuite) TestEnv() {
 	suite.Contains(data[env.EnvSelf], "param1=33")
 	suite.Contains(data[env.EnvSelf], "'param2=34 35'")
 	suite.Contains(data[env.EnvSelf], "+flag1")
-	suite.Contains(data[env.EnvSelf], "-flag2")
+	suite.Contains(data[env.EnvSelf], "_flag2")
 	suite.NotContains(data[env.EnvSelf], "pos1")
 	suite.NotContains(data[env.EnvSelf], "pos2")
 	suite.NotContains(data[env.EnvSelf], "pos3")
