@@ -105,10 +105,10 @@ description = "works too"
 	values, directive := completeRun(suite.cmd, []string{"xx", "y"}, "")
 
 	suite.Equal([]string{
-		"+flag1\tflag1 description (yes)",
-		"+param\tworks too (yes)",
-		"_flag1\tflag1 description (no)",
-		"_param\tworks too (no)",
+		"+flag1\tflag1 description (set)",
+		"+param\tworks too (set)",
+		"_flag1\tflag1 description (clear)",
+		"_param\tworks too (clear)",
 		"param=",
 	}, values)
 	suite.Equal(cobra.ShellCompDirectiveNoFileComp, directive)
@@ -167,7 +167,7 @@ description = "works too"
 
 	values, directive := completeRun(suite.cmd, []string{"xx", "y"}, "+f")
 
-	suite.Equal([]string{"+flag1\tflag1 description (yes)"}, values)
+	suite.Equal([]string{"+flag1\tflag1 description (set)"}, values)
 	suite.Equal(cobra.ShellCompDirectiveNoFileComp, directive)
 }
 

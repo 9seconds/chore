@@ -10,22 +10,10 @@ import (
 	"github.com/anmitsu/go-shlex"
 )
 
-const (
-	PrefixFlagPositive = '+'
-	PrefixFlagNegative = '-'
-	PrefixLiteral      = ':'
-	SeparatorKeyword   = '='
-
-	FlagTrue  = "t"
-	FlagFalse = "f"
-
-	PositionalDelimiter = "--"
-)
-
 func Parse(args []string) (ParsedArgs, error) { //nolint: cyclop
 	parsed := ParsedArgs{
 		Parameters: make(map[string][]string),
-		Flags:      make(map[string]string),
+		Flags:      make(map[string]bool),
 		Positional: []string{},
 	}
 
@@ -34,17 +22,22 @@ func Parse(args []string) (ParsedArgs, error) { //nolint: cyclop
 			return parsed, fmt.Errorf("argument %d is not valid UTF-8 string", idx+1)
 		}
 
-		rune, _ := utf8.DecodeRuneInString(arg)
+		prefix := ""
+
+		if len(arg) > 0 {
+			rune, _ := utf8.DecodeRuneInString(arg)
+			prefix = string(rune)
+		}
 
 		switch {
 		case arg == PositionalDelimiter && !parsed.IsPositionalTime():
 			parsed.ExplicitPositional = true
 		case parsed.ExplicitPositional:
 			parsed.Positional = append(parsed.Positional, arg)
-		case rune == PrefixLiteral:
-			parsed.Positional = append(parsed.Positional, arg[1:])
-		case rune == PrefixFlagPositive, rune == PrefixFlagNegative:
-			flagName := arg[1:]
+		case prefix == PrefixLiteral:
+			parsed.Positional = append(parsed.Positional, arg[len(prefix):])
+		case prefix == PrefixFlag, prefix == PrefixFlagClear:
+			flagName := arg[len(prefix):]
 
 			if parsed.IsPositionalTime() {
 				return parsed, fmt.Errorf("unexpected flag %s while processing positionals", flagName)
@@ -56,17 +49,17 @@ func Parse(args []string) (ParsedArgs, error) { //nolint: cyclop
 				return parsed, fmt.Errorf("incorrect flag %s", arg)
 			}
 
-			if rune == PrefixFlagPositive {
-				parsed.Flags[name] = FlagTrue
+			if prefix == PrefixFlag {
+				parsed.Flags[name] = true
 			} else {
-				parsed.Flags[name] = FlagFalse
+				parsed.Flags[name] = false
 			}
-		case strings.ContainsRune(arg, SeparatorKeyword):
+		case strings.Contains(arg, SeparatorKeyword):
 			if parsed.IsPositionalTime() {
 				return parsed, fmt.Errorf("unexpected parameter %s while processing positionals", arg)
 			}
 
-			indexRune := strings.IndexRune(arg, SeparatorKeyword)
+			indexRune := strings.Index(arg, SeparatorKeyword)
 			name, value := arg[:indexRune], arg[indexRune+1:]
 			name = config.NormalizeName(name)
 

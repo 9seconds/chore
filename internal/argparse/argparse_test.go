@@ -75,10 +75,10 @@ func (suite *ParseTestSuite) TestMixed() {
 		"k": {"2"},
 		"p": {"d", "v"},
 	}, parsed.Parameters)
-	suite.Equal(map[string]string{
-		"x": argparse.FlagTrue,
-		"k": argparse.FlagFalse,
-		"j": argparse.FlagFalse,
+	suite.Equal(map[string]bool{
+		"x": true,
+		"k": false,
+		"j": false,
 	}, parsed.Flags)
 	suite.Equal([]string{"arg1", "arg2", "_j", "k=v"}, parsed.Positional)
 }

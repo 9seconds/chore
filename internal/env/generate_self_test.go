@@ -8,13 +8,13 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type GenerateRecursionTestSuite struct {
+type GenerateSelfTestSuite struct {
 	EnvBaseTestSuite
 
 	args argparse.ParsedArgs
 }
 
-func (suite *GenerateRecursionTestSuite) SetupTest() {
+func (suite *GenerateSelfTestSuite) SetupTest() {
 	suite.EnvBaseTestSuite.SetupTest()
 
 	suite.args = argparse.ParsedArgs{
@@ -22,15 +22,15 @@ func (suite *GenerateRecursionTestSuite) SetupTest() {
 			"param1": {"33"},
 			"param2": {"34 35"},
 		},
-		Flags: map[string]string{
-			"flag1": argparse.FlagTrue,
-			"flag2": argparse.FlagFalse,
+		Flags: map[string]bool{
+			"flag1": true,
+			"flag2": false,
 		},
 		Positional: []string{"pos1", "pos2", "pos3"},
 	}
 }
 
-func (suite *GenerateRecursionTestSuite) TestEnv() {
+func (suite *GenerateSelfTestSuite) TestEnv() {
 	env.GenerateSelf(
 		suite.Context(),
 		suite.values,
@@ -46,13 +46,13 @@ func (suite *GenerateRecursionTestSuite) TestEnv() {
 	suite.Contains(data[env.EnvSelf], "param1=33")
 	suite.Contains(data[env.EnvSelf], "'param2=34 35'")
 	suite.Contains(data[env.EnvSelf], "+flag1")
-	suite.Contains(data[env.EnvSelf], "_flag2")
+	suite.NotContains(data[env.EnvSelf], "flag2")
 	suite.NotContains(data[env.EnvSelf], "pos1")
 	suite.NotContains(data[env.EnvSelf], "pos2")
 	suite.NotContains(data[env.EnvSelf], "pos3")
 	suite.NotContains(data[env.EnvSelf], "--")
 }
 
-func TestGenerateRecursion(t *testing.T) {
-	suite.Run(t, &GenerateRecursionTestSuite{})
+func TestGenerateSelf(t *testing.T) {
+	suite.Run(t, &GenerateSelfTestSuite{})
 }

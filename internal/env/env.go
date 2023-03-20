@@ -1,12 +1,6 @@
 package env
 
-import (
-	"strings"
-)
-
-const (
-	DebugEnabled = "1"
-)
+import "strings"
 
 const (
 	Prefix                 = "CHORE_"

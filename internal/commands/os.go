@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"io"
-	"os"
 	"os/exec"
 	"sync"
 	"time"
@@ -78,7 +77,7 @@ func New(
 ) Command {
 	cmd := exec.Command(command, args...)
 
-	cmd.Env = append(os.Environ(), environ...)
+	cmd.Env = environ
 	cmd.Stdin = stdin
 	cmd.Stdout = stdout
 	cmd.Stderr = stderr

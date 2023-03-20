@@ -85,7 +85,9 @@ func (s *Script) Environ(ctx context.Context, args argparse.ParsedArgs) []string
 	}
 
 	for k, v := range args.Flags {
-		environ = append(environ, env.MakeValue(env.FlagName(k), string(v)))
+		if v {
+			environ = append(environ, env.MakeValue(env.FlagName(k), argparse.FlagEnabled))
+		}
 	}
 
 	waiterGroup := &sync.WaitGroup{}

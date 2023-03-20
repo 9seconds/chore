@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 
 	"github.com/9seconds/chore/internal/commands"
+	"github.com/9seconds/chore/internal/env"
 )
 
 const (
@@ -40,7 +41,13 @@ func openEditor(ctx context.Context, editor, path string) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	cmd := commands.New(editor, []string{path}, nil, os.Stdin, os.Stdout, os.Stderr)
+	cmd := commands.New(
+		editor,
+		[]string{path},
+		env.Environ(),
+		os.Stdin,
+		os.Stdout,
+		os.Stderr)
 
 	if err := cmd.Start(ctx); err != nil {
 		return fmt.Errorf("cannot start editor: %w", err)

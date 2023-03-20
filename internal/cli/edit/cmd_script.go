@@ -5,6 +5,7 @@ import (
 	"io"
 	"io/fs"
 
+	"github.com/9seconds/chore/internal/argparse"
 	"github.com/9seconds/chore/internal/cli/completions"
 	"github.com/9seconds/chore/internal/cli/validators"
 	"github.com/9seconds/chore/internal/env"
@@ -43,7 +44,7 @@ func NewScript() *cobra.Command {
 			tpl := getTemplate("static/edit-script.sh")
 			context := scriptTemplateContext{
 				DebugVar:     env.Debug,
-				DebugEnabled: env.DebugEnabled,
+				DebugEnabled: argparse.FlagEnabled,
 			}
 
 			if err := tpl.Execute(content, context); err != nil {

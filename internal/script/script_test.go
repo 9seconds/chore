@@ -142,9 +142,9 @@ func (suite *ScriptTestSuite) TestEnviron() {
 			"k":  {"v", "u"},
 			"XX": {"y"},
 		},
-		Flags: map[string]string{
-			"cleanup": argparse.FlagTrue,
-			"welcome": argparse.FlagFalse,
+		Flags: map[string]bool{
+			"cleanup": true,
+			"welcome": false,
 		},
 		Positional: []string{"a", "b", "c"},
 	})
@@ -158,7 +158,7 @@ func (suite *ScriptTestSuite) TestEnviron() {
 		require.True(suite.T(), found)
 	}
 
-	count := 48
+	count := 47
 
 	suite.Equal(scr.Namespace, data[env.EnvNamespace])
 	suite.Equal(scr.Executable, data[env.EnvCaller])
@@ -171,8 +171,8 @@ func (suite *ScriptTestSuite) TestEnviron() {
 	suite.Equal("y\n", data[env.ParameterNameList("XX")])
 	suite.Equal("u", data[env.ParameterName("k")])
 	suite.Equal("y", data[env.ParameterName("XX")])
-	suite.EqualValues(argparse.FlagTrue, data[env.FlagName("CLEANUP")])
-	suite.EqualValues(argparse.FlagFalse, data[env.FlagName("WELCOME")])
+	suite.EqualValues(argparse.FlagEnabled, data[env.FlagName("CLEANUP")])
+	suite.NotContains(data, env.FlagName("WELCOME"))
 	suite.Contains(data, env.EnvSelf)
 	suite.Contains(data, env.EnvSlug)
 	suite.Contains(data, env.EnvIDRun)

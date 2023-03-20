@@ -1,6 +1,7 @@
 package env_test
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/9seconds/chore/internal/env"
@@ -23,5 +24,17 @@ func TestMakeValue(t *testing.T) {
 		t.Run(name+"->"+value, func(t *testing.T) {
 			assert.Equal(t, expected, env.MakeValue(name, value))
 		})
+	}
+}
+
+func TestEnviron(t *testing.T) {
+	t.Setenv(env.ParameterName("X"), "1")
+	t.Setenv(env.FlagName("Y"), "1")
+	t.Setenv(env.ParameterNameList("Z"), "1")
+
+	for _, value := range env.Environ() {
+		assert.False(t, strings.HasPrefix(value, env.EnvFlagPrefix))
+		assert.False(t, strings.HasPrefix(value, env.EnvParameterPrefix))
+		assert.False(t, strings.HasPrefix(value, env.EnvParameterPrefixList))
 	}
 }

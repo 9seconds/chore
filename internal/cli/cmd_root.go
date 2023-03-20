@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/9seconds/chore/internal/argparse"
 	"github.com/9seconds/chore/internal/env"
 	"github.com/spf13/cobra"
 )
@@ -19,10 +20,10 @@ func NewRoot(version string) *cobra.Command {
 		PersistentPreRun: func(cmd *cobra.Command, _ []string) {
 			// env.Debug is a global flag propagated from a callee.
 			// it forcefully enabled debugging for a script.
-			isDebug = isDebug || os.Getenv(env.Debug) == env.DebugEnabled
+			isDebug = isDebug || os.Getenv(env.Debug) == argparse.FlagEnabled
 
 			if isDebug {
-				if err := os.Setenv(env.Debug, env.DebugEnabled); err != nil {
+				if err := os.Setenv(env.Debug, argparse.FlagEnabled); err != nil {
 					panic(err.Error())
 				}
 			} else {

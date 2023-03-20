@@ -14,16 +14,23 @@ import (
 )
 
 const (
-	SerializePrefixPositional   = '0'
-	SerializePrefixFlagPositive = '1'
-	SerializePrefixFlagNegative = '2'
-	SerializePrefixParameter    = '3'
-	SerializeParameterSeparator = '_'
+	PrefixFlag          = "+"
+	PrefixFlagClear     = "_"
+	PrefixLiteral       = ":"
+	SeparatorKeyword    = "="
+	PositionalDelimiter = "--"
+
+	FlagEnabled = "1"
+
+	SerializePrefixPositional   = "0"
+	SerializePrefixFlag         = "1"
+	SerializePrefixParameter    = "2"
+	SerializeParameterSeparator = "_"
 )
 
 type ParsedArgs struct {
 	Parameters         map[string][]string
-	Flags              map[string]string
+	Flags              map[string]bool
 	Positional         []string
 	ExplicitPositional bool
 }
@@ -51,17 +58,14 @@ func (p ParsedArgs) ToSelfStringChunks() []string {
 	chunks := make([]string, 0, len(p.Flags)+len(p.Parameters))
 
 	for _, key := range binutils.SortedMapKeys(p.Flags) {
-		prefix := PrefixFlagNegative
-		if p.Flags[key] == FlagTrue {
-			prefix = PrefixFlagPositive
+		if p.Flags[key] {
+			chunks = append(chunks, PrefixFlag+key)
 		}
-
-		chunks = append(chunks, fmt.Sprintf("%c%s", prefix, key))
 	}
 
 	for _, key := range binutils.SortedMapKeys(p.Parameters) {
 		for _, value := range p.Parameters[key] {
-			chunks = append(chunks, fmt.Sprintf("%s%c%s", key, SeparatorKeyword, value))
+			chunks = append(chunks, key+SeparatorKeyword+value)
 		}
 	}
 
@@ -72,7 +76,7 @@ func (p ParsedArgs) ToSlugString() string {
 	chunks := make([]string, 0, len(p.Positional)+len(p.Flags)+len(p.Parameters))
 
 	for _, v := range p.Positional {
-		chunks = append(chunks, fmt.Sprintf("%c%s", SerializePrefixPositional, v))
+		chunks = append(chunks, SerializePrefixPositional+v)
 	}
 
 	params := make([]string, 0, len(p.Parameters))
@@ -106,23 +110,14 @@ func (p ParsedArgs) ToSlugString() string {
 		for _, val := range values {
 			chunks = append(
 				chunks,
-				fmt.Sprintf(
-					"%c%s%c%s",
-					SerializePrefixParameter,
-					key,
-					SerializeParameterSeparator,
-					val))
+				SerializePrefixParameter+key+SerializeParameterSeparator+val)
 		}
 	}
 
 	for _, key := range binutils.SortedMapKeys(p.Flags) {
-		prefix := SerializePrefixFlagPositive
-
-		if p.Flags[key] != FlagTrue {
-			prefix = SerializePrefixFlagNegative
+		if p.Flags[key] {
+			chunks = append(chunks, SerializePrefixFlag+key)
 		}
-
-		chunks = append(chunks, fmt.Sprintf("%c%s", prefix, key))
 	}
 
 	return slug.Make(strings.Join(chunks, " "))
@@ -202,9 +197,10 @@ func (p ParsedArgs) Checksum() string {
 		binutils.MixStringSlice(mixer, p.Parameters[key]) //nolint: errcheck
 	}
 
+	binutils.MixLength(mixer, len(p.Flags)) //nolint: errcheck
+
 	for _, key := range binutils.SortedMapKeys(p.Flags) {
-		binutils.MixString(mixer, key)          //nolint: errcheck
-		binutils.MixString(mixer, p.Flags[key]) //nolint: errcheck
+		binutils.MixString(mixer, key) //nolint: errcheck
 	}
 
 	binutils.MixStringSlice(mixer, p.Positional) //nolint: errcheck

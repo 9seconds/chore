@@ -67,12 +67,12 @@ func completeRun(cmd *cobra.Command, args []string, toComplete string) ([]string
 			continue
 		}
 
-		negative := string(argparse.PrefixFlagNegative) + name
-		positive := string(argparse.PrefixFlagPositive) + name
+		negative := string(argparse.PrefixFlagClear) + name
+		positive := string(argparse.PrefixFlag) + name
 
 		if descr := flag.Description(); descr != "" {
-			negative += "\t" + descr + " (no)"
-			positive += "\t" + descr + " (yes)"
+			negative += "\t" + descr + " (clear)"
+			positive += "\t" + descr + " (set)"
 		}
 
 		if toComplete == "" || strings.HasPrefix(negative, toComplete) {

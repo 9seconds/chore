@@ -44,15 +44,15 @@ func (suite *ParsedArgsTestSuite) TestChecksum() {
 			"v": {"k"},
 			"k": {"kk"},
 		},
-		Flags: map[string]string{
-			"cleanup": argparse.FlagTrue,
-			"welcome": argparse.FlagFalse,
+		Flags: map[string]bool{
+			"cleanup": true,
+			"welcome": false,
 		},
 		Positional: []string{"1", "2", "3 4 5"},
 	}
 
 	suite.Equal(
-		"ngTqWLT-Uf0bY0p7NVnJhILIhNOTDUmnXBIdYuv2Bi0",
+		"p8bRasque_49ECe4B8wAml1cVeDj5pxomI0F94kl_b4",
 		args.Checksum())
 }
 
@@ -77,8 +77,8 @@ func (suite *ParsedArgsTestSuite) TestCannotFindRequiredParameter() {
 		Parameters: map[string][]string{
 			"int1": {"1"},
 		},
-		Flags: map[string]string{
-			"flag1": argparse.FlagTrue,
+		Flags: map[string]bool{
+			"flag1": true,
 		},
 	}
 
@@ -93,8 +93,8 @@ func (suite *ParsedArgsTestSuite) TestCannotFindRequiredFlag() {
 			"int1":  {"1"},
 			"json1": {"[]"},
 		},
-		Flags: map[string]string{
-			"flag2": argparse.FlagTrue,
+		Flags: map[string]bool{
+			"flag2": true,
 		},
 	}
 
@@ -110,9 +110,9 @@ func (suite *ParsedArgsTestSuite) TestUnknownParameter() {
 			"json1": {"[]"},
 			"x":     {"y"},
 		},
-		Flags: map[string]string{
-			"flag1": argparse.FlagFalse,
-			"flag2": argparse.FlagTrue,
+		Flags: map[string]bool{
+			"flag1": false,
+			"flag2": true,
 		},
 	}
 
@@ -127,10 +127,10 @@ func (suite *ParsedArgsTestSuite) TestUnknownFlag() {
 			"int1":  {"1"},
 			"json1": {"[]"},
 		},
-		Flags: map[string]string{
-			"flag1": argparse.FlagFalse,
-			"flag2": argparse.FlagTrue,
-			"x":     argparse.FlagTrue,
+		Flags: map[string]bool{
+			"flag1": false,
+			"flag2": true,
+			"x":     true,
 		},
 	}
 
@@ -145,9 +145,9 @@ func (suite *ParsedArgsTestSuite) TestIncorrectParameter() {
 			"int1":  {"1"},
 			"json1": {"{"},
 		},
-		Flags: map[string]string{
-			"flag1": argparse.FlagFalse,
-			"flag2": argparse.FlagTrue,
+		Flags: map[string]bool{
+			"flag1": false,
+			"flag2": true,
 		},
 	}
 
@@ -162,9 +162,9 @@ func (suite *ParsedArgsTestSuite) TestAllParametersIncorrect() {
 			"int1":  {"xxx"},
 			"json1": {"{"},
 		},
-		Flags: map[string]string{
-			"flag1": argparse.FlagFalse,
-			"flag2": argparse.FlagTrue,
+		Flags: map[string]bool{
+			"flag1": false,
+			"flag2": true,
 		},
 	}
 
@@ -179,9 +179,9 @@ func (suite *ParsedArgsTestSuite) TestValidateListOk() {
 			"int1":  {"1", "2", "3"},
 			"json1": {"{}"},
 		},
-		Flags: map[string]string{
-			"flag1": argparse.FlagFalse,
-			"flag2": argparse.FlagTrue,
+		Flags: map[string]bool{
+			"flag1": false,
+			"flag2": true,
 		},
 	}
 
@@ -194,9 +194,9 @@ func (suite *ParsedArgsTestSuite) TestValidateListFail() {
 			"int1":  {"1", "xxx", "3"},
 			"json1": {"{}"},
 		},
-		Flags: map[string]string{
-			"flag1": argparse.FlagFalse,
-			"flag2": argparse.FlagTrue,
+		Flags: map[string]bool{
+			"flag1": false,
+			"flag2": true,
 		},
 	}
 
@@ -218,9 +218,9 @@ func (suite *ParsedArgsTestSuite) TestGetParameterList() {
 			"int1":  {"1", "xxx yyy", "3"},
 			"json1": {"{}"},
 		},
-		Flags: map[string]string{
-			"flag1": argparse.FlagFalse,
-			"flag2": argparse.FlagTrue,
+		Flags: map[string]bool{
+			"flag1": false,
+			"flag2": true,
 		},
 	}
 
@@ -245,9 +245,9 @@ func (suite *ParsedArgsTestSuite) TestGetParameter() {
 			"int1":  {"1", "xxx yyy", "3"},
 			"json1": {"{}"},
 		},
-		Flags: map[string]string{
-			"flag1": argparse.FlagFalse,
-			"flag2": argparse.FlagTrue,
+		Flags: map[string]bool{
+			"flag1": false,
+			"flag2": true,
 		},
 	}
 
@@ -267,15 +267,15 @@ func (suite *ParsedArgsTestSuite) TestToSelfStringChunks() {
 			"int1":  {"1", "xxx yyy", "3"},
 			"json1": {"{}"},
 		},
-		Flags: map[string]string{
-			"flag1": argparse.FlagFalse,
-			"flag2": argparse.FlagTrue,
+		Flags: map[string]bool{
+			"flag1": false,
+			"flag2": true,
 		},
 		Positional: []string{"p1", "p2"},
 	}
 
 	suite.Equal(
-		[]string{"_flag1", "+flag2", "int1=1", "int1=xxx yyy", "int1=3", "json1={}"},
+		[]string{"+flag2", "int1=1", "int1=xxx yyy", "int1=3", "json1={}"},
 		args.ToSelfStringChunks())
 }
 
@@ -285,15 +285,15 @@ func (suite *ParsedArgsTestSuite) TestToSlugString() {
 			"int1":  {"1", "xxx yyy", "3"},
 			"json1": {"{}"},
 		},
-		Flags: map[string]string{
-			"flag1": argparse.FlagFalse,
-			"flag2": argparse.FlagTrue,
+		Flags: map[string]bool{
+			"flag1": false,
+			"flag2": true,
 		},
 		Positional: []string{"p1", "p2"},
 	}
 
 	suite.Equal(
-		`0p1-0p2-3json1_-3int1_xxx-yyy-3int1_3-3int1_1-2flag1-1flag2`,
+		`0p1-0p2-2json1_-2int1_xxx-yyy-2int1_3-2int1_1-1flag2`,
 		args.ToSlugString())
 }
 
