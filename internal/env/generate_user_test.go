@@ -9,10 +9,10 @@ import (
 )
 
 type GenerateUserTestSuite struct {
-	EnvBaseTestSuite
+	BaseTestSuite
 }
 
-func (suite *GenerateUserTestSuite) TestNoEnv() {
+func (suite *GenerateUserTestSuite) TestNo() {
 	user, err := user.Current()
 	if err != nil {
 		suite.T().Skipf("Test skipped because of %v", err)
@@ -22,13 +22,13 @@ func (suite *GenerateUserTestSuite) TestNoEnv() {
 	data := suite.Collect()
 
 	suite.Len(data, 3)
-	suite.Equal(user.Uid, data[env.EnvUserUID])
-	suite.Equal(user.Gid, data[env.EnvUserGID])
-	suite.Equal(user.Username, data[env.EnvUserName])
+	suite.Equal(user.Uid, data[env.UserUID])
+	suite.Equal(user.Gid, data[env.UserGID])
+	suite.Equal(user.Username, data[env.UserName])
 }
 
-func (suite *GenerateUserTestSuite) TestEnv() {
-	suite.Setenv(env.EnvUserName, "xx")
+func (suite *GenerateUserTestSuite) Test() {
+	suite.Setenv(env.UserName, "xx")
 
 	env.GenerateUser(suite.Context(), suite.values, suite.wg)
 	suite.Empty(suite.Collect())

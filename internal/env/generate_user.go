@@ -9,7 +9,7 @@ import (
 )
 
 func GenerateUser(ctx context.Context, results chan<- string, waiters *sync.WaitGroup) {
-	if _, ok := os.LookupEnv(EnvUserName); ok {
+	if _, ok := os.LookupEnv(UserName); ok {
 		return
 	}
 
@@ -25,8 +25,8 @@ func GenerateUser(ctx context.Context, results chan<- string, waiters *sync.Wait
 			return
 		}
 
-		sendValue(ctx, results, EnvUserUID, user.Uid)
-		sendValue(ctx, results, EnvUserGID, user.Gid)
-		sendValue(ctx, results, EnvUserName, user.Username)
+		sendValue(ctx, results, UserUID, user.Uid)
+		sendValue(ctx, results, UserGID, user.Gid)
+		sendValue(ctx, results, UserName, user.Username)
 	}()
 }

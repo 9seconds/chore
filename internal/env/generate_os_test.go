@@ -9,15 +9,15 @@ import (
 )
 
 type GenerateOSTestSuite struct {
-	EnvBaseTestSuite
+	BaseTestSuite
 }
 
-func (suite *GenerateOSTestSuite) TestNoEnv() {
+func (suite *GenerateOSTestSuite) TestNo() {
 	env.GenerateOS(suite.Context(), suite.values, suite.wg)
 	data := suite.Collect()
 
-	suite.Equal(runtime.GOOS, data[env.EnvOSType])
-	suite.Equal(runtime.GOARCH, data[env.EnvOSArch])
+	suite.Equal(runtime.GOOS, data[env.OSType])
+	suite.Equal(runtime.GOARCH, data[env.OSArch])
 }
 
 func TestGenerateOS(t *testing.T) {

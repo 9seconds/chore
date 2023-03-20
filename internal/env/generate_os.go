@@ -17,10 +17,10 @@ func GenerateOS(ctx context.Context, results chan<- string, waiters *sync.WaitGr
 	go func() {
 		defer waiters.Done()
 
-		sendValue(ctx, results, EnvOSType, runtime.GOOS)
-		sendValue(ctx, results, EnvOSArch, runtime.GOARCH)
+		sendValue(ctx, results, OSType, runtime.GOOS)
+		sendValue(ctx, results, OSArch, runtime.GOARCH)
 
-		if _, ok := os.LookupEnv(EnvOSID); ok {
+		if _, ok := os.LookupEnv(OSID); ok {
 			return
 		}
 
@@ -31,10 +31,10 @@ func GenerateOS(ctx context.Context, results chan<- string, waiters *sync.WaitGr
 			return
 		}
 
-		sendValue(ctx, results, EnvOSID, version.ID)
-		sendValue(ctx, results, EnvOSVersion, version.Version)
-		sendValue(ctx, results, EnvOSCodename, version.Codename)
-		sendValue(ctx, results, EnvOSVersionMajor, strconv.FormatUint(version.Major, 10))
-		sendValue(ctx, results, EnvOSVersionMinor, strconv.FormatUint(version.Minor, 10))
+		sendValue(ctx, results, OSID, version.ID)
+		sendValue(ctx, results, OSVersion, version.Version)
+		sendValue(ctx, results, OSCodename, version.Codename)
+		sendValue(ctx, results, OSVersionMajor, strconv.FormatUint(version.Major, 10))
+		sendValue(ctx, results, OSVersionMinor, strconv.FormatUint(version.Minor, 10))
 	}()
 }

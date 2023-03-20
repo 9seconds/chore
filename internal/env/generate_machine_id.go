@@ -10,7 +10,7 @@ import (
 )
 
 func GenerateMachineID(ctx context.Context, results chan<- string, waiters *sync.WaitGroup) {
-	if _, ok := os.LookupEnv(EnvMachineID); ok {
+	if _, ok := os.LookupEnv(MachineID); ok {
 		return
 	}
 
@@ -19,7 +19,7 @@ func GenerateMachineID(ctx context.Context, results chan<- string, waiters *sync
 	go func() {
 		defer waiters.Done()
 
-		if _, ok := os.LookupEnv(EnvMachineID); ok {
+		if _, ok := os.LookupEnv(MachineID); ok {
 			return
 		}
 
@@ -30,6 +30,6 @@ func GenerateMachineID(ctx context.Context, results chan<- string, waiters *sync
 			return
 		}
 
-		sendValue(ctx, results, EnvMachineID, value)
+		sendValue(ctx, results, MachineID, value)
 	}()
 }

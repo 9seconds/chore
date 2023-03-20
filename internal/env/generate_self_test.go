@@ -9,13 +9,13 @@ import (
 )
 
 type GenerateSelfTestSuite struct {
-	EnvBaseTestSuite
+	BaseTestSuite
 
 	args argparse.ParsedArgs
 }
 
 func (suite *GenerateSelfTestSuite) SetupTest() {
-	suite.EnvBaseTestSuite.SetupTest()
+	suite.BaseTestSuite.SetupTest()
 
 	suite.args = argparse.ParsedArgs{
 		Parameters: map[string][]string{
@@ -30,7 +30,7 @@ func (suite *GenerateSelfTestSuite) SetupTest() {
 	}
 }
 
-func (suite *GenerateSelfTestSuite) TestEnv() {
+func (suite *GenerateSelfTestSuite) Test() {
 	env.GenerateSelf(
 		suite.Context(),
 		suite.values,
@@ -42,15 +42,15 @@ func (suite *GenerateSelfTestSuite) TestEnv() {
 	data := suite.Collect()
 
 	suite.Len(data, 1)
-	suite.Contains(data[env.EnvSelf], "run namespace2 script1")
-	suite.Contains(data[env.EnvSelf], "param1=33")
-	suite.Contains(data[env.EnvSelf], "'param2=34 35'")
-	suite.Contains(data[env.EnvSelf], "+flag1")
-	suite.NotContains(data[env.EnvSelf], "flag2")
-	suite.NotContains(data[env.EnvSelf], "pos1")
-	suite.NotContains(data[env.EnvSelf], "pos2")
-	suite.NotContains(data[env.EnvSelf], "pos3")
-	suite.NotContains(data[env.EnvSelf], "--")
+	suite.Contains(data[env.Self], "run namespace2 script1")
+	suite.Contains(data[env.Self], "param1=33")
+	suite.Contains(data[env.Self], "'param2=34 35'")
+	suite.Contains(data[env.Self], "+flag1")
+	suite.NotContains(data[env.Self], "flag2")
+	suite.NotContains(data[env.Self], "pos1")
+	suite.NotContains(data[env.Self], "pos2")
+	suite.NotContains(data[env.Self], "pos3")
+	suite.NotContains(data[env.Self], "--")
 }
 
 func TestGenerateSelf(t *testing.T) {

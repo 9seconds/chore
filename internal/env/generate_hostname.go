@@ -15,17 +15,17 @@ func GenerateHostname(ctx context.Context, results chan<- string, waiters *sync.
 	go func() {
 		defer waiters.Done()
 
-		if _, ok := os.LookupEnv(EnvHostname); !ok {
+		if _, ok := os.LookupEnv(Hostname); !ok {
 			if value, err := os.Hostname(); err == nil {
-				sendValue(ctx, results, EnvHostname, value)
+				sendValue(ctx, results, Hostname, value)
 			} else {
 				log.Printf("cannot get hostname: %v", err)
 			}
 		}
 
-		if _, ok := os.LookupEnv(EnvHostnameFQDN); !ok {
+		if _, ok := os.LookupEnv(HostnameFQDN); !ok {
 			if value, err := fqdn.FqdnHostname(); err == nil {
-				sendValue(ctx, results, EnvHostnameFQDN, value)
+				sendValue(ctx, results, HostnameFQDN, value)
 			} else {
 				log.Printf("cannot get fqdn hostname: %v", err)
 			}

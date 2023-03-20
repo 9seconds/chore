@@ -10,7 +10,7 @@ import (
 )
 
 type GenerateHostnameTestSuite struct {
-	EnvBaseTestSuite
+	BaseTestSuite
 }
 
 func (suite *GenerateHostnameTestSuite) TestHostname() {
@@ -22,7 +22,7 @@ func (suite *GenerateHostnameTestSuite) TestHostname() {
 	env.GenerateHostname(suite.Context(), suite.values, suite.wg)
 	data := suite.Collect()
 
-	suite.Equal(value, data[env.EnvHostname])
+	suite.Equal(value, data[env.Hostname])
 }
 
 func (suite *GenerateHostnameTestSuite) TestFQDNHostname() {
@@ -34,12 +34,12 @@ func (suite *GenerateHostnameTestSuite) TestFQDNHostname() {
 	env.GenerateHostname(suite.Context(), suite.values, suite.wg)
 	data := suite.Collect()
 
-	suite.Equal(value, data[env.EnvHostnameFQDN])
+	suite.Equal(value, data[env.HostnameFQDN])
 }
 
-func (suite *GenerateHostnameTestSuite) TestWithEnv() {
-	suite.Setenv(env.EnvHostname, "xx")
-	suite.Setenv(env.EnvHostnameFQDN, "yy")
+func (suite *GenerateHostnameTestSuite) TestWith() {
+	suite.Setenv(env.Hostname, "xx")
+	suite.Setenv(env.HostnameFQDN, "yy")
 
 	env.GenerateHostname(suite.Context(), suite.values, suite.wg)
 	data := suite.Collect()

@@ -12,13 +12,13 @@ import (
 )
 
 type GenerateNetworkBaseTestSuite struct {
-	EnvBaseTestSuite
+	BaseTestSuite
 
 	testlib.NetworkTestSuite
 }
 
 func (suite *GenerateNetworkBaseTestSuite) SetupTest() {
-	suite.EnvBaseTestSuite.SetupTest()
+	suite.BaseTestSuite.SetupTest()
 	suite.NetworkTestSuite.Setup(suite.T())
 }
 
@@ -30,8 +30,8 @@ func (suite *GenerateNetworkTestSuite) SetupResponder(r httpmock.Responder) {
 	httpmock.RegisterResponder(http.MethodGet, "https://ipinfo.io/json", r)
 }
 
-func (suite *GenerateNetworkTestSuite) TestEnvSet() {
-	suite.Setenv(env.EnvNetworkIPv4, "xx")
+func (suite *GenerateNetworkTestSuite) TestSet() {
+	suite.Setenv(env.NetworkIPv4, "xx")
 	env.GenerateNetwork(suite.Context(), suite.values, suite.wg, true)
 	suite.Empty(suite.Collect())
 }
@@ -73,17 +73,17 @@ func (suite *GenerateNetworkTestSuite) TestCorrectResponse() {
 	data := suite.Collect()
 
 	suite.Len(data, 11)
-	suite.Equal("127.0.0.1", data[env.EnvNetworkIPv4])
-	suite.Equal("hostname.provider.com", data[env.EnvNetworkHostname])
-	suite.Equal("XXX", data[env.EnvNetworkCity])
-	suite.Equal("RRR", data[env.EnvNetworkRegion])
-	suite.Equal("CC", data[env.EnvNetworkCountry])
-	suite.Equal("1234.56", data[env.EnvNetworkLatitude])
-	suite.Equal("78.9", data[env.EnvNetworkLongitude])
-	suite.Equal("OOO", data[env.EnvNetworkOrganization])
-	suite.Equal("0000", data[env.EnvNetworkASN])
-	suite.Equal("0000", data[env.EnvNetworkPostal])
-	suite.Equal("Europe/Berlin", data[env.EnvNetworkTimezone])
+	suite.Equal("127.0.0.1", data[env.NetworkIPv4])
+	suite.Equal("hostname.provider.com", data[env.NetworkHostname])
+	suite.Equal("XXX", data[env.NetworkCity])
+	suite.Equal("RRR", data[env.NetworkRegion])
+	suite.Equal("CC", data[env.NetworkCountry])
+	suite.Equal("1234.56", data[env.NetworkLatitude])
+	suite.Equal("78.9", data[env.NetworkLongitude])
+	suite.Equal("OOO", data[env.NetworkOrganization])
+	suite.Equal("0000", data[env.NetworkASN])
+	suite.Equal("0000", data[env.NetworkPostal])
+	suite.Equal("Europe/Berlin", data[env.NetworkTimezone])
 }
 
 type GenerateNetworkIPv6TestSuite struct {
@@ -94,8 +94,8 @@ func (suite *GenerateNetworkIPv6TestSuite) SetupResponder(r httpmock.Responder) 
 	httpmock.RegisterResponder(http.MethodGet, "https://ifconfig.co", r)
 }
 
-func (suite *GenerateNetworkIPv6TestSuite) TestEnvSet() {
-	suite.Setenv(env.EnvNetworkIPv6, "xx")
+func (suite *GenerateNetworkIPv6TestSuite) TestSet() {
+	suite.Setenv(env.NetworkIPv6, "xx")
 	env.GenerateNetworkIPv6(suite.Context(), suite.values, suite.wg, true)
 	suite.Empty(suite.Collect())
 }
@@ -126,7 +126,7 @@ func (suite *GenerateNetworkIPv6TestSuite) TestCorrectResponse() {
 	data := suite.Collect()
 
 	suite.Len(data, 1)
-	suite.Equal("cafe::1", data[env.EnvNetworkIPv6])
+	suite.Equal("cafe::1", data[env.NetworkIPv6])
 }
 
 func TestGenerateNetwork(t *testing.T) {

@@ -33,8 +33,8 @@ func TestEnviron(t *testing.T) {
 	t.Setenv(env.ParameterNameList("Z"), "1")
 
 	for _, value := range env.Environ() {
-		assert.False(t, strings.HasPrefix(value, env.EnvFlagPrefix))
-		assert.False(t, strings.HasPrefix(value, env.EnvParameterPrefix))
-		assert.False(t, strings.HasPrefix(value, env.EnvParameterPrefixList))
+		assert.False(t, strings.HasPrefix(value, env.FlagPrefix))
+		assert.False(t, strings.HasPrefix(value, env.ParameterPrefix))
+		assert.False(t, strings.HasPrefix(value, env.ParameterPrefixList))
 	}
 }

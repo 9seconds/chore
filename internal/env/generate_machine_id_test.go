@@ -8,19 +8,19 @@ import (
 )
 
 type GenerateMachineIDTestSuite struct {
-	EnvBaseTestSuite
+	BaseTestSuite
 }
 
-func (suite *GenerateMachineIDTestSuite) TestNoEnv() {
+func (suite *GenerateMachineIDTestSuite) TestNo() {
 	env.GenerateMachineID(suite.Context(), suite.values, suite.wg)
 	data := suite.Collect()
 
 	suite.Len(data, 1)
-	suite.NotEmpty(data[env.EnvMachineID])
+	suite.NotEmpty(data[env.MachineID])
 }
 
-func (suite *GenerateMachineIDTestSuite) TestWithEnv() {
-	suite.Setenv(env.EnvMachineID, "xxx")
+func (suite *GenerateMachineIDTestSuite) TestWith() {
+	suite.Setenv(env.MachineID, "xxx")
 	env.GenerateMachineID(suite.Context(), suite.values, suite.wg)
 	data := suite.Collect()
 

@@ -30,7 +30,7 @@ func ExtractRealNamespace(name string) (string, bool) {
 	exists := true
 
 	if name == MagicNamespace {
-		name, exists = os.LookupEnv(env.EnvNamespace)
+		name, exists = os.LookupEnv(env.Namespace)
 	}
 
 	return name, exists

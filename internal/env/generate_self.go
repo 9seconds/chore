@@ -32,6 +32,6 @@ func GenerateSelf(
 		cli := []string{executable, "run", namespace, script}
 		cli = append(cli, args.ToSelfStringChunks()...)
 
-		sendValue(ctx, results, EnvSelf, shellescape.QuoteCommand(cli))
+		sendValue(ctx, results, Self, shellescape.QuoteCommand(cli))
 	}()
 }

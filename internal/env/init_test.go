@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type EnvBaseTestSuite struct {
+type BaseTestSuite struct {
 	suite.Suite
 
 	testlib.CtxTestSuite
@@ -18,18 +18,18 @@ type EnvBaseTestSuite struct {
 	values chan string
 }
 
-func (suite *EnvBaseTestSuite) SetupTest() {
+func (suite *BaseTestSuite) SetupTest() {
 	suite.CtxTestSuite.Setup(suite.T())
 
 	suite.values = make(chan string, 1)
 	suite.wg = &sync.WaitGroup{}
 }
 
-func (suite *EnvBaseTestSuite) TearDownTest() {
+func (suite *BaseTestSuite) TearDownTest() {
 	suite.wg.Wait()
 }
 
-func (suite *EnvBaseTestSuite) Collect() map[string]string {
+func (suite *BaseTestSuite) Collect() map[string]string {
 	go func() {
 		suite.wg.Wait()
 		close(suite.values)
@@ -47,6 +47,6 @@ func (suite *EnvBaseTestSuite) Collect() map[string]string {
 	return collected
 }
 
-func (suite *EnvBaseTestSuite) Setenv(name, value string) {
+func (suite *BaseTestSuite) Setenv(name, value string) {
 	suite.T().Setenv(name, value)
 }

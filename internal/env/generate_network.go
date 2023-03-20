@@ -76,7 +76,7 @@ func GenerateNetwork(ctx context.Context, results chan<- string, waiters *sync.W
 	go func() {
 		defer waiters.Done()
 
-		if _, ok := os.LookupEnv(EnvNetworkIPv4); ok {
+		if _, ok := os.LookupEnv(NetworkIPv4); ok {
 			return
 		}
 
@@ -87,27 +87,27 @@ func GenerateNetwork(ctx context.Context, results chan<- string, waiters *sync.W
 			return
 		}
 
-		sendValue(ctx, results, EnvNetworkIPv4, resp.IP)
-		sendValue(ctx, results, EnvNetworkHostname, resp.Hostname)
-		sendValue(ctx, results, EnvNetworkCity, resp.City)
-		sendValue(ctx, results, EnvNetworkRegion, resp.Region)
-		sendValue(ctx, results, EnvNetworkCountry, resp.Country)
-		sendValue(ctx, results, EnvNetworkPostal, resp.Postal)
-		sendValue(ctx, results, EnvNetworkTimezone, resp.Timezone)
+		sendValue(ctx, results, NetworkIPv4, resp.IP)
+		sendValue(ctx, results, NetworkHostname, resp.Hostname)
+		sendValue(ctx, results, NetworkCity, resp.City)
+		sendValue(ctx, results, NetworkRegion, resp.Region)
+		sendValue(ctx, results, NetworkCountry, resp.Country)
+		sendValue(ctx, results, NetworkPostal, resp.Postal)
+		sendValue(ctx, results, NetworkTimezone, resp.Timezone)
 
 		asnChunks := ipInfoOrgFormat.FindStringSubmatch(resp.Org)
 
 		switch {
 		case asnChunks == nil && resp.Org != "":
-			sendValue(ctx, results, EnvNetworkOrganization, resp.Org)
+			sendValue(ctx, results, NetworkOrganization, resp.Org)
 		case asnChunks != nil:
-			sendValue(ctx, results, EnvNetworkASN, asnChunks[1])
-			sendValue(ctx, results, EnvNetworkOrganization, asnChunks[2])
+			sendValue(ctx, results, NetworkASN, asnChunks[1])
+			sendValue(ctx, results, NetworkOrganization, asnChunks[2])
 		}
 
 		if lat, lon, ok := strings.Cut(resp.Loc, ","); ok {
-			sendValue(ctx, results, EnvNetworkLatitude, lat)
-			sendValue(ctx, results, EnvNetworkLongitude, lon)
+			sendValue(ctx, results, NetworkLatitude, lat)
+			sendValue(ctx, results, NetworkLongitude, lon)
 		}
 	}()
 }
@@ -122,7 +122,7 @@ func GenerateNetworkIPv6(ctx context.Context, results chan<- string, waiters *sy
 	go func() {
 		defer waiters.Done()
 
-		if _, ok := os.LookupEnv(EnvNetworkIPv6); ok {
+		if _, ok := os.LookupEnv(NetworkIPv6); ok {
 			return
 		}
 
@@ -133,6 +133,6 @@ func GenerateNetworkIPv6(ctx context.Context, results chan<- string, waiters *sy
 			return
 		}
 
-		sendValue(ctx, results, EnvNetworkIPv6, resp.IP)
+		sendValue(ctx, results, NetworkIPv6, resp.IP)
 	}()
 }

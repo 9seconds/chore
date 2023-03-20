@@ -9,7 +9,7 @@ import (
 )
 
 type GenerateGitTestSuite struct {
-	EnvBaseTestSuite
+	BaseTestSuite
 }
 
 func (suite *GenerateGitTestSuite) TestGitAccessNo() {
@@ -18,7 +18,7 @@ func (suite *GenerateGitTestSuite) TestGitAccessNo() {
 }
 
 func (suite *GenerateGitTestSuite) TestGitAccessIfPresent() {
-	suite.Setenv(env.EnvGitReference, "xx")
+	suite.Setenv(env.GitReference, "xx")
 	env.GenerateGit(suite.Context(), suite.values, suite.wg, git.AccessModeIfUndefined)
 	suite.Empty(suite.Collect())
 }
@@ -28,12 +28,12 @@ func (suite *GenerateGitTestSuite) TestGitAccess() {
 	data := suite.Collect()
 
 	suite.Len(data, 6)
-	suite.Contains(data, env.EnvGitReference)
-	suite.Contains(data, env.EnvGitReferenceShort)
-	suite.Contains(data, env.EnvGitReferenceType)
-	suite.Contains(data, env.EnvGitCommitHash)
-	suite.Contains(data, env.EnvGitCommitHashShort)
-	suite.Contains(data, env.EnvGitIsDirty)
+	suite.Contains(data, env.GitReference)
+	suite.Contains(data, env.GitReferenceShort)
+	suite.Contains(data, env.GitReferenceType)
+	suite.Contains(data, env.GitCommitHash)
+	suite.Contains(data, env.GitCommitHashShort)
+	suite.Contains(data, env.GitIsDirty)
 }
 
 func TestGenerateGit(t *testing.T) {

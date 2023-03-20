@@ -56,16 +56,16 @@ func (s *Script) Environ(ctx context.Context, args argparse.ParsedArgs) []string
 	defer cancel()
 
 	environ := []string{
-		env.MakeValue(env.EnvNamespace, s.Namespace),
-		env.MakeValue(env.EnvCaller, s.Executable),
-		env.MakeValue(env.EnvIDRun, s.ID),
-		env.MakeValue(env.EnvPathCaller, s.Path()),
-		env.MakeValue(env.EnvPathData, s.DataPath()),
-		env.MakeValue(env.EnvPathCache, s.CachePath()),
-		env.MakeValue(env.EnvPathState, s.StatePath()),
-		env.MakeValue(env.EnvPathTemp, s.TempPath()),
+		env.MakeValue(env.Namespace, s.Namespace),
+		env.MakeValue(env.Caller, s.Executable),
+		env.MakeValue(env.IDRun, s.ID),
+		env.MakeValue(env.PathCaller, s.Path()),
+		env.MakeValue(env.PathData, s.DataPath()),
+		env.MakeValue(env.PathCache, s.CachePath()),
+		env.MakeValue(env.PathState, s.StatePath()),
+		env.MakeValue(env.PathTemp, s.TempPath()),
 		env.MakeValue(
-			env.EnvSlug,
+			env.Slug,
 			slug.Make(fmt.Sprintf(
 				"%s-%s-%s-%s",
 				s.Namespace, s.Executable, s.ID, args.ToSlugString()))),
@@ -86,7 +86,9 @@ func (s *Script) Environ(ctx context.Context, args argparse.ParsedArgs) []string
 
 	for k, v := range args.Flags {
 		if v {
-			environ = append(environ, env.MakeValue(env.FlagName(k), argparse.FlagEnabled))
+			environ = append(
+				environ,
+				env.MakeValue(env.FlagName(k), argparse.FlagEnabled))
 		}
 	}
 

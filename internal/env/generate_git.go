@@ -17,7 +17,7 @@ func GenerateGit(ctx context.Context, results chan<- string, waiters *sync.WaitG
 	case git.AccessModeNo:
 		return
 	case git.AccessModeIfUndefined:
-		if _, ok := os.LookupEnv(EnvGitReference); ok {
+		if _, ok := os.LookupEnv(GitReference); ok {
 			return
 		}
 	}
@@ -45,28 +45,28 @@ func GenerateGit(ctx context.Context, results chan<- string, waiters *sync.WaitG
 		commitHash := head.Hash().String()
 		commitHashShort := string([]rune(commitHash)[:GitCommitHashShortLength])
 
-		sendValue(ctx, results, EnvGitReference, refName.String())
-		sendValue(ctx, results, EnvGitReferenceShort, refName.Short())
-		sendValue(ctx, results, EnvGitCommitHash, commitHash)
-		sendValue(ctx, results, EnvGitCommitHashShort, commitHashShort)
+		sendValue(ctx, results, GitReference, refName.String())
+		sendValue(ctx, results, GitReferenceShort, refName.Short())
+		sendValue(ctx, results, GitCommitHash, commitHash)
+		sendValue(ctx, results, GitCommitHashShort, commitHashShort)
 
 		switch {
 		case refName.IsBranch():
-			sendValue(ctx, results, EnvGitReferenceType, git.RefTypeBranch.String())
+			sendValue(ctx, results, GitReferenceType, git.RefTypeBranch.String())
 		case refName.IsTag():
-			sendValue(ctx, results, EnvGitReferenceType, git.RefTypeTag.String())
+			sendValue(ctx, results, GitReferenceType, git.RefTypeTag.String())
 		case refName.IsRemote():
-			sendValue(ctx, results, EnvGitReferenceType, git.RefTypeRemote.String())
+			sendValue(ctx, results, GitReferenceType, git.RefTypeRemote.String())
 		case refName.IsNote():
-			sendValue(ctx, results, EnvGitReferenceType, git.RefTypeNote.String())
+			sendValue(ctx, results, GitReferenceType, git.RefTypeNote.String())
 		default:
-			sendValue(ctx, results, EnvGitReferenceType, git.RefTypeCommit.String())
+			sendValue(ctx, results, GitReferenceType, git.RefTypeCommit.String())
 		}
 
 		if isDirty, err := repo.IsDirty(); err != nil {
 			log.Printf("cannot detect if repository is dirty: %v", err)
 		} else {
-			sendValue(ctx, results, EnvGitIsDirty, strconv.FormatBool(isDirty))
+			sendValue(ctx, results, GitIsDirty, strconv.FormatBool(isDirty))
 		}
 	}()
 }

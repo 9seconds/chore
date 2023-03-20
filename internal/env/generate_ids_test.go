@@ -9,13 +9,13 @@ import (
 )
 
 type GenerateIdsTestSuite struct {
-	EnvBaseTestSuite
+	BaseTestSuite
 
 	args argparse.ParsedArgs
 }
 
 func (suite *GenerateIdsTestSuite) SetupTest() {
-	suite.EnvBaseTestSuite.SetupTest()
+	suite.BaseTestSuite.SetupTest()
 
 	suite.args = argparse.ParsedArgs{
 		Parameters: map[string][]string{
@@ -25,19 +25,19 @@ func (suite *GenerateIdsTestSuite) SetupTest() {
 	}
 }
 
-func (suite *GenerateIdsTestSuite) TestNoEnvs() {
+func (suite *GenerateIdsTestSuite) TestNos() {
 	env.GenerateIds(suite.Context(), suite.values, suite.wg, "xx", suite.args)
 
 	data := suite.Collect()
 
 	suite.Len(data, 3)
-	suite.NotEmpty(data[env.EnvIDChainRun])
+	suite.NotEmpty(data[env.IDChainRun])
 	suite.Equal(
 		"bPw4mf0i7ORf4zXimc4AJl0AjO5uiSFqWgmdhPTrJ-A",
-		data[env.EnvIDIsolated])
+		data[env.IDIsolated])
 	suite.Equal(
 		"OANtkcb4mtiB_O-4ovEDuNE21yga8uQOvXHpH60aldM",
-		data[env.EnvIDChainIsolated])
+		data[env.IDChainIsolated])
 }
 
 func TestGenerateIds(t *testing.T) {

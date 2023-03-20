@@ -51,7 +51,7 @@ func TestList(t *testing.T) {
 }
 
 func TestExtractRealNamespace(t *testing.T) {
-	if _, ok := os.LookupEnv(env.EnvNamespace); ok {
+	if _, ok := os.LookupEnv(env.Namespace); ok {
 		t.Skip("environment variable is defined")
 	}
 
@@ -62,7 +62,7 @@ func TestExtractRealNamespace(t *testing.T) {
 	_, exists = script.ExtractRealNamespace(".")
 	assert.False(t, exists)
 
-	t.Setenv(env.EnvNamespace, "xx")
+	t.Setenv(env.Namespace, "xx")
 
 	namespace, exists = script.ExtractRealNamespace(".")
 	assert.True(t, exists)

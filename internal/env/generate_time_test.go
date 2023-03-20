@@ -10,7 +10,7 @@ import (
 )
 
 type GenerateTimeTestSuite struct {
-	EnvBaseTestSuite
+	BaseTestSuite
 }
 
 func (suite *GenerateTimeTestSuite) TestOk() {
@@ -18,46 +18,46 @@ func (suite *GenerateTimeTestSuite) TestOk() {
 	data := suite.Collect()
 	suite.Len(data, 15)
 
-	tme, err := time.Parse(time.RFC3339, data[env.EnvStartedAtRFC3339])
+	tme, err := time.Parse(time.RFC3339, data[env.StartedAtRFC3339])
 	suite.NoError(err)
 
 	suite.WithinDuration(time.Now(), tme, time.Second)
 	suite.Equal(
 		strconv.FormatInt(tme.Unix(), 10),
-		data[env.EnvStartedAtUnix])
+		data[env.StartedAtUnix])
 	suite.Equal(
 		strconv.FormatInt(int64(tme.Year()), 10),
-		data[env.EnvStartedAtYear])
+		data[env.StartedAtYear])
 	suite.Equal(
 		strconv.FormatInt(int64(tme.YearDay()), 10),
-		data[env.EnvStartedAtYearDay])
+		data[env.StartedAtYearDay])
 	suite.Equal(
 		strconv.FormatInt(int64(tme.Day()), 10),
-		data[env.EnvStartedAtDay])
+		data[env.StartedAtDay])
 	suite.Equal(
 		strconv.FormatInt(int64(tme.Month()), 10),
-		data[env.EnvStartedAtMonth])
+		data[env.StartedAtMonth])
 	suite.Equal(
 		tme.Month().String(),
-		data[env.EnvStartedAtMonthStr])
+		data[env.StartedAtMonthStr])
 	suite.Equal(
 		strconv.FormatInt(int64(tme.Hour()), 10),
-		data[env.EnvStartedAtHour])
+		data[env.StartedAtHour])
 	suite.Equal(
 		strconv.FormatInt(int64(tme.Minute()), 10),
-		data[env.EnvStartedAtMinute])
+		data[env.StartedAtMinute])
 	suite.Equal(
 		strconv.FormatInt(int64(tme.Second()), 10),
-		data[env.EnvStartedAtSecond])
-	suite.NotEmpty(data[env.EnvStartedAtNanosecond])
+		data[env.StartedAtSecond])
+	suite.NotEmpty(data[env.StartedAtNanosecond])
 	suite.Equal(
 		strconv.FormatInt(int64(tme.Weekday()), 10),
-		data[env.EnvStartedAtWeekday])
+		data[env.StartedAtWeekday])
 	suite.Equal(
 		tme.Weekday().String(),
-		data[env.EnvStartedAtWeekdayStr])
-	suite.NotEmpty(data[env.EnvStartedAtTimezone])
-	suite.NotEmpty(data[env.EnvStartedAtOffset])
+		data[env.StartedAtWeekdayStr])
+	suite.NotEmpty(data[env.StartedAtTimezone])
+	suite.NotEmpty(data[env.StartedAtOffset])
 }
 
 func TestGenerateTime(t *testing.T) {
