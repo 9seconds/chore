@@ -29,6 +29,8 @@ func GenerateSelf(
 			return
 		}
 
+		sendValue(ctx, results, Bin, executable)
+
 		cli := []string{executable, "run", namespace, script}
 		cli = append(cli, args.ToSelfStringChunks()...)
 

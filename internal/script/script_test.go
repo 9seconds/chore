@@ -158,10 +158,11 @@ func (suite *ScriptTestSuite) TestEnviron() {
 		require.True(suite.T(), found)
 	}
 
-	count := 47
+	count := 48
 
 	suite.Equal(scr.Namespace, data[env.Namespace])
 	suite.Equal(scr.Executable, data[env.Caller])
+	suite.Contains(data, env.Bin)
 	suite.Equal(scr.Path(), data[env.PathCaller])
 	suite.Equal(scr.DataPath(), data[env.PathData])
 	suite.Equal(scr.CachePath(), data[env.PathCache])

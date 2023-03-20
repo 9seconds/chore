@@ -18,6 +18,7 @@ const (
 	UserPrefix          = Prefix + "USER_"
 
 	Debug     = Prefix + "DEBUG"
+	Bin       = Prefix + "BIN"
 	MachineID = Prefix + "MACHINE_ID"
 
 	Namespace = Prefix + "NAMESPACE"

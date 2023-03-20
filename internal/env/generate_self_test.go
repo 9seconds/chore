@@ -41,7 +41,8 @@ func (suite *GenerateSelfTestSuite) Test() {
 
 	data := suite.Collect()
 
-	suite.Len(data, 1)
+	suite.Len(data, 2)
+	suite.Contains(data, env.Bin)
 	suite.Contains(data[env.Self], "run namespace2 script1")
 	suite.Contains(data[env.Self], "param1=33")
 	suite.Contains(data[env.Self], "'param2=34 35'")
