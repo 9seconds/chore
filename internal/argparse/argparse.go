@@ -25,8 +25,8 @@ func Parse(args []string) (ParsedArgs, error) { //nolint: cyclop
 		prefix := ""
 
 		if len(arg) > 0 {
-			rune, _ := utf8.DecodeRuneInString(arg)
-			prefix = string(rune)
+			rne, _ := utf8.DecodeRuneInString(arg)
+			prefix = string(rne)
 		}
 
 		switch {
