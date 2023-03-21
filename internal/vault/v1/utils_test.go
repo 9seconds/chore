@@ -13,22 +13,19 @@ func TestGenerateNonce(t *testing.T) {
 	assert.Len(t, generateNonce(), NonceLength)
 }
 
-func TestGenerateCipherKey(t *testing.T) {
-	assert.Equal(
-		t,
-		"1Qzl39waGKJl5q+DgKT33WeSOlQcGDk913VI2yT6seM=",
-		base64.StdEncoding.EncodeToString(
-			generateCipherKey([]byte("aaa"), bytes.Repeat([]byte{1}, NonceLength)),
-		))
-}
+func TestGenerateKeys(t *testing.T) {
+	cipherKey, macKey := generateKeys(
+		[]byte("aaa"),
+		bytes.Repeat([]byte{1}, NonceLength))
 
-func TestGenerateMacKey(t *testing.T) {
 	assert.Equal(
 		t,
-		"Z0sx+YR7a+ZVfZtbArZ/wc4abHxGcutP8bSS3MCv1vE=",
-		base64.StdEncoding.EncodeToString(
-			generateMacKey([]byte("aaa"), bytes.Repeat([]byte{1}, NonceLength)),
-		))
+		"FcyYaM7/JoZ4Y9OGOKgbiJPfcJ21PTF274PvU76vlzw=",
+		base64.StdEncoding.EncodeToString(cipherKey))
+	assert.Equal(
+		t,
+		"QkDv808Ckygo6nrtt1IkFum7CT0YbX2e3S/lWLSAzCo=",
+		base64.StdEncoding.EncodeToString(macKey))
 }
 
 func TestEncryptDecrypt(t *testing.T) {

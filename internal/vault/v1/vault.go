@@ -56,20 +56,20 @@ func (v *Vault) UnmarshalBinary(data []byte) error {
 	}
 
 	length := int(binary.LittleEndian.Uint32(data[:LenLength]))
-	data = data[LenLength:]
-
-	if len(data) != length {
+	if len(data)-LenLength != length {
 		return fmt.Errorf("message length mismatch: %w", ErrShortData)
 	}
 
-	macMixer := hmac.New(sha256.New, generateMacKey(v.password, kdfNonce))
+	cipherKey, macKey := generateKeys(v.password, kdfNonce)
+
+	macMixer := hmac.New(sha256.New, macKey)
 	macMixer.Write(data)
 
 	if subtle.ConstantTimeCompare(mac, macMixer.Sum(nil)) != 1 {
 		return ErrBadPassword
 	}
 
-	message, err := decryptMessage(generateCipherKey(v.password, kdfNonce), data)
+	message, err := decryptMessage(cipherKey, data[LenLength:])
 	if err != nil {
 		return ErrBadPassword
 	}
@@ -91,11 +91,14 @@ func (v *Vault) MarshalBinary() ([]byte, error) {
 		panic(err.Error())
 	}
 
-	encrypted := encryptMessage(generateCipherKey(v.password, kdfNonce), encBuf.Bytes())
+	cipherKey, macKey := generateKeys(v.password, kdfNonce)
+	encrypted := encryptMessage(cipherKey, encBuf.Bytes())
+
 	length := make([]byte, LenLength)
 	binary.LittleEndian.PutUint32(length, uint32(len(encrypted)))
 
-	macMixer := hmac.New(sha256.New, generateMacKey(v.password, kdfNonce))
+	macMixer := hmac.New(sha256.New, macKey)
+	macMixer.Write(length)
 	macMixer.Write(encrypted)
 
 	data := make([]byte, 0, NonceLength+MACLength+LenLength+len(encrypted))

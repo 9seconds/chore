@@ -5,6 +5,7 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
+	"sync"
 
 	"golang.org/x/crypto/scrypt"
 )
@@ -12,13 +13,13 @@ import (
 const (
 	KeyLength = 32
 
-	CipherKeyN = 1 << 12
+	CipherKeyN = 1 << 16
 	CipherKeyR = 2
 	CipherKeyP = 8
 
-	MACKeyN = 1 << 8
-	MACKeyR = 4
-	MACKeyP = 10
+	MACKeyN = 1 << 16
+	MACKeyR = 3
+	MACKeyP = 5
 )
 
 // constant IV is fine because we rotate keys each time, keys is
@@ -79,14 +80,6 @@ func generateNonce() []byte {
 	return data
 }
 
-func generateCipherKey(password, nonce []byte) []byte {
-	return generateKey(password, nonce, CipherKeyN, CipherKeyR, CipherKeyP)
-}
-
-func generateMacKey(password, nonce []byte) []byte {
-	return generateKey(password, nonce, MACKeyN, MACKeyP, MACKeyP)
-}
-
 func generateKey(password, nonce []byte, n, r, p int) []byte {
 	key, err := scrypt.Key(password, nonce, n, r, p, KeyLength)
 	if err != nil {
@@ -94,4 +87,31 @@ func generateKey(password, nonce []byte, n, r, p int) []byte {
 	}
 
 	return key
+}
+
+func generateKeys(password, nonce []byte) ([]byte, []byte) {
+	waiters := &sync.WaitGroup{}
+
+	waiters.Add(2) //nolint: gomnd
+
+	var (
+		cipherKey []byte
+		macKey    []byte
+	)
+
+	go func() {
+		cipherKey = generateKey(password, nonce, CipherKeyN, CipherKeyR, CipherKeyP)
+
+		waiters.Done()
+	}()
+
+	go func() {
+		macKey = generateKey(password, nonce, MACKeyN, MACKeyR, MACKeyP)
+
+		waiters.Done()
+	}()
+
+	waiters.Wait()
+
+	return cipherKey, macKey
 }
