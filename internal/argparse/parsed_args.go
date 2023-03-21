@@ -36,14 +36,7 @@ type ParsedArgs struct {
 }
 
 func (p ParsedArgs) GetParameterList(key string) string {
-	builder := strings.Builder{}
-
-	for _, v := range p.Parameters[key] {
-		builder.WriteString(v)
-		builder.WriteRune('\n')
-	}
-
-	return builder.String()
+	return strings.Join(p.Parameters[key], "\n")
 }
 
 func (p ParsedArgs) GetParameter(key string) string {

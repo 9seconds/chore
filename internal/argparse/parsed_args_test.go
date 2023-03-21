@@ -209,8 +209,8 @@ func (suite *ParsedArgsTestSuite) TestValidateListFail() {
 
 func (suite *ParsedArgsTestSuite) TestGetParameterList() {
 	testTable := map[string]string{
-		"int1":  "1\nxxx yyy\n3\n",
-		"json1": "{}\n",
+		"int1":  "1\nxxx yyy\n3",
+		"json1": "{}",
 		"":      "",
 	}
 	args := argparse.ParsedArgs{
