@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"bytes"
 	"crypto/hmac"
 	"crypto/sha256"
 	"crypto/subtle"
@@ -60,16 +59,16 @@ func (v *Vault) UnmarshalBinary(data []byte) error {
 		return fmt.Errorf("message length mismatch: %w", ErrShortData)
 	}
 
-	cipherKey, macKey := generateKeys(v.password, kdfNonce)
+	key := generateKey(v.password, kdfNonce)
 
-	macMixer := hmac.New(sha256.New, macKey)
+	macMixer := hmac.New(sha256.New, key)
 	macMixer.Write(data)
 
 	if subtle.ConstantTimeCompare(mac, macMixer.Sum(nil)) != 1 {
 		return ErrBadPassword
 	}
 
-	message, err := decryptMessage(cipherKey, data[LenLength:])
+	message, err := decryptMessage(key, data[LenLength:])
 	if err != nil {
 		return ErrBadPassword
 	}
@@ -81,33 +80,29 @@ func (v *Vault) UnmarshalBinary(data []byte) error {
 
 func (v *Vault) MarshalBinary() ([]byte, error) {
 	kdfNonce := generateNonce()
-	encBuf := bytes.Buffer{}
+	key := generateKey(v.password, kdfNonce)
 
-	encoder := json.NewEncoder(&encBuf)
-	encoder.SetEscapeHTML(false)
-	encoder.SetIndent("", "")
-
-	if err := encoder.Encode(v.data); err != nil {
+	data, err := json.Marshal(v.data)
+	if err != nil {
 		panic(err.Error())
 	}
 
-	cipherKey, macKey := generateKeys(v.password, kdfNonce)
-	encrypted := encryptMessage(cipherKey, encBuf.Bytes())
+	data = encryptMessage(key, data)
 
 	length := make([]byte, LenLength)
-	binary.LittleEndian.PutUint32(length, uint32(len(encrypted)))
+	binary.LittleEndian.PutUint32(length, uint32(len(data)))
 
-	macMixer := hmac.New(sha256.New, macKey)
+	macMixer := hmac.New(sha256.New, key)
 	macMixer.Write(length)
-	macMixer.Write(encrypted)
+	macMixer.Write(data)
 
-	data := make([]byte, 0, NonceLength+MACLength+LenLength+len(encrypted))
-	data = append(data, kdfNonce...)
-	data = append(data, macMixer.Sum(nil)...)
-	data = append(data, length...)
-	data = append(data, encrypted...)
+	result := make([]byte, 0, NonceLength+MACLength+LenLength+len(data))
+	result = append(result, kdfNonce...)
+	result = append(result, macMixer.Sum(nil)...)
+	result = append(result, length...)
+	result = append(result, data...)
 
-	return data, nil
+	return result, nil
 }
 
 func (v *Vault) Version() uint8 {

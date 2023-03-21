@@ -5,21 +5,16 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
-	"sync"
 
-	"golang.org/x/crypto/scrypt"
+	"golang.org/x/crypto/argon2"
 )
 
 const (
-	KeyLength = 32
+	KeyLength = 32 // aes256
 
-	CipherKeyN = 1 << 16
-	CipherKeyR = 2
-	CipherKeyP = 8
-
-	MACKeyN = 1 << 16
-	MACKeyR = 3
-	MACKeyP = 5
+	ArgonTime    = 1
+	ArgonMemory  = 64 * 1024
+	ArgonThreads = 4
 )
 
 // constant IV is fine because we rotate keys each time, keys is
@@ -80,38 +75,12 @@ func generateNonce() []byte {
 	return data
 }
 
-func generateKey(password, nonce []byte, n, r, p int) []byte {
-	key, err := scrypt.Key(password, nonce, n, r, p, KeyLength)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	return key
-}
-
-func generateKeys(password, nonce []byte) ([]byte, []byte) {
-	waiters := &sync.WaitGroup{}
-
-	waiters.Add(2) //nolint: gomnd
-
-	var (
-		cipherKey []byte
-		macKey    []byte
-	)
-
-	go func() {
-		cipherKey = generateKey(password, nonce, CipherKeyN, CipherKeyR, CipherKeyP)
-
-		waiters.Done()
-	}()
-
-	go func() {
-		macKey = generateKey(password, nonce, MACKeyN, MACKeyR, MACKeyP)
-
-		waiters.Done()
-	}()
-
-	waiters.Wait()
-
-	return cipherKey, macKey
+func generateKey(password, nonce []byte) []byte {
+	return argon2.IDKey(
+		password,
+		nonce,
+		ArgonTime,
+		ArgonMemory,
+		ArgonThreads,
+		KeyLength)
 }
