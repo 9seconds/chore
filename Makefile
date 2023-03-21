@@ -46,6 +46,10 @@ static:
 test:
 	@go test -parallel $(shell nproc) ./...
 
+.PHONY: benchmark
+benchmark:
+	@go test -run XXXXXXX -bench=. -benchmem ./...
+
 .PHONY: full-test
 full-test:
 	@go test -parallel $(shell nproc) -race -cover -coverprofile coverage.out ./...
