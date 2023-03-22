@@ -3,10 +3,12 @@ package testlib
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
 	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/stretchr/testify/require"
 )
 
@@ -37,7 +39,9 @@ func (suite *GitTestSuite) Setup(t *testing.T, path string) {
 func (suite *GitTestSuite) GitCommit(message string) {
 	suite.t.Helper()
 
-	_, err := suite.workTree.Commit(message, &git.CommitOptions{})
+	_, err := suite.workTree.Commit(message, &git.CommitOptions{
+		Author: suite.getExampleSignature(),
+	})
 	require.NoError(suite.t, err)
 }
 
@@ -110,6 +114,15 @@ func (suite *GitTestSuite) GitCreateTag(name string, hash plumbing.Hash) {
 func (suite *GitTestSuite) GitCreateAnnotatedTag(name, message string, hash plumbing.Hash) {
 	_, err := suite.repo.CreateTag(name, hash, &git.CreateTagOptions{
 		Message: message,
+		Tagger:  suite.getExampleSignature(),
 	})
 	require.NoError(suite.t, err)
+}
+
+func (suite *GitTestSuite) getExampleSignature() *object.Signature {
+	return &object.Signature{
+		Name:  "John Doe",
+		Email: "john@doe.org",
+		When:  time.Now(),
+	}
 }

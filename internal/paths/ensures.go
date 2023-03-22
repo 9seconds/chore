@@ -16,7 +16,7 @@ const (
 `
 
 	DirectoryPermission fs.FileMode = 0o755
-	FilePermission      fs.FileMode = 0o664
+	FilePermission      fs.FileMode = 0o644
 )
 
 func EnsureDir(path string) error {
