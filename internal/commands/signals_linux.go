@@ -1,4 +1,4 @@
-//go:build aix || darwin || dragonfly || freebsd || linux || netbsd || openbsd || solaris
+//go:build linux
 
 package commands
 
@@ -38,7 +38,6 @@ var SignalsToRelay = []os.Signal{
 	syscall.SIGIOT,
 	syscall.SIGSTKFLT,
 	syscall.SIGIO,
-	// syscall.SIGCLD,
 	syscall.SIGPWR,
 	syscall.SIGWINCH,
 	syscall.SIGUNUSED,

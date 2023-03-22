@@ -1,0 +1,60 @@
+# vim: set ts=2 sw=2 tw=0 ft=yaml
+
+project_name: chore
+
+before:
+  hooks:
+    # - make clean
+    - go generate ./...
+
+
+builds:
+  - binary: chore
+    flags:
+      - -trimpath
+      - -mod=readonly
+    ldflags:
+      - -s -w -X "main.version={{ .Version }}"
+    env:
+      - CGO_ENABLED=0
+    tags:
+      - osusergo
+      - netgo
+      - timetzdata
+    targets:
+      - linux_amd64
+      - linux_arm64
+      - darwin_amd64
+      - darwin_arm64
+    no_unique_dist_dir: false
+    mod_timestamp: "{{ .CommitTimestamp }}"
+
+snapshot:
+  name_template: "SNAPSHOT-{{ .ShortCommit }}"
+
+archives:
+  - id: chore
+    format: "tar.gz"
+    wrap_in_directory: false
+    strip_parent_binary_folder: true
+    rlcp: true
+    files:
+      - LICENSE
+      - README.md
+
+signs:
+  - artifacts: all
+    args:
+      - "--armor"
+      - "--output"
+      - "${signature}"
+      - "--detach-sign"
+      - "--local-user"
+      - "{{ .Env.GPG_KEY }}"
+      - "${artifact}"
+
+checksum:
+  disable: true
+
+changelog:
+  skip: true
