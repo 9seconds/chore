@@ -14,11 +14,7 @@ type mainCallback func([]string, io.Writer) (string, fs.FileMode, error)
 
 func main(callback mainCallback) cobra.PositionalArgs {
 	return func(cmd *cobra.Command, args []string) error {
-		editor, err := cmd.Flags().Lookup("editor").Value.(*FlagEditor).Get()
-		if err != nil {
-			return fmt.Errorf("cannot get editor: %w", err)
-		}
-
+		editor, _ := cmd.Flags().Lookup("editor").Value.(*FlagEditor).Get()
 		buf := bytes.Buffer{}
 
 		path, mode, err := callback(args, &buf)

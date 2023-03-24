@@ -66,7 +66,7 @@ func NewShow() *cobra.Command {
 	return cmd
 }
 
-func mainShow(cmd *cobra.Command, args []string) error { //nolint: cyclop
+func mainShow(cmd *cobra.Command, args []string) error {
 	switch len(args) {
 	case 0:
 		return mainShowListNamespaces(cmd)
@@ -79,30 +79,11 @@ func mainShow(cmd *cobra.Command, args []string) error { //nolint: cyclop
 		return fmt.Errorf("cannot initialize script: %w", err)
 	}
 
-	showPaths, err := cmd.Flags().GetBool("show-path")
-	if err != nil {
-		return err
-	}
-
-	showConfig, err := cmd.Flags().GetBool("show-config")
-	if err != nil {
-		return err
-	}
-
-	showData, err := cmd.Flags().GetBool("show-data")
-	if err != nil {
-		return err
-	}
-
-	showCache, err := cmd.Flags().GetBool("show-cache")
-	if err != nil {
-		return err
-	}
-
-	showState, err := cmd.Flags().GetBool("show-state")
-	if err != nil {
-		return err
-	}
+	showPaths, _ := cmd.Flags().GetBool("show-path")
+	showConfig, _ := cmd.Flags().GetBool("show-config")
+	showData, _ := cmd.Flags().GetBool("show-data")
+	showCache, _ := cmd.Flags().GetBool("show-cache")
+	showState, _ := cmd.Flags().GetBool("show-state")
 
 	if showPaths || showConfig || showData || showCache || showState {
 		mainShowFlags(cmd, scr, showPaths, showConfig, showData, showCache, showState)

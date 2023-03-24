@@ -16,6 +16,7 @@ require (
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/gosimple/slug v1.13.1
 	github.com/jarcoal/httpmock v1.2.0
+	github.com/minio/selfupdate v0.6.0
 	github.com/rs/xid v1.4.0
 	github.com/sethvargo/go-password v0.2.0
 	github.com/spf13/cobra v1.6.1
@@ -30,6 +31,7 @@ require (
 )
 
 require (
+	aead.dev/minisign v0.2.0 // indirect
 	github.com/Microsoft/go-winio v0.6.0 // indirect
 	github.com/ProtonMail/go-crypto v0.0.0-20230321155629-9a39f2531310 // indirect
 	github.com/acomagu/bufpipe v1.0.4 // indirect

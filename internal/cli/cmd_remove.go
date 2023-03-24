@@ -33,11 +33,7 @@ func NewRemove() *cobra.Command {
 }
 
 func mainRemove(cmd *cobra.Command, args []string) error {
-	dryRun, err := cmd.Flags().GetBool("dry-run")
-	if err != nil {
-		return err
-	}
-
+	dryRun, _ := cmd.Flags().GetBool("dry-run")
 	namespace, _ := script.ExtractRealNamespace(args[0])
 	toRemove := make([]string, 0, 5*(len(args)-1)) //nolint: gomnd
 

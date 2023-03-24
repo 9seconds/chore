@@ -1,13 +1,8 @@
 package env
 
 import (
-	"bufio"
 	"context"
-	"encoding/json"
-	"fmt"
-	"io"
 	"log"
-	"net/http"
 	"os"
 	"regexp"
 	"strings"
@@ -34,39 +29,12 @@ type ifConfigResponse struct {
 
 var ipInfoOrgFormat = regexp.MustCompile(`^AS(\d+)\s+(.*?)$`)
 
-func doRequest(ctx context.Context, client *http.Client, url string, target interface{}) error {
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
-	req, _ := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	req.Header.Set("User-Agent", "chore")
-	req.Header.Set("Accept", "application/json")
-
-	resp, err := client.Do(req)
-	if err != nil {
-		return fmt.Errorf("cannot access endpoint: %w", err)
-	}
-
-	defer func() {
-		io.Copy(io.Discard, resp.Body) //nolint: errcheck
-		resp.Body.Close()
-	}()
-
-	if resp.StatusCode >= http.StatusBadRequest {
-		return fmt.Errorf("unexpected response status code %d", resp.StatusCode)
-	}
-
-	reader := bufio.NewReader(resp.Body)
-	decoder := json.NewDecoder(reader)
-
-	if err := decoder.Decode(target); err != nil {
-		return fmt.Errorf("cannot parse response: %w", err)
-	}
-
-	return nil
-}
-
-func GenerateNetwork(ctx context.Context, results chan<- string, waiters *sync.WaitGroup, requireNetwork bool) {
+func GenerateNetwork(
+	ctx context.Context,
+	results chan<- string,
+	waiters *sync.WaitGroup,
+	requireNetwork bool,
+) {
 	if !requireNetwork {
 		return
 	}
@@ -81,7 +49,13 @@ func GenerateNetwork(ctx context.Context, results chan<- string, waiters *sync.W
 		}
 
 		resp := ipInfoResponse{}
-		if err := doRequest(ctx, network.HTTPClientV4, "https://ipinfo.io/json", &resp); err != nil {
+
+		err := network.DoJSONRequestWithClient(
+			ctx,
+			network.HTTPClientV4,
+			"https://ipinfo.io/json",
+			&resp)
+		if err != nil {
 			log.Printf("cannot request network data: %v", err)
 
 			return
@@ -112,7 +86,12 @@ func GenerateNetwork(ctx context.Context, results chan<- string, waiters *sync.W
 	}()
 }
 
-func GenerateNetworkIPv6(ctx context.Context, results chan<- string, waiters *sync.WaitGroup, requireNetwork bool) {
+func GenerateNetworkIPv6(
+	ctx context.Context,
+	results chan<- string,
+	waiters *sync.WaitGroup,
+	requireNetwork bool,
+) {
 	if !requireNetwork {
 		return
 	}
@@ -127,7 +106,13 @@ func GenerateNetworkIPv6(ctx context.Context, results chan<- string, waiters *sy
 		}
 
 		resp := ifConfigResponse{}
-		if err := doRequest(ctx, network.HTTPClientV6, "https://ifconfig.co", &resp); err != nil {
+
+		err := network.DoJSONRequestWithClient(
+			ctx,
+			network.HTTPClientV6,
+			"https://ifconfig.co",
+			&resp)
+		if err != nil {
 			log.Printf("cannot get IPv6 address: %v", err)
 
 			return

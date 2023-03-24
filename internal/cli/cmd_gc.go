@@ -23,11 +23,7 @@ func NewGC() *cobra.Command {
 }
 
 func mainGC(cmd *cobra.Command, _ []string) error {
-	dryRun, err := cmd.Flags().GetBool("dry-run")
-	if err != nil {
-		return err
-	}
-
+	dryRun, _ := cmd.Flags().GetBool("dry-run")
 	validScripts := []*script.Script{}
 
 	namespaces, err := script.ListNamespaces()

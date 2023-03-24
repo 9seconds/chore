@@ -2,6 +2,10 @@ package network
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+	"io"
+	"log"
 	"net"
 	"net/http"
 	"net/http/cookiejar"
@@ -10,7 +14,7 @@ import (
 
 const (
 	connectTimeout = 2 * time.Second
-	httpTimeout    = 10 * time.Second
+	httpTimeout    = 30 * time.Second
 )
 
 type Dialer interface {
@@ -72,3 +76,67 @@ var (
 		Timeout: httpTimeout,
 	}
 )
+
+func CloseResponse(resp *http.Response) error {
+	if _, err := io.Copy(io.Discard, resp.Body); err != nil {
+		return err
+	}
+
+	return resp.Body.Close()
+}
+
+func NewRequest(ctx context.Context, url string) *http.Request {
+	req, _ := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	req.Header.Set("User-Agent", "chore")
+
+	return req
+}
+
+func SendRequest(client *http.Client, req *http.Request) (*http.Response, error) {
+	log.Printf("request %s", req.URL.String())
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("cannot complete a request: %w", err)
+	}
+
+	if resp.StatusCode >= http.StatusBadRequest {
+		CloseResponse(resp) //nolint: errcheck
+
+		return nil, fmt.Errorf("unexpected response status code %d", resp.StatusCode)
+	}
+
+	log.Printf("response %s: %s (length: %d)", req.URL.String(), resp.Status, resp.ContentLength)
+
+	return resp, err
+}
+
+func DoJSONRequestWithClient(
+	ctx context.Context,
+	client *http.Client,
+	url string,
+	target interface{},
+) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	req := NewRequest(ctx, url)
+	req.Header.Set("Accept", "application/json")
+
+	resp, err := SendRequest(client, req)
+	if err != nil {
+		return err
+	}
+
+	defer CloseResponse(resp) //nolint: errcheck
+
+	if err := json.NewDecoder(resp.Body).Decode(target); err != nil {
+		return fmt.Errorf("cannot decode JSON: %w", err)
+	}
+
+	return nil
+}
+
+func DoJSONRequest(ctx context.Context, url string, target interface{}) error {
+	return DoJSONRequestWithClient(ctx, HTTPClient, url, target)
+}

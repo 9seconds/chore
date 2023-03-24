@@ -49,7 +49,8 @@ func main() {
 		cli.NewRename(),
 		cli.NewShow(),
 		cli.NewVault(),
-		cli.NewGC())
+		cli.NewGC(),
+		cli.NewUpdate())
 
 	root.SetIn(os.Stdin)
 	root.SetOut(os.Stdout)

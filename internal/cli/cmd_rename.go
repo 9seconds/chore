@@ -36,11 +36,7 @@ func mainRename(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	force, err := cmd.Flags().GetBool("force")
-	if err != nil {
-		return err
-	}
-
+	force, _ := cmd.Flags().GetBool("force")
 	namespace, _ := script.ExtractRealNamespace(args[0])
 	scriptFrom := &script.Script{
 		Namespace:  namespace,
