@@ -15,6 +15,10 @@ import (
 const (
 	connectTimeout = 2 * time.Second
 	httpTimeout    = 30 * time.Second
+
+	// practically, I'm pretty much sure we won't need to have a deal with
+	// JSONs bigger than 1mb
+	maxJSONSize = 1 * 1024 * 1024
 )
 
 type Dialer interface {
@@ -130,7 +134,9 @@ func DoJSONRequestWithClient(
 
 	defer CloseResponse(resp) //nolint: errcheck
 
-	if err := json.NewDecoder(resp.Body).Decode(target); err != nil {
+	decoder := json.NewDecoder(io.LimitReader(resp.Body, maxJSONSize))
+
+	if err := decoder.Decode(target); err != nil {
 		return fmt.Errorf("cannot decode JSON: %w", err)
 	}
 

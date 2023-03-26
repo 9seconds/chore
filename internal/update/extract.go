@@ -14,6 +14,8 @@ import (
 	"github.com/ProtonMail/go-crypto/openpgp"
 )
 
+const MaxFileSize = 20 * 1024 * 1024
+
 var ErrCannotFindBinary = errors.New("cannot find binary in archive")
 
 func Extract(ctx context.Context, archiveURL, signatureURL string) (io.Reader, error) {
@@ -87,7 +89,7 @@ func extractDownloadTo(ctx context.Context, url string) (*bytes.Reader, error) {
 
 	defer network.CloseResponse(resp) //nolint: errcheck
 
-	data, err := io.ReadAll(resp.Body)
+	data, err := io.ReadAll(io.LimitReader(resp.Body, MaxFileSize))
 	if err != nil {
 		return nil, fmt.Errorf("cannot read response: %w", err)
 	}

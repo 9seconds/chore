@@ -123,12 +123,13 @@ func GetLatestRelease(ctx context.Context, withUnstable bool) (Release, error) {
 func getLatestRelease(ctx context.Context, stableOnly bool) (jsonRelease, error) {
 	target := jsonRelease{}
 	thisURL, _ := url.Parse(urlRelease)
+	theseReleases := []jsonRelease{}
 
 	query := thisURL.Query()
 	query.Set("per_page", strconv.Itoa(paginationPageSize))
 
 	for page := 1; ; page++ {
-		theseReleases := []jsonRelease{}
+		theseReleases := theseReleases[:0]
 
 		query.Set("page", strconv.Itoa(page))
 
