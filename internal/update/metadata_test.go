@@ -16,68 +16,7 @@ import (
 )
 
 type MetadataTestSuite struct {
-	suite.Suite
-
-	testlib.FixturesTestSuite
-	testlib.NetworkTestSuite
-	testlib.CtxTestSuite
-}
-
-func (suite *MetadataTestSuite) SetupTest() {
-	suite.FixturesTestSuite.Setup(suite.T())
-	suite.NetworkTestSuite.Setup(suite.T())
-	suite.CtxTestSuite.Setup(suite.T())
-
-	suite.Register1PageResponder(
-		httpmock.NewJsonResponderOrPanic(
-			http.StatusOK,
-			httpmock.File(suite.FixturePath("releases_page_1.json"))))
-	suite.Register2PageResponder(
-		httpmock.NewJsonResponderOrPanic(
-			http.StatusOK,
-			httpmock.File(suite.FixturePath("releases_page_2.json"))))
-	suite.RegisterMetadataResponder(
-		httpmock.NewJsonResponderOrPanic(
-			http.StatusOK,
-			suite.GetFixture("metadata.json")))
-	suite.RegisterArtifactsResponder(
-		httpmock.NewJsonResponderOrPanic(
-			http.StatusOK,
-			suite.GetFixture("artifacts.json")))
-}
-
-func (suite *MetadataTestSuite) GetFixture(name string) httpmock.File {
-	return httpmock.File(suite.FixturePath(name))
-}
-
-func (suite *MetadataTestSuite) Register1PageResponder(resp httpmock.Responder) {
-	httpmock.RegisterResponderWithQuery(
-		http.MethodGet,
-		"https://api.github.com/repos/9seconds/chore/releases",
-		"page=1&per_page=100",
-		resp)
-}
-
-func (suite *MetadataTestSuite) Register2PageResponder(resp httpmock.Responder) {
-	httpmock.RegisterResponderWithQuery(
-		http.MethodGet,
-		"https://api.github.com/repos/9seconds/chore/releases",
-		"page=2&per_page=100",
-		resp)
-}
-
-func (suite *MetadataTestSuite) RegisterMetadataResponder(resp httpmock.Responder) {
-	httpmock.RegisterResponder(
-		http.MethodGet,
-		"https://github.com/9seconds/chore/releases/download/v0.0.1/metadata.json",
-		resp)
-}
-
-func (suite *MetadataTestSuite) RegisterArtifactsResponder(resp httpmock.Responder) {
-	httpmock.RegisterResponder(
-		http.MethodGet,
-		"https://github.com/9seconds/chore/releases/download/v0.0.1/artifacts.json",
-		resp)
+	UpdateTestSuite
 }
 
 func (suite *MetadataTestSuite) TestBadPaging() {
@@ -86,6 +25,9 @@ func (suite *MetadataTestSuite) TestBadPaging() {
 		"err":        httpmock.NewErrorResponder(errors.New("err")),
 		"bad_status": httpmock.NewStringResponder(http.StatusBadRequest, "[]"),
 		"bad_json":   httpmock.NewStringResponder(http.StatusOK, ""),
+		"bad_reader": testlib.NetworkResponderFromReader(
+			http.StatusOK,
+			testlib.NetworkBrokenReader()),
 	}
 	withUnstable := []bool{true, false}
 
@@ -122,6 +64,9 @@ func (suite *MetadataTestSuite) TestBadFiles() {
 		"_err":        httpmock.NewErrorResponder(errors.New("err")),
 		"_bad_status": httpmock.NewStringResponder(http.StatusBadRequest, "[]"),
 		"_bad_json":   httpmock.NewStringResponder(http.StatusOK, ""),
+		"_bad_reader": testlib.NetworkResponderFromReader(
+			http.StatusOK,
+			testlib.NetworkBrokenReader()),
 		"metadata_bad_project": httpmock.NewJsonResponderOrPanic(
 			http.StatusOK,
 			suite.GetFixture("metadata_bad_project.json")),
@@ -254,12 +199,8 @@ func (suite *MetadataTestSuite) TestOk() {
 	release, err := update.GetLatestRelease(suite.Context(), true)
 	suite.NoError(err)
 	suite.Equal("0.0.1", release.Version)
-	suite.Equal(
-		"https://github.com/9seconds/chore/releases/download/v0.0.1/chore_0.0.1_linux_amd64.tar.gz",
-		release.ArchiveURL)
-	suite.Equal(
-		"https://github.com/9seconds/chore/releases/download/v0.0.1/chore_0.0.1_linux_amd64.tar.gz.sig",
-		release.SignatureURL)
+	suite.Equal(URLArchive, release.ArchiveURL)
+	suite.Equal(URLSignature, release.SignatureURL)
 }
 
 func TestMetadata(t *testing.T) {

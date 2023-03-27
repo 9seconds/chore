@@ -1,7 +1,12 @@
 package testlib
 
 import (
+	"bytes"
+	"io"
+	"net/http"
+	"strconv"
 	"testing"
+	"testing/iotest"
 
 	"github.com/9seconds/chore/internal/network"
 	"github.com/jarcoal/httpmock"
@@ -62,4 +67,23 @@ func (suite *NetworkTestSuite) MakeNetConn() *NetConnMock {
 	})
 
 	return connMock
+}
+
+func NetworkResponderFromReader(status int, reader io.Reader) httpmock.Responder {
+	resp := &http.Response{
+		Status:        strconv.Itoa(status) + " " + http.StatusText(status),
+		StatusCode:    status,
+		Body:          io.NopCloser(reader),
+		ContentLength: -1,
+		Header:        http.Header{},
+	}
+
+	return httpmock.ResponderFromResponse(resp)
+}
+
+func NetworkBrokenReader() io.Reader {
+	reader := iotest.OneByteReader(bytes.NewReader([]byte{1, 2, 3, 4}))
+	reader = iotest.TimeoutReader(reader)
+
+	return reader
 }
