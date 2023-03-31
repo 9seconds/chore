@@ -26,6 +26,8 @@ type UpdateTestSuite struct {
 }
 
 func (suite *UpdateTestSuite) SetupSuite() {
+	suite.NetworkTestSuite.SetupSuite()
+
 	if runtime.GOOS != "linux" || runtime.GOARCH != "amd64" {
 		// I can't possibly pass metadata and artifacts for everything
 		// let's concentrate on linux/amd64 only

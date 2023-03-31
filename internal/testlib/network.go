@@ -18,6 +18,17 @@ type NetworkTestSuite struct {
 	dns    *DNSResolverMock
 }
 
+func (suite *NetworkTestSuite) SetupSuite() {
+	httpmock.Activate()
+	httpmock.ActivateNonDefault(network.HTTPClient)
+	httpmock.ActivateNonDefault(network.HTTPClientV4)
+	httpmock.ActivateNonDefault(network.HTTPClientV6)
+}
+
+func (suite *NetworkTestSuite) TearDownSuite() {
+	httpmock.Deactivate()
+}
+
 func (suite *NetworkTestSuite) Setup(t *testing.T) {
 	t.Helper()
 
@@ -27,7 +38,7 @@ func (suite *NetworkTestSuite) Setup(t *testing.T) {
 	httpmock.ActivateNonDefault(network.HTTPClient)
 	httpmock.ActivateNonDefault(network.HTTPClientV4)
 	httpmock.ActivateNonDefault(network.HTTPClientV6)
-	t.Cleanup(httpmock.DeactivateAndReset)
+	t.Cleanup(httpmock.Reset)
 
 	suite.dialer = &DialerMock{}
 	oldDialer := network.NetDialer

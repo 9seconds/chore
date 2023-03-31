@@ -59,7 +59,12 @@ func GetLatestRelease(ctx context.Context, withUnstable bool) (Release, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	retval := Release{}
+	var (
+		retval       Release
+		version      string
+		archiveURL   string
+		signatureURL string
+	)
 
 	release, err := getLatestRelease(ctx, withUnstable)
 
@@ -93,7 +98,7 @@ func GetLatestRelease(ctx context.Context, withUnstable bool) (Release, error) {
 
 		value, err := getVersion(ctx, assets)
 		if err == nil {
-			retval.Version = value
+			version = value
 		} else {
 			select {
 			case errChan <- fmt.Errorf("cannot get the version: %w", err):
@@ -107,8 +112,8 @@ func GetLatestRelease(ctx context.Context, withUnstable bool) (Release, error) {
 
 		archive, signature, err := getArchiveURLs(ctx, assets)
 		if err == nil {
-			retval.ArchiveURL = archive
-			retval.SignatureURL = signature
+			archiveURL = archive
+			signatureURL = signature
 		} else {
 			select {
 			case errChan <- fmt.Errorf("cannot get the url with archive: %w", err):
@@ -117,7 +122,15 @@ func GetLatestRelease(ctx context.Context, withUnstable bool) (Release, error) {
 		}
 	}()
 
-	return retval, <-errChan
+	if err := <-errChan; err != nil {
+		return retval, err
+	}
+
+	retval.Version = version
+	retval.ArchiveURL = archiveURL
+	retval.SignatureURL = signatureURL
+
+	return retval, nil
 }
 
 func getLatestRelease(ctx context.Context, stableOnly bool) (jsonRelease, error) {
