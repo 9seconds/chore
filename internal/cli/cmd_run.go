@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/9seconds/chore/internal/argparse"
+	"github.com/9seconds/chore/internal/cli/base"
 	"github.com/9seconds/chore/internal/cli/validators"
 	"github.com/9seconds/chore/internal/commands"
 	"github.com/9seconds/chore/internal/config"
@@ -23,7 +24,7 @@ func NewRun() *cobra.Command {
 			cobra.MinimumNArgs(2), //nolint: gomnd
 			validators.Script(0, 1),
 		),
-		Run:                   mainRun,
+		Run:                   base.Main(mainRun),
 		ValidArgsFunction:     completeRun,
 		DisableFlagsInUseLine: true,
 		DisableFlagParsing:    true,
@@ -39,43 +40,31 @@ func NewRun() *cobra.Command {
 	return cmd
 }
 
-func mainRun(cmd *cobra.Command, args []string) {
-	exitCode, err := mainRunWrapper(cmd, args)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "command has failed: %v\n", err)
-		commands.Exit(1)
-	}
-
-	if exitCode != 0 {
-		commands.Exit(exitCode)
-	}
-}
-
-func mainRunWrapper(cmd *cobra.Command, args []string) (int, error) {
+func mainRun(cmd *cobra.Command, args []string) error {
 	ctx := cmd.Context()
 	namespace, _ := script.ExtractRealNamespace(args[0])
 
 	conf, err := config.Get()
 	if err != nil {
-		return 0, fmt.Errorf("cannot open application config: %w", err)
+		return fmt.Errorf("cannot open application config: %w", err)
 	}
 
 	scr, err := script.New(namespace, args[1])
 	if err != nil {
-		return 0, fmt.Errorf("cannot initialize script: %w", err)
+		return fmt.Errorf("cannot initialize script: %w", err)
 	}
 
 	if err := scr.EnsureDirs(); err != nil {
-		return 0, fmt.Errorf("cannot initialize script directories: %w", err)
+		return fmt.Errorf("cannot initialize script directories: %w", err)
 	}
 
 	parsedArgs, err := argparse.Parse(args[2:])
 	if err != nil {
-		return 0, fmt.Errorf("cannot parse arguments: %w", err)
+		return fmt.Errorf("cannot parse arguments: %w", err)
 	}
 
 	if err := parsedArgs.Validate(ctx, scr.Config.Flags, scr.Config.Parameters); err != nil {
-		return 0, fmt.Errorf("cannot validate arguments: %w", err)
+		return fmt.Errorf("cannot validate arguments: %w", err)
 	}
 
 	confEnviron := conf.Environ(namespace)
@@ -101,7 +90,7 @@ func mainRunWrapper(cmd *cobra.Command, args []string) (int, error) {
 		os.Stderr)
 
 	if err := runCmd.Start(ctx); err != nil {
-		return 0, fmt.Errorf("cannot start command: %w", err)
+		return fmt.Errorf("cannot start command: %w", err)
 	}
 
 	log.Printf("command %s has started as %d", scr, runCmd.Pid())
@@ -116,5 +105,7 @@ func mainRunWrapper(cmd *cobra.Command, args []string) (int, error) {
 		result.SystemTime,
 		result.ElapsedTime)
 
-	return result.ExitCode, nil
+	return base.ErrExit{
+		Code: result.ExitCode,
+	}
 }

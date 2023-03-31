@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/9seconds/chore/internal/cli/base"
 	"github.com/9seconds/chore/internal/cli/validators"
 	"github.com/9seconds/chore/internal/vault"
 	"github.com/spf13/cobra"
@@ -25,7 +26,7 @@ func NewSet() *cobra.Command {
 			cobra.RangeArgs(2, 3), //nolint: gomnd
 			validators.Namespace(0),
 		),
-		RunE: main(func(cmd *cobra.Command, vlt vault.Vault, args []string) (bool, error) {
+		Run: base.Main(main(func(cmd *cobra.Command, vlt vault.Vault, args []string) (bool, error) {
 			var (
 				value string
 				err   error
@@ -44,7 +45,7 @@ func NewSet() *cobra.Command {
 			vlt.Set(args[0], value)
 
 			return true, nil
-		}),
+		})),
 	}
 }
 

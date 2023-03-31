@@ -35,6 +35,8 @@ regexp = '^\d\w+$'`)
 }
 
 func (suite *CmdRunTestSuite) TestOk() {
+	suite.ExitMock(0).Once()
+
 	_, err := suite.ExecuteCommand("ns", "s", "param=ppp")
 	suite.NoError(err)
 }

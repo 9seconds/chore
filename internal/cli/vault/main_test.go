@@ -40,13 +40,27 @@ ns = "xxx"`, edit.ConfigDefaultPermission)
 }
 
 func (suite *VaultTestSuite) TestUnknownPassword() {
-	_, err := suite.ExecuteCommand("list", "xx")
-	suite.ErrorContains(err, "cannot find out correct password")
+	suite.ExitMock(1).Once()
+
+	ctx, err := suite.ExecuteCommand("list", "xx")
+	suite.NoError(err)
+	suite.Contains(ctx.Stderr.String(), "cannot find out correct password")
 }
 
 func (suite *VaultTestSuite) TestEmptyPassword() {
-	_, err := suite.ExecuteCommand("list", "z")
-	suite.ErrorContains(err, "password is empty")
+	suite.ExitMock(1).Once()
+
+	ctx, err := suite.ExecuteCommand("list", "z")
+	suite.NoError(err)
+	suite.Contains(ctx.Stderr.String(), "password is empty")
+}
+
+func (suite *VaultTestSuite) TestKeyUnknown() {
+	suite.ExitMock(1).Once()
+
+	ctx, err := suite.ExecuteCommand("get", "ns", "k")
+	suite.NoError(err)
+	suite.Contains(ctx.Stderr.String(), "key is unknown")
 }
 
 func (suite *VaultTestSuite) TestCRUD() {
@@ -54,10 +68,6 @@ func (suite *VaultTestSuite) TestCRUD() {
 	suite.NoError(err)
 	suite.Empty(ctx.StdoutLines())
 	suite.Empty(ctx.StderrLines())
-
-	ctx, err = suite.ExecuteCommand("get", "ns", "k")
-	suite.ErrorIs(err, vault.ErrKeyUnknown)
-	suite.Contains(ctx.Stderr.String(), err.Error())
 
 	ctx, err = suite.ExecuteCommand("set", "ns", "k", "v")
 	suite.NoError(err)
@@ -78,10 +88,6 @@ func (suite *VaultTestSuite) TestCRUD() {
 	suite.NoError(err)
 	suite.Empty(ctx.StdoutLines())
 	suite.Empty(ctx.StderrLines())
-
-	ctx, err = suite.ExecuteCommand("get", "ns", "k")
-	suite.ErrorIs(err, vault.ErrKeyUnknown)
-	suite.Contains(ctx.Stderr.String(), err.Error())
 }
 
 func TestVault(t *testing.T) {

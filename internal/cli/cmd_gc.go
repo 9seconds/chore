@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 
+	"github.com/9seconds/chore/internal/cli/base"
 	"github.com/9seconds/chore/internal/gc"
 	"github.com/9seconds/chore/internal/script"
 	"github.com/spf13/cobra"
@@ -13,7 +14,7 @@ func NewGC() *cobra.Command {
 		Use:               "gc",
 		Short:             "Cleanup garbage in chore directories",
 		Args:              cobra.NoArgs,
-		RunE:              mainGC,
+		Run:               base.Main(mainGC),
 		ValidArgsFunction: cobra.NoFileCompletions,
 	}
 

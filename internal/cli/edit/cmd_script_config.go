@@ -22,7 +22,7 @@ func NewScriptConfig() *cobra.Command {
 			cobra.ExactArgs(2), //nolint: gomnd
 			validators.Script(0, 1),
 		),
-		RunE: main(func(args []string, content io.Writer) (string, fs.FileMode, error) {
+		Run: main(func(args []string, content io.Writer) (string, fs.FileMode, error) {
 			namespace, _ := script.ExtractRealNamespace(args[0])
 			scr := &script.Script{
 				Namespace:  namespace,

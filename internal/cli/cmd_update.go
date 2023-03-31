@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 
+	"github.com/9seconds/chore/internal/cli/base"
 	"github.com/9seconds/chore/internal/update"
 	"github.com/minio/selfupdate"
 	"github.com/spf13/cobra"
@@ -13,7 +14,7 @@ func NewUpdate() *cobra.Command {
 		Use:               "update",
 		Short:             "Check, verify and update binary in place.",
 		Args:              cobra.NoArgs,
-		RunE:              mainSelfUpdate,
+		Run:               base.Main(mainSelfUpdate),
 		ValidArgsFunction: cobra.NoFileCompletions,
 	}
 

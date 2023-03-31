@@ -6,6 +6,7 @@ import (
 	"io/fs"
 	"os"
 
+	"github.com/9seconds/chore/internal/cli/base"
 	"github.com/9seconds/chore/internal/cli/completions"
 	"github.com/9seconds/chore/internal/cli/validators"
 	"github.com/9seconds/chore/internal/script"
@@ -23,7 +24,7 @@ func NewRename() *cobra.Command {
 			cobra.ExactArgs(3), //nolint: gomnd
 			validators.Script(0, 1),
 		),
-		RunE: mainRename,
+		Run: base.Main(mainRename),
 	}
 
 	cmd.Flags().BoolP("force", "f", false, "Do, not ask")

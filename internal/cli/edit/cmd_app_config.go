@@ -24,7 +24,7 @@ func NewAppConfig() *cobra.Command {
 		Short:             "Edit chore configuration TOML",
 		Args:              cobra.NoArgs,
 		ValidArgsFunction: cobra.NoFileCompletions,
-		RunE: main(func(args []string, content io.Writer) (string, fs.FileMode, error) {
+		Run: main(func(args []string, content io.Writer) (string, fs.FileMode, error) {
 			namespaces, err := script.ListNamespaces()
 			if err != nil {
 				namespaces = nil

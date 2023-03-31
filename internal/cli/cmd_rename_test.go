@@ -34,10 +34,13 @@ func (suite *CmdRenameTestSuite) TestCannotMoveUnknownScript() {
 }
 
 func (suite *CmdRenameTestSuite) TestHasOffendingDirectory() {
+	suite.ExitMock(1).Once()
+
 	suite.EnsureDir(paths.CacheNamespaceScript("ns", "x"))
 
-	_, err := suite.ExecuteCommand("ns", "s", "x")
-	suite.ErrorContains(err, "it prevents renaming")
+	ctx, err := suite.ExecuteCommand("ns", "s", "x")
+	suite.NoError(err)
+	suite.Contains(ctx.Stderr.String(), "it prevents renaming")
 }
 
 func (suite *CmdRenameTestSuite) TestHasOffendingDirectoryForce() {

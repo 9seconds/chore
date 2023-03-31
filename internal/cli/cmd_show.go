@@ -14,6 +14,7 @@ import (
 	"text/tabwriter"
 	"unicode"
 
+	"github.com/9seconds/chore/internal/cli/base"
 	"github.com/9seconds/chore/internal/cli/completions"
 	"github.com/9seconds/chore/internal/cli/validators"
 	"github.com/9seconds/chore/internal/script"
@@ -51,7 +52,7 @@ func NewShow() *cobra.Command {
 			validators.ArgumentOptional(0, validators.Namespace(0)),
 			validators.ArgumentOptional(1, validators.Script(0, 1)),
 		),
-		RunE:              mainShow,
+		Run:               base.Main(mainShow),
 		ValidArgsFunction: completions.CompleteNamespaceScript,
 	}
 

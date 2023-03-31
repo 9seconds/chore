@@ -7,13 +7,14 @@ import (
 	"io/fs"
 	"os"
 
+	"github.com/9seconds/chore/internal/cli/base"
 	"github.com/spf13/cobra"
 )
 
 type mainCallback func([]string, io.Writer) (string, fs.FileMode, error)
 
-func main(callback mainCallback) cobra.PositionalArgs {
-	return func(cmd *cobra.Command, args []string) error {
+func main(callback mainCallback) func(*cobra.Command, []string) {
+	return base.Main(func(cmd *cobra.Command, args []string) error {
 		editor, _ := cmd.Flags().Lookup("editor").Value.(*FlagEditor).Get()
 		buf := bytes.Buffer{}
 
@@ -35,5 +36,5 @@ func main(callback mainCallback) cobra.PositionalArgs {
 		}
 
 		return nil
-	}
+	})
 }

@@ -2,22 +2,18 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"github.com/9seconds/chore/internal/cli"
-	"github.com/9seconds/chore/internal/commands"
 	"github.com/gosimple/slug"
 )
 
 var version = "dev"
 
 func main() {
-	defer commands.Exit(0)
-
 	slug.Lowercase = false
 	slug.MaxLength = 100
 
@@ -57,8 +53,8 @@ func main() {
 	root.SetErr(os.Stderr)
 
 	if err := root.ExecuteContext(ctx); err != nil {
-		fmt.Fprintln(os.Stderr, err.Error())
-		commands.Exit(1)
+		cancel()
+		log.Fatal(err)
 	}
 
 	cancel()

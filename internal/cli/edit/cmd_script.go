@@ -30,7 +30,7 @@ func NewScript() *cobra.Command {
 			validators.ASCIIName(0, validators.ErrNamespaceInvalid),
 			validators.ASCIIName(1, validators.ErrScriptInvalid),
 		),
-		RunE: main(func(args []string, content io.Writer) (string, fs.FileMode, error) {
+		Run: main(func(args []string, content io.Writer) (string, fs.FileMode, error) {
 			namespace, _ := script.ExtractRealNamespace(args[0])
 			scr := &script.Script{
 				Namespace:  namespace,

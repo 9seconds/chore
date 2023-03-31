@@ -7,6 +7,7 @@ import (
 	"os"
 	"sort"
 
+	"github.com/9seconds/chore/internal/cli/base"
 	"github.com/9seconds/chore/internal/cli/completions"
 	"github.com/9seconds/chore/internal/cli/validators"
 	"github.com/9seconds/chore/internal/script"
@@ -24,7 +25,7 @@ func NewRemove() *cobra.Command {
 			cobra.MinimumNArgs(2), //nolint: gomnd
 			validators.Namespace(0),
 		),
-		RunE: mainRemove,
+		Run: base.Main(mainRemove),
 	}
 
 	cmd.Flags().BoolP("dry-run", "n", false, "dry run")

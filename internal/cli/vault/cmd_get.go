@@ -3,6 +3,7 @@ package vault
 import (
 	"errors"
 
+	"github.com/9seconds/chore/internal/cli/base"
 	"github.com/9seconds/chore/internal/cli/validators"
 	"github.com/9seconds/chore/internal/vault"
 	"github.com/spf13/cobra"
@@ -21,7 +22,7 @@ func NewGet() *cobra.Command {
 			cobra.ExactArgs(2), //nolint: gomnd
 			validators.Namespace(0),
 		),
-		RunE: main(func(cmd *cobra.Command, vlt vault.Vault, args []string) (bool, error) {
+		Run: base.Main(main(func(cmd *cobra.Command, vlt vault.Vault, args []string) (bool, error) {
 			value, ok := vlt.Get(args[0])
 
 			if !ok {
@@ -31,6 +32,6 @@ func NewGet() *cobra.Command {
 			cmd.Println(value)
 
 			return false, nil
-		}),
+		})),
 	}
 }
