@@ -65,4 +65,4 @@ these tasks:
 8. It does not oblige your script to be a part of some frameworks or be implemented
    in any language
 
-Please proceed to Wiki if you are interested.
+Please proceed to [Wiki](https://github.com/9seconds/chore/wiki) if you are interested.
