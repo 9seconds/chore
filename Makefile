@@ -61,7 +61,7 @@ benchmark:
 
 .PHONY: full-test
 full-test:
-	@go test -parallel $(shell nproc) -cover -coverprofile coverage.out ./...
+	@go test -race -cover -coverprofile coverage.out ./...
 
 .PHONY: lint
 lint: $(GOBIN)/golangci-lint
