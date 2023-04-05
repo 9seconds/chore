@@ -3,12 +3,11 @@
 chore is an executor, environment, and management for scripts that help to
 perform some routine operations.
 
-Here is a list of cool titles:
+Here is a short list of cool titles:
 
 1. A Sometimes Better Management for Homebrew Scripts
 2. Even Superheroes Wash Floors
-3. Management of a set of self-contained scripts and their secrets.
-4. Blazingly fast 🚀 script management
+3. Blazingly fast 🚀 script management
 
 And here is the elevator pitch.
 
@@ -25,7 +24,8 @@ Most of such scripts are quick-and-dirty dumps that expect only happy paths and
 do not manage errors. They usually do not have tests (do you test your Bash
 scripts?), primitive error management, or incoming parameter validation. But
 this is not because I am sloppy: I like to have such things, they just bloat a
-code unnecessarily.
+code unnecessarily. Even parsing of parameters could take more lines of code
+than actual usage.
 
 For example, if I have a script
 
@@ -51,18 +51,19 @@ hash, etc. What if some execution environment provides you with some data?
 This is what chore is. It is an attempt to express how I manage
 these tasks:
 
-1. chore is a script runner that knows where your scripts are placed.
-2. Each script has its name and belongs to some namespace.
-3. namespaces are movable between different machines.
-4. Each namespace has its secret vault.
-5. Each script has a defined set of named parameters with a description of how
-   to validate them.
-6. chore generates many environment variables with data commonly required
-   by such scripts (IP addresses, dates and times, commit hashes, machine ids
-   , etc) so all you need is just to get it from the environment
-7. maintains XDG directories for them and provides a correct temporary directory
-   for each script run
-8. It does not oblige your script to be a part of some frameworks or be implemented
+1. chore is a script runner that runs scripts organized under simple convention.
+2. Each script could have an external configuration describing named parameters,
+   its purpose etc.
+3. Each script has its way to run other scripts from the same namespace so namespace
+   is self contained and movable.
+4. Each namespace has its secret vault, safe to move along with a namespace.
+5. chore prepopulates tens of commonly used values like start time, ip address,
+   machine id, git commit, geolocation and push them into scripts so they can
+   immediately use them
+6. maintains XDG directories for them and provides a correct temporary directory
+   for each script run. You can think that all related directories are prepared
+   beforehand, even temporary one.
+7. It does not oblige your script to be a part of some frameworks or be implemented
    in any language
 
-Please proceed to [Wiki](https://github.com/9seconds/chore/wiki) if you are interested.
+If you are interested, please proceed to [Wiki](https://github.com/9seconds/chore/wiki).
