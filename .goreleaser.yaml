@@ -37,7 +37,6 @@ archives:
     format: "tar.gz"
     wrap_in_directory: false
     strip_parent_binary_folder: true
-    rlcp: true
     files:
       - LICENSE
       - README.md
