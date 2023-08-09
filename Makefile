@@ -2,7 +2,7 @@ APP_NAME := chore
 GOBIN    := .bin
 
 GOLANGCI_LINT_VERSION := v1.52.2
-GOFUMPT_VERSION       := v0.4.0
+GOFUMPT_VERSION       := v0.5.0
 GORELEASER_VERSION    := v1.16.2
 
 STATIC_FLAGS := -buildmode=pie -modcacherw -trimpath -mod=readonly -ldflags=-linkmode=external -ldflags=-buildid='' -ldflags="-s -w"
