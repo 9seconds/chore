@@ -77,7 +77,7 @@ clean:
 
 .PHONY: update
 update:
-	@go get -u && go mod tidy -go=1.20
+	@go get -u && go mod tidy -go=1.21
 
 .PHONY: clean-dist
 clean-dist:
