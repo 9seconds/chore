@@ -159,7 +159,7 @@ func getLatestRelease(ctx context.Context, stableOnly bool) (jsonRelease, error)
 		for _, rel := range theseReleases {
 			switch {
 			case rel.Draft, stableOnly && rel.Prerelease:
-			case target.CreatedAt == "", target.CreatedAt > rel.CreatedAt:
+			case target.CreatedAt == "", target.CreatedAt < rel.CreatedAt:
 				target = rel
 			}
 		}
