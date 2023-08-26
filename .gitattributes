@@ -1,0 +1,3 @@
+*              text=auto
+*.go           diff=golang
+**/testdata/** -merge
