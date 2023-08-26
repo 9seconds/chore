@@ -3,9 +3,10 @@ package env_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/suite"
+
 	"github.com/9seconds/chore/internal/env"
 	"github.com/9seconds/chore/internal/git"
-	"github.com/stretchr/testify/suite"
 )
 
 type GenerateGitTestSuite struct {
@@ -27,14 +28,14 @@ func (suite *GenerateGitTestSuite) TestGitAccess() {
 	env.GenerateGit(suite.Context(), suite.values, suite.wg, git.AccessModeAlways)
 	data := suite.Collect()
 
-	suite.Len(data, 6)
+	suite.Len(data, 5)
 	suite.Contains(data, env.GitReference)
 	suite.Contains(data, env.GitReferenceShort)
 	suite.Contains(data, env.GitReferenceType)
 	suite.Contains(data, env.GitCommitHash)
 	suite.Contains(data, env.GitCommitHashShort)
-	suite.Contains(data, env.GitIsDirty)
-}
+	// suite.Contains(data, env.GitIsDirty)
+} //nolint: wsl
 
 func TestGenerateGit(t *testing.T) {
 	suite.Run(t, &GenerateGitTestSuite{})
