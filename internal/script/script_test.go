@@ -9,19 +9,18 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Showmax/go-fqdn"
-	"github.com/adrg/xdg"
-	"github.com/jarcoal/httpmock"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"github.com/stretchr/testify/suite"
-
 	"github.com/9seconds/chore/internal/argparse"
 	"github.com/9seconds/chore/internal/env"
 	"github.com/9seconds/chore/internal/git"
 	"github.com/9seconds/chore/internal/paths"
 	"github.com/9seconds/chore/internal/script"
 	"github.com/9seconds/chore/internal/testlib"
+	"github.com/Showmax/go-fqdn"
+	"github.com/adrg/xdg"
+	"github.com/jarcoal/httpmock"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/suite"
 )
 
 type ScriptTestSuite struct {
@@ -159,7 +158,7 @@ func (suite *ScriptTestSuite) TestEnviron() {
 		require.True(suite.T(), found)
 	}
 
-	count := 47
+	count := 48
 
 	suite.Equal(scr.Namespace, data[env.Namespace])
 	suite.Equal(scr.Executable, data[env.Caller])
@@ -202,7 +201,7 @@ func (suite *ScriptTestSuite) TestEnviron() {
 	suite.Contains(data, env.GitReferenceType)
 	suite.Contains(data, env.GitCommitHash)
 	suite.Contains(data, env.GitCommitHashShort)
-	// suite.Contains(data, env.GitIsDirty)
+	suite.Contains(data, env.GitIsDirty)
 
 	if value, err := os.Hostname(); err == nil {
 		suite.Equal(value, data[env.Hostname])

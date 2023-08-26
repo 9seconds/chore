@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"os"
+	"strconv"
 	"sync"
 
 	"github.com/9seconds/chore/internal/git"
@@ -62,14 +63,10 @@ func GenerateGit(ctx context.Context, results chan<- string, waiters *sync.WaitG
 			sendValue(ctx, results, GitReferenceType, git.RefTypeCommit.String())
 		}
 
-		// as of 2023-08-26, getting status of the repositroy takes about 1
-		// minute in my production environment. This all makes getting git
-		// status quite weird idea that I would personally like to avoid.
-
-		// if isDirty, err := repo.IsDirty(); err != nil {
-		// 	log.Printf("cannot detect if repository is dirty: %v", err)
-		// } else {
-		// 	sendValue(ctx, results, GitIsDirty, strconv.FormatBool(isDirty))
-		// }
-	}() //nolint: wsl
+		if isDirty, err := repo.IsDirty(); err != nil {
+			log.Printf("cannot detect if repository is dirty: %v", err)
+		} else {
+			sendValue(ctx, results, GitIsDirty, strconv.FormatBool(isDirty))
+		}
+	}()
 }
