@@ -33,7 +33,7 @@ description = "Amazing {{ .Executable }} of {{ .Namespace }}"
 #
 # It can be useful if you access many repository as a part of some chore
 # script.
-git = "if_undefined"  # default value
+git = "no"
 
 # Decide if network has to be accessed to provide you with a data
 # related to your IP address.
