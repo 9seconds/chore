@@ -3,7 +3,7 @@ GOBIN    := .bin
 
 GOLANGCI_LINT_VERSION := v1.54.2
 GOFUMPT_VERSION       := v0.5.0
-GORELEASER_VERSION    := v1.19.2
+GORELEASER_VERSION    := v1.20.0
 
 STATIC_FLAGS := -buildmode=pie -modcacherw -trimpath -mod=readonly -ldflags=-linkmode=external -ldflags=-buildid='' -ldflags="-s -w"
 GOTOOL       := env "GOBIN=$(abspath $(GOBIN))" "PATH=$(abspath $(GOBIN)):$(PATH)"
